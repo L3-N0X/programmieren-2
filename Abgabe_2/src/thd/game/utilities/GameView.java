@@ -71,13 +71,9 @@ import java.util.stream.Collectors;
  */
 public final class GameView {
 
-    /**
-     * Breite der Leinwand in Pixeln.
-     */
+    /** Breite der Leinwand in Pixeln. */
     public static final int WIDTH = 1280;
-    /**
-     * Höhe der Leinwand in Pixeln.
-     */
+    /** Höhe der Leinwand in Pixeln. */
     public static final int HEIGHT = 720;
 
     private static int instances = 0;
@@ -1059,6 +1055,7 @@ public final class GameView {
             center.setBackground(Color.BLACK);
             center.add(paintingPanel);
 
+
             // Struktur
             paintingPanel.setPreferredSize(new Dimension(GameView.WIDTH, GameView.HEIGHT));
             JPanel paintingPanelAndStatusBar = new JPanel(new BorderLayout(0, 0));
@@ -1075,6 +1072,7 @@ public final class GameView {
             setTitle(Version.getStandardTitle());
             paintingPanel.setFocusable(false);
             setResizable(true);
+
 
             // Listeners
             KeyListener keyListener = new KeyListener() {
@@ -1520,7 +1518,7 @@ public final class GameView {
                     imageFromDisk = ImageIO.read(resourceUrl);
                     Objects.requireNonNull(imageFromDisk,
                             () -> "ImageFile \"" + imageFileName
-                                    + "\" konnte nicht geladen werden oder ist kein gültiges Bildformat!");
+                                  + "\" konnte nicht geladen werden oder ist kein gültiges Bildformat!");
                 } catch (IOException e) {
                     throw new UncheckedIOException("Fehler beim Lesen der Bilddatei: " + imageFileName, e);
                 }
@@ -1667,7 +1665,7 @@ public final class GameView {
         private void setMouseCursor(String cursorImageFileName, boolean centered) {
             URL resourceUrl = GameView.class.getResource(Tools.RESOURCE_PREFIX + cursorImageFileName);
             Objects.requireNonNull(resourceUrl, () -> "Cursor-Datei konnte nicht gefunden werden: "
-                    + Tools.RESOURCE_PREFIX + cursorImageFileName);
+                                                      + Tools.RESOURCE_PREFIX + cursorImageFileName);
             Image im = new ImageIcon(resourceUrl).getImage();
             SwingUtilities.invokeLater(() -> paintingPanel.setCursor(createCursor(im, centered)));
         }

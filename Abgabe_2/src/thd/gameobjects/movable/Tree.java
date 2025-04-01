@@ -1,9 +1,7 @@
-package thd.gameobjects.unmoveable;
+package thd.gameobjects.movable;
 
 import thd.game.utilities.GameView;
 import thd.gameobjects.base.Position;
-
-import java.awt.*;
 
 public class Tree {
     GameView gameView;
@@ -26,7 +24,7 @@ public class Tree {
     }
 
     public void addToCanvas() {
-        gameView.addTextToCanvas("Objekt 1", position.getX(), position.getY(), size, true, Color.YELLOW, rotation);
+        gameView.addBlockImageToCanvas(TreeBlockImages.TREE, position.getX(), position.getY(), 16, rotation);
     }
 
     @Override

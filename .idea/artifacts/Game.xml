@@ -1,5 +1,5 @@
 <component name="ArtifactManager">
-  <artifact type="jar" build-on-make="true" name="Game">
+  <artifact type="jar" name="Game">
     <output-path>$PROJECT_DIR$/Abgabe_1/src/game</output-path>
     <root id="archive" name="Game.jar">
       <element id="directory" name="META-INF">

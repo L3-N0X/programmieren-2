@@ -1,36 +1,31 @@
 package thd.game.managers;
 
 import thd.game.utilities.GameView;
-import thd.gameobjects.unmoveable.LapTime;
-import thd.gameobjects.unmoveable.Rock;
-import thd.gameobjects.unmoveable.Tree;
+import thd.gameobjects.movable.Rock;
+import thd.gameobjects.movable.Tree;
+import thd.gameobjects.unmovable.LapTimeDisplay;
 
 public class GameManager {
 
-    private Tree tree;
-    private Rock rock;
-    private LapTime lapTime;
-    private GameView gameView;
+    private final Tree tree;
+    private final Rock rock;
+    private final LapTimeDisplay lapTimeDisplay;
+    private final GameView gameView;
 
     GameManager(GameView gameView) {
         tree = new Tree(gameView);
         rock = new Rock(gameView);
-        lapTime = new LapTime(gameView);
+        lapTimeDisplay = new LapTimeDisplay(gameView);
         this.gameView = gameView;
-        startGameLoop();
     }
 
-    void startGameLoop() {
-        while (gameView.isVisible()) {
-            tree.updatePosition();
-            tree.addToCanvas();
+    void gameLoop() {
+        tree.updatePosition();
+        tree.addToCanvas();
 
-            rock.updatePosition();
-            rock.addToCanvas();
+        rock.updatePosition();
+        rock.addToCanvas();
 
-            lapTime.addToCanvas();
-
-            gameView.plotCanvas();
-        }
+        lapTimeDisplay.addToCanvas();
     }
 }

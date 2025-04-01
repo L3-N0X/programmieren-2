@@ -1,9 +1,9 @@
 package thd.game.managers;
 
 import thd.game.utilities.GameView;
-import thd.gameobjects.unmoveable.LapTime;
-import thd.gameobjects.unmoveable.Rock;
-import thd.gameobjects.unmoveable.Tree;
+import thd.gameobjects.unmovable.LapTime;
+import thd.gameobjects.unmovable.Rock;
+import thd.gameobjects.unmovable.Tree;
 
 public class GameManager {
 
