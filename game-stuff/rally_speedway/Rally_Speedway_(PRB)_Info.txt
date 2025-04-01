@@ -1,0 +1,29 @@
+Spielname       Rally Speedway
+Spielart        Rennen - Overhead	
+Publisher       Commodore / Adventure International
+Programmierer   John Anderson	
+Musik-Interpret	keine Musik
+Jahr            1985
+Sprache         Englisch
+Anleitung       vorhanden
+Documents       vorhanden
+Cover           vorhanden
+Spieletest      vorhanden
+Lösung          nicht vorhanden
+Sp-Anzahl       2 Spieler (gleichzeitig)
+Schwierigkeit   mittelmäßig leicht	
+Bewertung       7
+Cheatmodus      nein
+Highscoreliste  nicht vorhanden
+Pgm getestet    ja - Programm OK
+getestet mit    CCS64-v3.0, Vice-v1.20
+Version         Probyte - (kein Crackscreen)
+Steuerung mit   Joystick in Port 2 und Port 1
+True-Drive-Emu  nein
+
+Bemerkungen
+Overhead-Autorennen für zwei Spieler gegeneinander oder einen Spieler gegen die Zeit (kein Computergegner) mit vielen einstellbaren Parametern wie Beschleunigung, Höchstgeschwindigkeit, Bodenhaftung, etc. Extrem witzig im Zwei-Spieler-Modus, auf eisiger, selbsterstellter Strecke mit viel Platz in den Kurven und einem etwa gleichstarken Gegner.  
+
+Wichtiges
+- eingebautenr Streckeneditor mit 6 Vorgabetracks. 
+- Selbst erstellte Tracks speicherbar (24 pro eigener Trackdisk).
