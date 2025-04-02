@@ -4,10 +4,16 @@ import thd.game.utilities.GameView;
 
 import java.awt.*;
 
+/**
+ * Manages the GameView and has the main game loop to plot each frame.
+ */
 public class GameViewManager {
     private final GameView gameView;
     private final GameManager gameManager;
 
+    /**
+     * Creates a new GameView, does its setup and starts the main game loop.
+     */
     public GameViewManager() {
         gameView = new GameView();
         gameView.updateWindowTitle("Rally Speedway");

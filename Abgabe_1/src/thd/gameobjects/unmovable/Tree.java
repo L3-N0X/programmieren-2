@@ -20,11 +20,17 @@ public class Tree {
         rotation = 0;
     }
 
+    /**
+     * Changes the position of the GameObject with a predefined movement
+     */
     public void updatePosition() {
         position.right(speedInPixel);
         rotation++;
     }
 
+    /**
+     * Adds this object to the gameView, this should be called each frame to update the existing object
+     */
     public void addToCanvas() {
         gameView.addTextToCanvas("Objekt 1", position.getX(), position.getY(), size, true, Color.YELLOW, rotation);
     }

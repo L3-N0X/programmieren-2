@@ -1,6 +1,6 @@
 package thd.gameobjects.movable;
 
-public class TreeBlockImages {
+class TreeBlockImages {
     static final String TREE = """
              GGG
             GGGGG

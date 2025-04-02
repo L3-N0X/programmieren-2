@@ -5,7 +5,7 @@ import thd.gameobjects.movable.Rock;
 import thd.gameobjects.movable.Tree;
 import thd.gameobjects.unmovable.LapTimeDisplay;
 
-public class GameManager {
+class GameManager {
 
     private final Tree tree;
     private final Rock rock;

@@ -24,10 +24,16 @@ public class Rock {
         height = 33;
     }
 
+    /**
+     * Changes the position of the GameObject with a predefined movement
+     */
     public void updatePosition() {
         position.left(speedInPixel);
     }
 
+    /**
+     * Adds this object to the gameView, this should be called each frame to update the existing object
+     */
     public void addToCanvas() {
         gameView.addRectangleToCanvas(position.getX(), position.getY(), width, height, 0, true, Color.GREEN);
         gameView.addRectangleToCanvas(position.getX(), position.getY(), width, height, 5, false, Color.WHITE);
