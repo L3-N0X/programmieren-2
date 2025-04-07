@@ -3,9 +3,8 @@ package thd.gameobjects.base;
 import thd.game.utilities.GameView;
 
 /**
- * The position class is used to display positions on the {@link GameView}.
- * The visible part of the canvas is from (0,0) to (1279, 719).
- * Negative values are also supported to render objects outside.
+ * The position class is used to display positions on the {@link GameView}. The visible part of the canvas is from (0,0)
+ * to (1279, 719). Negative values are also supported to render objects outside.
  *
  * @see GameView
  */
@@ -142,6 +141,43 @@ public class Position {
      */
     public void down(double pixel) {
         y += pixel;
+    }
+
+    /**
+     * Calculates the distance to the given position.
+     *
+     * @param other The other position
+     * @return The calculated distance
+     */
+    public double distance(Position other) {
+        return Math.hypot(other.x - x, other.y - y);
+    }
+
+    /**
+     * Moves towards the given position with the given speed.
+     *
+     * @param other        Another position.
+     * @param speedInPixel Speed of movement in a single frame.
+     */
+    public void moveToPosition(Position other, double speedInPixel) {
+        double distance = distance(other);
+        if (distance <= speedInPixel) {
+            updateCoordinates(other);
+        } else {
+            right((other.x - x) / distance * speedInPixel);
+            down((other.y - y) / distance * speedInPixel);
+        }
+    }
+
+    /**
+     * Checks if this position is similar to the other position.
+     *
+     * @param other Another position.
+     * @return True if this position has the same x- and y-coordinates as the other position, when both are rounded to
+     * <code>int</code>.
+     */
+    public boolean similarTo(Position other) {
+        return Math.round(x) == Math.round(other.x) && Math.round(y) == Math.round(other.y);
     }
 
     @Override

@@ -1,20 +1,16 @@
 package thd.gameobjects.movable;
 
 import thd.game.utilities.GameView;
+import thd.gameobjects.base.GameObject;
 import thd.gameobjects.base.Position;
 
 /**
  * A BlockImage of a tree as GameObject.
  */
-public class Tree {
-    private final GameView gameView;
-    private final Position position;
-    private final double speedInPixel;
-    private double rotation;
+public class Tree extends GameObject {
     private static final int TREE_BLOCK_SIZE = 16;
-    private final int size;
-    private final int width;
-    private final int height;
+    private final ShakeMovementPattern shakeMovementPattern;
+    private Position shakeOrigin;
 
     /**
      * Creates a new moving Tree BlockImage in the game at a default position.
@@ -23,26 +19,28 @@ public class Tree {
      * @see TreeBlockImages for the Image that gets rendered
      */
     public Tree(GameView gameView) {
-        this.gameView = gameView;
-        position = new Position(0, (double) GameView.HEIGHT / 2);
+        super(gameView);
+        position.updateCoordinates(0, (double) GameView.HEIGHT / 2);
         speedInPixel = 5;
-        rotation = 0;
         size = 1;
         width = TREE_BLOCK_SIZE * 4;
         height = TREE_BLOCK_SIZE * 7;
+        shakeMovementPattern = new ShakeMovementPattern();
+        shakeOrigin = new Position(position);
     }
 
-    /**
-     * Changes the position of the GameObject with a predefined movement.
-     */
+    @Override
     public void updatePosition() {
-        position.right(speedInPixel);
-        rotation++;
+        if (gameView.timer(1000, 3000, this)) {
+            position.updateCoordinates(shakeMovementPattern.nextPosition(shakeOrigin, 8));
+        } else {
+            position.right(speedInPixel);
+            rotation++;
+            shakeOrigin.updateCoordinates(position);
+        }
     }
 
-    /**
-     * Adds this object to the {@link thd.game.utilities.GameView}, this should be called each frame to update the existing object.
-     */
+    @Override
     public void addToCanvas() {
         gameView.addBlockImageToCanvas(TreeBlockImages.TREE, position.getX(), position.getY(), TREE_BLOCK_SIZE, rotation);
     }
