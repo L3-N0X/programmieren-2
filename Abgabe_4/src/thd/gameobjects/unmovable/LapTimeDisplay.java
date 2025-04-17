@@ -19,9 +19,9 @@ public class LapTimeDisplay extends GameObject {
     public LapTimeDisplay(GameView gameView) {
         super(gameView);
         size = 20;
-        position.updateCoordinates(new Position(30, (int) (GameView.HEIGHT - size - 50)));
-        width = 150;
+        width = 90;
         height = 50;
+        position.updateCoordinates(new Position(30, (int) (GameView.HEIGHT - size - height)));
     }
 
     @Override

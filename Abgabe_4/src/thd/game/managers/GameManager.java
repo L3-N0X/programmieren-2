@@ -1,31 +1,44 @@
 package thd.game.managers;
 
 import thd.game.utilities.GameView;
-import thd.gameobjects.movable.Rock;
-import thd.gameobjects.movable.Tree;
+import thd.gameobjects.movable.*;
+import thd.gameobjects.unmovable.BestTimeDisplay;
 import thd.gameobjects.unmovable.LapTimeDisplay;
+import thd.gameobjects.unmovable.LastTimeDisplay;
 
-class GameManager {
-
-    private final Tree tree;
-    private final Rock rock;
-    private final LapTimeDisplay lapTimeDisplay;
-    private final GameView gameView;
+class GameManager extends UserControlledGameObjectPool {
 
     GameManager(GameView gameView) {
-        tree = new Tree(gameView);
-        rock = new Rock(gameView);
+        super(gameView);
+        houseBig = new HouseBig(gameView);
+        rocksVeryMany = new RocksVeryMany(gameView);
+        trackHorizontal = new TrackHorizontal(gameView);
+        trackBendLE = new TrackBendLE(gameView);
+        trackCurveN = new TrackCurveN(gameView);
+        houseCorner = new HouseCorner(gameView);
+        car = new Car(gameView);
         lapTimeDisplay = new LapTimeDisplay(gameView);
-        this.gameView = gameView;
+        lastTimeDisplay = new LastTimeDisplay(gameView);
+        bestTimeDisplay = new BestTimeDisplay(gameView);
     }
 
-    void gameLoop() {
-        tree.updatePosition();
-        tree.addToCanvas();
+    @Override
+    protected void gameLoop() {
+        super.gameLoop();
 
-        rock.updatePosition();
-        rock.addToCanvas();
-        
+        rocksVeryMany.addToCanvas();
+        houseBig.addToCanvas();
+        trackBendLE.addToCanvas();
+        trackHorizontal.addToCanvas();
+        trackCurveN.addToCanvas();
+        houseCorner.addToCanvas();
+
+        car.updateStatus();
+        car.updatePosition();
+        car.addToCanvas();
+
         lapTimeDisplay.addToCanvas();
+        lastTimeDisplay.addToCanvas();
+        bestTimeDisplay.addToCanvas();
     }
 }

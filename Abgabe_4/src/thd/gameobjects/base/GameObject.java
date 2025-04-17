@@ -34,6 +34,12 @@ public class GameObject {
     }
 
     /**
+     * Updates the status of the game object.
+     */
+    public void updateStatus() {
+    }
+
+    /**
      * Draws the game object to the canvas.
      */
     public void addToCanvas() {

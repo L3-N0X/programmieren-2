@@ -10,6 +10,7 @@ import java.awt.*;
 public class GameViewManager {
     private final GameView gameView;
     private final GameManager gameManager;
+    //public static final boolean DEBUG = false;
 
     /**
      * Creates a new GameView, does its setup and starts the main game loop.
@@ -20,6 +21,13 @@ public class GameViewManager {
         gameView.updateStatusText("Leon Gött - Java Programmierung SS 2025");
         gameView.updateWindowIcon("icon.png");
         gameView.updateBackgroundColor(new Color(0x62d532));
+
+        gameView.updateColorForBlockImage('A', new Color(44, 61, 236));
+        gameView.updateColorForBlockImage('D', new Color(98, 213, 50));
+        gameView.updateColorForBlockImage('E', new Color(175, 60, 88));
+        gameView.updateColorForBlockImage('F', new Color(205, 205, 205));
+        gameView.updateColorForBlockImage('H', new Color(255, 255, 70));
+
         gameManager = new GameManager(gameView);
         startGameLoop();
     }
