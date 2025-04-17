@@ -1,6 +1,5 @@
 package thd.gameobjects.movable;
 
-import thd.game.managers.GameViewManager;
 import thd.game.utilities.GameView;
 import thd.gameobjects.base.GameObject;
 
@@ -20,9 +19,12 @@ public class Car extends GameObject {
     private static final double BREAK_RATE = 1.3;
 
     /**
-     * Checks, if the car is currently breaking
+     * State variable if the car is currently breaking.
      */
     public boolean isBreaking;
+    /**
+     * State variable if the car already started driving.
+     */
     public boolean startedDriving;
 
     private int lastSteeringTime;
@@ -126,11 +128,11 @@ public class Car extends GameObject {
         if (shotInProgress) {
             gameView.addTextToCanvas("X", position.getX(), position.getY(), 34, true, Color.BLACK, rotation, "droidsansmono.ttf");
         } else {
-            gameView.addBlockImageToCanvas(carTiles[carRotation].toString(), position.getX(), position.getY(), size, 0);
+            gameView.addBlockImageToCanvas(carTiles[carRotation].blockImage(), position.getX(), position.getY(), size, 0);
         }
-        if (GameViewManager.DEBUG) {
-            gameView.addTextToCanvas("Speed: " + speedInPixel, 5, 30, 14, true, Color.BLACK, 0);
-        }
+        //if (GameViewManager.DEBUG) {
+        //    gameView.addTextToCanvas("Speed: " + speedInPixel, 5, 30, 14, true, Color.BLACK, 0);
+        //}
         shotInProgress = false;
     }
 

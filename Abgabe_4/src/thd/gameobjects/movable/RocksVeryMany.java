@@ -29,7 +29,7 @@ public class RocksVeryMany extends GameObject {
 
     @Override
     public void addToCanvas() {
-        gameView.addBlockImageToCanvas(GameBlockImages.Track.ROCKS_VERY_MANY, position.getX(), position.getY(), GameBlockImages.BLOCK_SIZE, rotation);
+        gameView.addBlockImageToCanvas(GameBlockImages.TrackTiles.ROCKS_VERY_MANY.blockImage(), position.getX(), position.getY(), GameBlockImages.BLOCK_SIZE, rotation);
     }
 
     @Override

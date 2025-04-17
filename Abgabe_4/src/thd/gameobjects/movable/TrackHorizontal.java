@@ -29,7 +29,7 @@ public class TrackHorizontal extends GameObject {
 
     @Override
     public void addToCanvas() {
-        gameView.addBlockImageToCanvas(GameBlockImages.Track.HORIZONTAL, position.getX(), position.getY(), GameBlockImages.BLOCK_SIZE, rotation);
+        gameView.addBlockImageToCanvas(GameBlockImages.TrackTiles.HORIZONTAL.blockImage(), position.getX(), position.getY(), GameBlockImages.BLOCK_SIZE, rotation);
     }
 
     @Override

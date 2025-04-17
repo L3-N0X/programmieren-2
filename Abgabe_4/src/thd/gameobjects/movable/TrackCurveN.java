@@ -29,7 +29,7 @@ public class TrackCurveN extends GameObject {
 
     @Override
     public void addToCanvas() {
-        gameView.addBlockImageToCanvas(GameBlockImages.Track.CURVE_N, position.getX(), position.getY(), GameBlockImages.BLOCK_SIZE, rotation);
+        gameView.addBlockImageToCanvas(GameBlockImages.TrackTiles.CURVE_S.blockImage(), position.getX(), position.getY(), GameBlockImages.BLOCK_SIZE, rotation);
     }
 
     @Override

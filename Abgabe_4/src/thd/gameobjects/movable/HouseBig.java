@@ -30,7 +30,7 @@ public class HouseBig extends GameObject {
 
     @Override
     public void addToCanvas() {
-        gameView.addBlockImageToCanvas(GameBlockImages.Track.HOUSE_BIG, position.getX(), position.getY(), GameBlockImages.BLOCK_SIZE, rotation);
+        gameView.addBlockImageToCanvas(GameBlockImages.TrackTiles.HOUSE_BIG.blockImage(), position.getX(), position.getY(), GameBlockImages.BLOCK_SIZE, rotation);
     }
 
     @Override

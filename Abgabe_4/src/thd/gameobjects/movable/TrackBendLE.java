@@ -29,7 +29,7 @@ public class TrackBendLE extends GameObject {
 
     @Override
     public void addToCanvas() {
-        gameView.addBlockImageToCanvas(GameBlockImages.Track.BEND_LE, position.getX(), position.getY(), GameBlockImages.BLOCK_SIZE, rotation);
+        gameView.addBlockImageToCanvas(GameBlockImages.TrackTiles.BEND_LE.blockImage(), position.getX(), position.getY(), GameBlockImages.BLOCK_SIZE, rotation);
     }
 
     @Override

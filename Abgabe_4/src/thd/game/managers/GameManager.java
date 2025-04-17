@@ -8,8 +8,12 @@ import thd.gameobjects.unmovable.LastTimeDisplay;
 
 class GameManager extends UserControlledGameObjectPool {
 
+    private final GameObjectManager gameObjectManager;
+
     GameManager(GameView gameView) {
         super(gameView);
+        this.gameObjectManager = new GameObjectManager();
+
         houseBig = new HouseBig(gameView);
         rocksVeryMany = new RocksVeryMany(gameView);
         trackHorizontal = new TrackHorizontal(gameView);
@@ -20,25 +24,22 @@ class GameManager extends UserControlledGameObjectPool {
         lapTimeDisplay = new LapTimeDisplay(gameView);
         lastTimeDisplay = new LastTimeDisplay(gameView);
         bestTimeDisplay = new BestTimeDisplay(gameView);
+
+        gameObjectManager.add(houseBig);
+        gameObjectManager.add(rocksVeryMany);
+        gameObjectManager.add(trackHorizontal);
+        gameObjectManager.add(trackBendLE);
+        gameObjectManager.add(trackCurveN);
+        gameObjectManager.add(houseCorner);
+        gameObjectManager.add(car);
+        gameObjectManager.add(lapTimeDisplay);
+        gameObjectManager.add(lastTimeDisplay);
+        gameObjectManager.add(bestTimeDisplay);
     }
 
     @Override
     protected void gameLoop() {
         super.gameLoop();
-
-        rocksVeryMany.addToCanvas();
-        houseBig.addToCanvas();
-        trackBendLE.addToCanvas();
-        trackHorizontal.addToCanvas();
-        trackCurveN.addToCanvas();
-        houseCorner.addToCanvas();
-
-        car.updateStatus();
-        car.updatePosition();
-        car.addToCanvas();
-
-        lapTimeDisplay.addToCanvas();
-        lastTimeDisplay.addToCanvas();
-        bestTimeDisplay.addToCanvas();
+        gameObjectManager.gameLoop();
     }
 }
