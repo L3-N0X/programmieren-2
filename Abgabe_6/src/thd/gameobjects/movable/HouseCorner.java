@@ -2,12 +2,12 @@ package thd.gameobjects.movable;
 
 import thd.game.managers.GamePlayManager;
 import thd.game.utilities.GameView;
-import thd.gameobjects.base.GameObject;
+import thd.gameobjects.base.CollidingGameObject;
 
 /**
  * A BlockImage of a house as GameObject.
  */
-public class HouseCorner extends GameObject {
+public class HouseCorner extends CollidingGameObject {
 
     /**
      * Creates a new moving House BlockImage in the game at a default position.
@@ -18,11 +18,22 @@ public class HouseCorner extends GameObject {
      */
     public HouseCorner(GameView gameView, GamePlayManager gamePlayManager) {
         super(gameView, gamePlayManager);
-        position.updateCoordinates(128 * GameBlockImages.BLOCK_SIZE, 112 * GameBlockImages.BLOCK_SIZE);
+        position.updateCoordinates(GameBlockImages.TrackTiles.TILE_WIDTH * GameBlockImages.BLOCK_SIZE,
+                                   GameBlockImages.TrackTiles.TILE_HEIGHT * GameBlockImages.BLOCK_SIZE);
         speedInPixel = 0;
         size = GameBlockImages.BLOCK_SIZE;
-        width = 128 * GameBlockImages.BLOCK_SIZE;
-        height = 112 * GameBlockImages.BLOCK_SIZE;
+        width = GameBlockImages.TrackTiles.TILE_WIDTH * GameBlockImages.BLOCK_SIZE;
+        height = GameBlockImages.TrackTiles.TILE_HEIGHT * GameBlockImages.BLOCK_SIZE;
+        hitBoxOffsets(8 * GameBlockImages.BLOCK_SIZE, 8 * GameBlockImages.BLOCK_SIZE, -32 * GameBlockImages.BLOCK_SIZE,
+                      -8 * GameBlockImages.BLOCK_SIZE);
+    }
+
+    @Override
+    public void reactToCollisionWith(CollidingGameObject other) {
+        if (other instanceof Bullet) {
+            gamePlayManager.addPoints(300);
+            gamePlayManager.destroyGameObject(this);
+        }
     }
 
     @Override
@@ -39,5 +50,21 @@ public class HouseCorner extends GameObject {
     @Override
     public String toString() {
         return "Tree: " + position;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        return super.equals(o);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
     }
 }

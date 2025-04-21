@@ -3,15 +3,17 @@ package thd.gameobjects.movable;
 import thd.game.managers.GamePlayManager;
 import thd.game.managers.GameViewManager;
 import thd.game.utilities.GameView;
-import thd.gameobjects.base.GameObject;
+import thd.gameobjects.base.CollidingGameObject;
 import thd.gameobjects.base.MainCharacter;
 
 import java.awt.*;
+import java.util.LinkedList;
+import java.util.Objects;
 
 /**
  * A background tile of a rock formation with many rocks.
  */
-public class Car extends GameObject implements MainCharacter {
+public class Car extends CollidingGameObject implements MainCharacter {
     /**
      * State variable if the car is currently breaking.
      */
@@ -33,6 +35,7 @@ public class Car extends GameObject implements MainCharacter {
     private static final int STEERING_COOLDOWN_IN_MILLISECONDS = 200;
 
     private final GameBlockImages.CarTiles[] carTiles;
+    private final LinkedList<CollidingGameObject> collidingGameObjectsForPathDecision;
 
     private int carRotation;
 
@@ -55,6 +58,31 @@ public class Car extends GameObject implements MainCharacter {
         height = GameBlockImages.CarTiles.TILE_HEIGHT * size;
         carRotation = ROTATION_OFFSET;
         carTiles = GameBlockImages.CarTiles.values();
+        collidingGameObjectsForPathDecision = new LinkedList<>();
+        hitBoxOffsets(8, 8, -16, -16);
+    }
+
+    /**
+     * Adds GameObjects to the list of GameObjects the car can collide with.
+     *
+     * @param collidingGameObject The gameObjects that should get added
+     */
+    public void addCollidingGameObjectsForPathDecision(CollidingGameObject collidingGameObject) {
+        collidingGameObjectsForPathDecision.add(collidingGameObject);
+    }
+
+    /**
+     * Removes GameObjects to the list of GameObjects the car can collide with.
+     *
+     * @param collidingGameObject The gameObjects that should get removed
+     */
+    public void removeCollidingGameObjectsForPathDecision(CollidingGameObject collidingGameObject) {
+        collidingGameObjectsForPathDecision.remove(collidingGameObject);
+    }
+
+    @Override
+    public void reactToCollisionWith(CollidingGameObject other) {
+
     }
 
     /**
@@ -122,6 +150,14 @@ public class Car extends GameObject implements MainCharacter {
         double dx = Math.cos(rotation) * speedInPixel;
         double dy = Math.sin(rotation) * speedInPixel;
         position.updateCoordinates(position.getX() + dx, position.getY() + dy);
+        for (CollidingGameObject collidingGameObject : collidingGameObjectsForPathDecision) {
+            if (collidesWith(collidingGameObject)) {
+                position.updateCoordinates(position.getX() - dx, position.getY() - dy);
+                speedInPixel = 0;
+                gamePlayManager.lifeLost();
+                break;
+            }
+        }
         lastUpdateTime = gameView.gameTimeInMilliseconds();
     }
 
@@ -148,5 +184,25 @@ public class Car extends GameObject implements MainCharacter {
     @Override
     public String toString() {
         return "Car: " + position + "Speed:" + speedInPixel;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Car other = (Car) o;
+        return super.equals(o)
+               && Objects.equals(collidingGameObjectsForPathDecision, other.collidingGameObjectsForPathDecision)
+               && isBreaking == other.isBreaking
+               && startedDriving == other.startedDriving
+               && carRotation == other.carRotation
+               && lastSteeringTime == other.lastSteeringTime
+               && lastAcceleratingTime == other.lastAcceleratingTime
+               && lastUpdateTime == other.lastUpdateTime
+               && shotDurationInMilliseconds == other.shotDurationInMilliseconds;
     }
 }

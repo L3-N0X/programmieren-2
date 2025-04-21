@@ -5,7 +5,7 @@ import thd.gameobjects.base.GameObject;
 import java.util.LinkedList;
 import java.util.List;
 
-class GameObjectManager {
+class GameObjectManager extends CollisionManager {
 
     private final List<GameObject> gameObjects;
     private final List<GameObject> gameObjectsToBeAdded;
@@ -39,6 +39,7 @@ class GameObjectManager {
             gameObject.updatePosition();
             gameObject.addToCanvas();
         }
+        manageCollisions(true);
     }
 
     private void updateLists() {
@@ -51,12 +52,18 @@ class GameObjectManager {
     }
 
     private void removeFromGameObjects() {
-        gameObjects.removeAll(gameObjectsToBeRemoved);
+        for (GameObject gameObject : gameObjectsToBeRemoved) {
+            removeFromCollisionManagement(gameObject);
+            gameObjects.remove(gameObject);
+        }
         gameObjectsToBeRemoved.clear();
     }
 
     private void addToGameObjects() {
-        gameObjects.addAll(gameObjectsToBeAdded);
+        for (GameObject gameObject : gameObjectsToBeAdded) {
+            gameObjects.add(gameObject);
+            addToCollisionManagement(gameObject);
+        }
         gameObjectsToBeAdded.clear();
     }
 }

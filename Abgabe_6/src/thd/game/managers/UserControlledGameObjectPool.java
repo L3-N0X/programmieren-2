@@ -46,7 +46,10 @@ class UserControlledGameObjectPool {
         } else if (keyCode == KeyEvent.VK_D || keyCode == KeyEvent.VK_RIGHT) {
             car.right();
         } else if (keyCode == KeyEvent.VK_W || keyCode == KeyEvent.VK_UP) {
-            car.startedDriving = true;
+            if (!car.startedDriving) {
+                car.startedDriving = true;
+                lapTimeDisplay.startLap();
+            }
         } else if (keyCode == KeyEvent.VK_SPACE) {
             car.shoot();
         } else if (keyCode == KeyEvent.VK_S || keyCode == KeyEvent.VK_DOWN) {

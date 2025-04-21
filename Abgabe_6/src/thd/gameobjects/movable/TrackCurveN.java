@@ -17,11 +17,11 @@ public class TrackCurveN extends GameObject {
      */
     public TrackCurveN(GameView gameView, GamePlayManager gamePlayManager) {
         super(gameView, gamePlayManager);
-        position.updateCoordinates(2 * 128 * GameBlockImages.BLOCK_SIZE, 0);
+        position.updateCoordinates(2 * GameBlockImages.TrackTiles.TILE_WIDTH * GameBlockImages.BLOCK_SIZE, 0);
         speedInPixel = 0;
         size = GameBlockImages.BLOCK_SIZE;
-        width = 128 * GameBlockImages.BLOCK_SIZE;
-        height = 112 * GameBlockImages.BLOCK_SIZE;
+        width = GameBlockImages.TrackTiles.TILE_WIDTH * GameBlockImages.BLOCK_SIZE;
+        height = GameBlockImages.TrackTiles.TILE_HEIGHT * GameBlockImages.BLOCK_SIZE;
     }
 
     @Override
@@ -38,5 +38,21 @@ public class TrackCurveN extends GameObject {
     @Override
     public String toString() {
         return "Rock: " + position;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        return super.equals(o);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
     }
 }

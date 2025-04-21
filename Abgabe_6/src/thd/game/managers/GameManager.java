@@ -32,6 +32,9 @@ class GameManager extends GamePlayManager {
         spawnGameObject(lapTimeDisplay);
         spawnGameObject(lastTimeDisplay);
         spawnGameObject(bestTimeDisplay);
+
+        car.addCollidingGameObjectsForPathDecision(houseBig);
+        car.addCollidingGameObjectsForPathDecision(houseCorner);
     }
 
     @Override
@@ -41,6 +44,5 @@ class GameManager extends GamePlayManager {
     }
 
     private void gameManagement() {
-
     }
 }

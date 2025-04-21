@@ -1,19 +1,23 @@
 package thd.game.managers;
 
 import thd.game.utilities.GameView;
+import thd.gameobjects.base.CollidingGameObject;
 import thd.gameobjects.base.GameObject;
-import thd.gameobjects.movable.Square;
 
 /**
  * The {@link GamePlayManager} handles spawning and destroying gameObjects.
  */
 public class GamePlayManager extends UserControlledGameObjectPool {
     private final GameObjectManager gameObjectManager;
-    private int currentNumberOfVisibleSquares;
+
+    private static final int LIVES = 1;
+    protected int lives;
+    protected int points;
 
     protected GamePlayManager(GameView gameView) {
         super(gameView);
         gameObjectManager = new GameObjectManager();
+        lives = LIVES;
     }
 
     /**
@@ -26,12 +30,31 @@ public class GamePlayManager extends UserControlledGameObjectPool {
     }
 
     /**
-     * This will destroy a existing gameObject in the game.
+     * This will destroy an existing gameObject in the game.
      *
      * @param gameObject The gameObject that gets destroyed.
      */
     public void destroyGameObject(GameObject gameObject) {
         gameObjectManager.remove(gameObject);
+        if (gameObject instanceof CollidingGameObject) {
+            car.removeCollidingGameObjectsForPathDecision((CollidingGameObject) gameObject);
+        }
+    }
+
+    /**
+     * Add points to the point counter.
+     *
+     * @param points the amount to be added
+     */
+    public void addPoints(int points) {
+        this.points += points;
+    }
+
+    /**
+     * Decreases the life counter by one.
+     */
+    public void lifeLost() {
+        this.lives--;
     }
 
     protected void destroyAllGameObjects() {
@@ -46,9 +69,6 @@ public class GamePlayManager extends UserControlledGameObjectPool {
     }
 
     private void gamePlayManagement() {
-        if (gameView.timer(1000, 1, this) && currentNumberOfVisibleSquares < 5) {
-            spawnGameObject(new Square(gameView, this));
-            currentNumberOfVisibleSquares++;
-        }
+
     }
 }

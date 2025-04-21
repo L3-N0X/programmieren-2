@@ -2,12 +2,13 @@ package thd.gameobjects.movable;
 
 import thd.game.managers.GamePlayManager;
 import thd.game.utilities.GameView;
+import thd.gameobjects.base.CollidingGameObject;
 import thd.gameobjects.base.GameObject;
 
 /**
  * A simple bullet {@link GameObject}.
  */
-class Bullet extends GameObject {
+class Bullet extends CollidingGameObject {
 
     /**
      * Creates a new bullet in the game at a default position.
@@ -22,6 +23,12 @@ class Bullet extends GameObject {
         size = 3;
         width = 6 * size;
         height = 3 * size;
+        hitBoxOffsets(width / 4, height / 4, -width / 2, -height / 2);
+    }
+
+    @Override
+    public void reactToCollisionWith(CollidingGameObject other) {
+
     }
 
     Bullet(GameView gameView, GamePlayManager gamePlayManager, double x, double y, double rotation) {
@@ -57,5 +64,21 @@ class Bullet extends GameObject {
     @Override
     public String toString() {
         return "Rock: " + position;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        return super.equals(o);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
     }
 }
