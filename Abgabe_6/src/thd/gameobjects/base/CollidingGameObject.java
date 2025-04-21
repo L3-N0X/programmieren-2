@@ -93,7 +93,13 @@ public abstract class CollidingGameObject extends GameObject {
                && Objects.equals(hitBoxRectangle, other.hitBoxRectangle)
                && Double.compare(hitBoxOffsetX, other.hitBoxOffsetX) == 0
                && Double.compare(hitBoxOffsetY, other.hitBoxOffsetX) == 0
-               && Double.compare(hitBoxOffsetWidth, other.hitBoxOffsetWidth) == 0
-               && Double.compare(hitBoxOffsetHeight, other.hitBoxOffsetHeight) == 0;
+               && Double.compare(hitBoxOffsetHeight, other.hitBoxOffsetHeight) == 0
+               && Double.compare(hitBoxOffsetWidth, other.hitBoxOffsetWidth) == 0;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(hitBoxRectangle, hitBoxOffsetX, hitBoxOffsetY, hitBoxOffsetHeight, hitBoxOffsetWidth,
+                            super.hashCode());
     }
 }

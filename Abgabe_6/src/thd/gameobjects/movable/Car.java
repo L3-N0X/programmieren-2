@@ -205,4 +205,10 @@ public class Car extends CollidingGameObject implements MainCharacter {
                && lastUpdateTime == other.lastUpdateTime
                && shotDurationInMilliseconds == other.shotDurationInMilliseconds;
     }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(isBreaking, startedDriving, carRotation, lastSteeringTime, lastAcceleratingTime,
+                            lastUpdateTime, shotDurationInMilliseconds, super.hashCode());
+    }
 }

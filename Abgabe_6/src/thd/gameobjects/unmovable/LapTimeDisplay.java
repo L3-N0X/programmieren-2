@@ -65,6 +65,6 @@ public class LapTimeDisplay extends GameObject {
 
     @Override
     public int hashCode() {
-        return super.hashCode();
+        return Objects.hash(lapTimer, super.hashCode());
     }
 }

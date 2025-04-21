@@ -4,6 +4,8 @@ import thd.game.managers.GamePlayManager;
 import thd.game.utilities.GameView;
 import thd.gameobjects.base.CollidingGameObject;
 
+import java.util.Objects;
+
 /**
  * A BlockImage of a house as GameObject.
  */
@@ -65,6 +67,6 @@ public class HouseCorner extends CollidingGameObject {
 
     @Override
     public int hashCode() {
-        return super.hashCode();
+        return Objects.hash(position, targetPosition, speedInPixel, rotation, size, width, height);
     }
 }

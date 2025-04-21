@@ -4,6 +4,8 @@ import thd.game.managers.GamePlayManager;
 import thd.game.utilities.GameView;
 import thd.gameobjects.base.GameObject;
 
+import java.util.Objects;
+
 /**
  * A background tile of a rock formation with many rocks.
  */
@@ -53,6 +55,6 @@ public class TrackBendLE extends GameObject {
 
     @Override
     public int hashCode() {
-        return super.hashCode();
+        return Objects.hash(position, targetPosition, speedInPixel, rotation, size, width, height);
     }
 }

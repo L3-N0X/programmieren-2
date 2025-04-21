@@ -5,6 +5,8 @@ import thd.game.utilities.GameView;
 import thd.gameobjects.base.CollidingGameObject;
 import thd.gameobjects.base.GameObject;
 
+import java.util.Objects;
+
 /**
  * A simple bullet {@link GameObject}.
  */
@@ -79,6 +81,6 @@ class Bullet extends CollidingGameObject {
 
     @Override
     public int hashCode() {
-        return super.hashCode();
+        return Objects.hash(position, targetPosition, speedInPixel, rotation, size, width, height);
     }
 }

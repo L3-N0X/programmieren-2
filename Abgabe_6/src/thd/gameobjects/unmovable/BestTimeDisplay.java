@@ -6,6 +6,7 @@ import thd.gameobjects.base.GameObject;
 import thd.gameobjects.base.Position;
 
 import java.awt.*;
+import java.util.Objects;
 
 /**
  * A Text-Display component to display the current lap time in-game.
@@ -52,6 +53,6 @@ public class BestTimeDisplay extends GameObject {
 
     @Override
     public int hashCode() {
-        return super.hashCode();
+        return Objects.hash(position, targetPosition, speedInPixel, rotation, size, width, height);
     }
 }
