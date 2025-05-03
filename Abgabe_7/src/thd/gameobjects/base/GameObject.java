@@ -14,6 +14,7 @@ public abstract class GameObject {
     protected final GamePlayManager gamePlayManager;
     protected final Position position;
     protected final Position targetPosition;
+    protected char distanceToBackground;
     protected double speedInPixel;
     protected double rotation;
     protected double size;
@@ -77,6 +78,15 @@ public abstract class GameObject {
         return height;
     }
 
+    /**
+     * Returns the distance to the background. 0 = background, higher numbers = more in the foreground.
+     *
+     * @return distance to the background
+     */
+    public char getDistanceToBackground() {
+        return distanceToBackground;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == this) {
@@ -88,6 +98,7 @@ public abstract class GameObject {
         GameObject other = (GameObject) o;
         return Objects.equals(position, other.position)
                && Objects.equals(targetPosition, other.targetPosition)
+               && distanceToBackground == other.distanceToBackground
                && Double.compare(speedInPixel, other.speedInPixel) == 0
                && Double.compare(rotation, other.rotation) == 0
                && Double.compare(size, other.size) == 0
