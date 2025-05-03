@@ -1,6 +1,7 @@
 package thd.game.managers;
 
 import thd.gameobjects.base.CollidingGameObject;
+import thd.gameobjects.base.CollidingObject;
 import thd.gameobjects.base.GameObject;
 
 import java.util.LinkedList;
@@ -16,7 +17,7 @@ class CollisionManager {
 
     /**
      * Manages collisions between any game objects in the list. If a collision is detected, the method
-     * {@link CollidingGameObject#reactToCollisionWith(CollidingGameObject)} is called for both game objects. If
+     * {@link CollidingObject#reactToCollisionWith(CollidingObject)} is called for both game objects. If
      * <code>showHitBoxes</code> is true, all hitboxes of game objects in the list are shown as red rectangles.
      *
      * @param showHitBoxes If true, hitboxes of colliding game objects in the list are shown.

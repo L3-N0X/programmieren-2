@@ -3,6 +3,7 @@ package thd.gameobjects.movable;
 import thd.game.managers.GamePlayManager;
 import thd.game.utilities.GameView;
 import thd.gameobjects.base.CollidingGameObject;
+import thd.gameobjects.base.CollidingObject;
 import thd.gameobjects.base.GameObject;
 
 /**
@@ -23,11 +24,12 @@ class Bullet extends CollidingGameObject {
         size = 3;
         width = 6 * size;
         height = 3 * size;
+        distanceToBackground = 20;
         hitBoxOffsets(width / 4, height / 4, -width / 2, -height / 2);
     }
 
     @Override
-    public void reactToCollisionWith(CollidingGameObject other) {
+    public void reactToCollisionWith(CollidingObject other) {
 
     }
 
@@ -65,20 +67,4 @@ class Bullet extends CollidingGameObject {
     public String toString() {
         return "Rock: " + position;
     }
-
-    //@Override
-    //public boolean equals(Object o) {
-    //    if (o == this) {
-    //        return true;
-    //    }
-    //    if (o == null || getClass() != o.getClass()) {
-    //        return false;
-    //    }
-    //    return super.equals(o);
-    //}
-    //
-    //@Override
-    //public int hashCode() {
-    //    return Objects.hash(position, targetPosition, speedInPixel, rotation, size, width, height);
-    //}
 }

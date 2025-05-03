@@ -1,7 +1,7 @@
 package thd.game.managers;
 
 import thd.game.utilities.GameView;
-import thd.gameobjects.movable.*;
+import thd.gameobjects.movable.Car;
 import thd.gameobjects.unmovable.BestTimeDisplay;
 import thd.gameobjects.unmovable.LapTimeDisplay;
 import thd.gameobjects.unmovable.LastTimeDisplay;
@@ -11,12 +11,6 @@ import java.awt.event.KeyEvent;
 
 class UserControlledGameObjectPool {
     protected final GameView gameView;
-    protected HouseBig houseBig;
-    protected RocksVeryMany rocksVeryMany;
-    protected HouseCorner houseCorner;
-    protected TrackHorizontal trackHorizontal;
-    protected TrackBendLE trackBendLE;
-    protected TrackCurveN trackCurveN;
     protected Car car;
     protected LapTimeDisplay lapTimeDisplay;
     protected LastTimeDisplay lastTimeDisplay;
@@ -30,8 +24,10 @@ class UserControlledGameObjectPool {
         Integer[] pressedKeys = gameView.keyCodesOfCurrentlyPressedKeys();
         car.isBreaking = false;
         for (int keyCode : pressedKeys) {
-            gameView.addTextToCanvas("Taste " + ((char) keyCode) + " gedrückt", 0, 0, 18,
-                                     true, Color.WHITE, 0);
+            if (GameViewManager.DEBUG) {
+                gameView.addTextToCanvas("Taste " + ((char) keyCode) + " gedrückt", 0, 0, 18,
+                                         true, Color.WHITE, 0);
+            }
             processKeyCode(keyCode);
         }
         if (car.startedDriving && !car.isBreaking) {
@@ -48,7 +44,7 @@ class UserControlledGameObjectPool {
         } else if (keyCode == KeyEvent.VK_W || keyCode == KeyEvent.VK_UP) {
             if (!car.startedDriving) {
                 car.startedDriving = true;
-                lapTimeDisplay.startLap();
+                lapTimeDisplay.startLapTimer();
             }
         } else if (keyCode == KeyEvent.VK_SPACE) {
             car.shoot();

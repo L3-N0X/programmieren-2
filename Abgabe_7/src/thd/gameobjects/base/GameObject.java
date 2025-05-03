@@ -32,6 +32,7 @@ public abstract class GameObject {
         this.gamePlayManager = gamePlayManager;
         position = new Position();
         targetPosition = new Position();
+        distanceToBackground = 0;
     }
 
     /**
@@ -108,6 +109,7 @@ public abstract class GameObject {
 
     @Override
     public int hashCode() {
-        return Objects.hash(position, targetPosition, speedInPixel, rotation, size, width, height);
+        return Objects.hash(position, targetPosition, distanceToBackground, speedInPixel, rotation, size, width,
+                            height);
     }
 }

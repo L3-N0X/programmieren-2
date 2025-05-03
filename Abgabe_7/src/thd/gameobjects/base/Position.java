@@ -10,7 +10,7 @@ import java.util.Objects;
  *
  * @see GameView
  */
-public class Position {
+public class Position implements Comparable<Position> {
 
     private double x;
     private double y;
@@ -202,5 +202,10 @@ public class Position {
     @Override
     public int hashCode() {
         return Objects.hash(x, y);
+    }
+
+    @Override
+    public int compareTo(Position other) {
+        return Double.compare(distance(new Position()), other.distance(new Position()));
     }
 }

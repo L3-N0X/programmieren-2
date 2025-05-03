@@ -9,7 +9,7 @@ import java.util.Objects;
 /**
  * Game objects that are able to collide with other game objects.
  */
-public abstract class CollidingGameObject extends GameObject {
+public abstract class CollidingGameObject extends CollidingObject {
     private final Rectangle hitBoxRectangle;
     private double hitBoxOffsetX;
     private double hitBoxOffsetY;
@@ -34,10 +34,16 @@ public abstract class CollidingGameObject extends GameObject {
      * @param other The other game object.
      * @return <code>true</code> if the there was a collision.
      */
-    public final boolean collidesWith(CollidingGameObject other) {
+    @Override
+    public final boolean collidesWith(CollidingObject other) {
         updateHitBox();
-        other.updateHitBox();
-        return hitBoxRectangle.intersects(other.hitBoxRectangle);
+        if (other instanceof CollidingGameObject) {
+            ((CollidingGameObject) other).updateHitBox();
+            return hitBoxRectangle.intersects(((CollidingGameObject) other).hitBoxRectangle);
+        } else if (other instanceof MultipleCollidingGameObject) {
+            return other.collidesWith(this);
+        }
+        return false;
     }
 
     private void updateHitBox() {
@@ -63,16 +69,9 @@ public abstract class CollidingGameObject extends GameObject {
     }
 
     /**
-     * If a game object is collided with another game object, it reacts to the collision. This method needs to be
-     * overridden by game objects and implemented with appropriate reactions.
-     *
-     * @param other The other game object that is involved in the collision.
-     */
-    public abstract void reactToCollisionWith(CollidingGameObject other);
-
-    /**
      * Shows hitbox of this game object as a red rectangle.
      */
+    @Override
     public void showHitBox() {
         if (hitBoxRectangle.width > 0 && hitBoxRectangle.height > 0) {
             gameView.addRectangleToCanvas(hitBoxRectangle.x, hitBoxRectangle.y, hitBoxRectangle.width,

@@ -4,6 +4,7 @@ import thd.game.managers.GamePlayManager;
 import thd.game.managers.GameViewManager;
 import thd.game.utilities.GameView;
 import thd.gameobjects.base.CollidingGameObject;
+import thd.gameobjects.base.CollidingObject;
 import thd.gameobjects.base.MainCharacter;
 
 import java.awt.*;
@@ -58,6 +59,7 @@ public class Car extends CollidingGameObject implements MainCharacter {
         carRotation = ROTATION_OFFSET;
         carTiles = GameBlockImages.CarTiles.values();
         collidingGameObjectsForPathDecision = new LinkedList<>();
+        distanceToBackground = 10;
         hitBoxOffsets(8, 8, -16, -16);
     }
 
@@ -66,7 +68,7 @@ public class Car extends CollidingGameObject implements MainCharacter {
      *
      * @param collidingGameObject The gameObjects that should get added
      */
-    public void addCollidingGameObjectsForPathDecision(CollidingGameObject collidingGameObject) {
+    private void addCollidingGameObjectsForPathDecision(CollidingGameObject collidingGameObject) {
         collidingGameObjectsForPathDecision.add(collidingGameObject);
     }
 
@@ -80,7 +82,7 @@ public class Car extends CollidingGameObject implements MainCharacter {
     }
 
     @Override
-    public void reactToCollisionWith(CollidingGameObject other) {
+    public void reactToCollisionWith(CollidingObject other) {
 
     }
 
@@ -148,10 +150,13 @@ public class Car extends CollidingGameObject implements MainCharacter {
         rotation = ((double) ((carRotation - ROTATION_OFFSET) % ROTATION_STEPS) / ROTATION_STEPS) * 2 * Math.PI;
         double dx = Math.cos(rotation) * speedInPixel;
         double dy = Math.sin(rotation) * speedInPixel;
-        position.updateCoordinates(position.getX() + dx, position.getY() + dy);
+        gamePlayManager.moveWorldToLeft(dx);
+        gamePlayManager.moveWorldUp(dy);
+
         for (CollidingGameObject collidingGameObject : collidingGameObjectsForPathDecision) {
             if (collidesWith(collidingGameObject)) {
-                position.updateCoordinates(position.getX() - dx, position.getY() - dy);
+                gamePlayManager.moveWorldToLeft(-dx);
+                gamePlayManager.moveWorldUp(-dy);
                 speedInPixel = 0;
                 gamePlayManager.lifeLost();
                 break;
@@ -184,30 +189,4 @@ public class Car extends CollidingGameObject implements MainCharacter {
     public String toString() {
         return "Car: " + position + "Speed:" + speedInPixel;
     }
-
-    //@Override
-    //public boolean equals(Object o) {
-    //    if (o == this) {
-    //        return true;
-    //    }
-    //    if (o == null || getClass() != o.getClass()) {
-    //        return false;
-    //    }
-    //    Car other = (Car) o;
-    //    return super.equals(o)
-    //           && Objects.equals(collidingGameObjectsForPathDecision, other.collidingGameObjectsForPathDecision)
-    //           && isBreaking == other.isBreaking
-    //           && startedDriving == other.startedDriving
-    //           && carRotation == other.carRotation
-    //           && lastSteeringTime == other.lastSteeringTime
-    //           && lastAcceleratingTime == other.lastAcceleratingTime
-    //           && lastUpdateTime == other.lastUpdateTime
-    //           && shotDurationInMilliseconds == other.shotDurationInMilliseconds;
-    //}
-    //
-    //@Override
-    //public int hashCode() {
-    //    return Objects.hash(isBreaking, startedDriving, carRotation, lastSteeringTime, lastAcceleratingTime,
-    //                        lastUpdateTime, shotDurationInMilliseconds, super.hashCode());
-    //}
 }

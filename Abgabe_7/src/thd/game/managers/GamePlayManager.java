@@ -7,7 +7,7 @@ import thd.gameobjects.base.GameObject;
 /**
  * The {@link GamePlayManager} handles spawning and destroying gameObjects.
  */
-public class GamePlayManager extends UserControlledGameObjectPool {
+public class GamePlayManager extends WorldShiftManager {
     private final GameObjectManager gameObjectManager;
 
     private static final int LIVES = 1;
@@ -25,7 +25,9 @@ public class GamePlayManager extends UserControlledGameObjectPool {
      *
      * @param gameObject The gameObject that gets spawned.
      */
+    @Override
     public void spawnGameObject(GameObject gameObject) {
+        super.spawnGameObject(gameObject);
         gameObjectManager.add(gameObject);
     }
 
@@ -34,11 +36,19 @@ public class GamePlayManager extends UserControlledGameObjectPool {
      *
      * @param gameObject The gameObject that gets destroyed.
      */
+    @Override
     public void destroyGameObject(GameObject gameObject) {
+        super.destroyGameObject(gameObject);
         gameObjectManager.remove(gameObject);
         if (gameObject instanceof CollidingGameObject) {
             car.removeCollidingGameObjectsForPathDecision((CollidingGameObject) gameObject);
         }
+    }
+
+    @Override
+    protected void destroyAllGameObjects() {
+        super.destroyAllGameObjects();
+        gameObjectManager.removeAll();
     }
 
     /**
@@ -55,10 +65,6 @@ public class GamePlayManager extends UserControlledGameObjectPool {
      */
     public void lifeLost() {
         this.lives--;
-    }
-
-    protected void destroyAllGameObjects() {
-        gameObjectManager.removeAll();
     }
 
     @Override

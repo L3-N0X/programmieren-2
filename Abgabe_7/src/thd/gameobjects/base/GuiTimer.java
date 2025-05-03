@@ -5,34 +5,43 @@ import thd.game.utilities.GameView;
 /**
  * A simple lap timer for the games GUI with some helper functions for formatting time.
  */
-public class LapTimer {
+public class GuiTimer {
 
     private int startTime;
     private final GameView gameView;
 
     /**
-     * Creates a new LapTimer for the GUI.
+     * Creates a new GuiTimer for the GUI.
      *
      * @param gameView the gameView of the game
      */
-    public LapTimer(GameView gameView) {
+    public GuiTimer(GameView gameView) {
         this.gameView = gameView;
         startTime = -1;
     }
 
     /**
-     * Resets the timer to zero.
+     * Resets the timer to zero, this starts the timer.
      */
-    public void reset() {
+    public void resetAndStart() {
         startTime = gameView.gameTimeInMilliseconds();
     }
 
     /**
-     * Calculates the time since last reset and formates the time.
+     * Sets the time to a duration which is then displayed.
+     *
+     * @param durationInMilliseconds the duration in milliseconds.
+     */
+    public void updateDurationInMilliseconds(int durationInMilliseconds) {
+        startTime = gameView.gameTimeInMilliseconds() - durationInMilliseconds;
+    }
+
+    /**
+     * Calculates the time since last resetAndStart and formates the time.
      *
      * @return the time formated correctly
      */
-    public String timeSinceStartFormatted() {
+    String timeSinceStartFormatted() {
         if (startTime != -1) {
             int timeSinceStart = timeSinceStart();
             int minutes = timeSinceStart / 60_000 % 60;

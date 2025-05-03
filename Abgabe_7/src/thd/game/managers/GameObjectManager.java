@@ -51,19 +51,31 @@ class GameObjectManager extends CollisionManager {
         }
     }
 
+    private void addToGameObjects() {
+        for (GameObject toAdd : gameObjectsToBeAdded) {
+            sortIntoGameObjects(toAdd);
+            addToCollisionManagement(toAdd);
+            sortIntoGameObjects(toAdd);
+        }
+        gameObjectsToBeAdded.clear();
+    }
+
+    private void sortIntoGameObjects(GameObject toAdd) {
+        int indexToSortIn = 0;
+        for (GameObject gameObject : gameObjects) {
+            if (gameObject.getDistanceToBackground() >= toAdd.getDistanceToBackground()) {
+                break;
+            }
+            indexToSortIn++;
+        }
+        gameObjects.add(indexToSortIn, toAdd);
+    }
+
     private void removeFromGameObjects() {
         for (GameObject gameObject : gameObjectsToBeRemoved) {
             removeFromCollisionManagement(gameObject);
             gameObjects.remove(gameObject);
         }
         gameObjectsToBeRemoved.clear();
-    }
-
-    private void addToGameObjects() {
-        for (GameObject gameObject : gameObjectsToBeAdded) {
-            gameObjects.add(gameObject);
-            addToCollisionManagement(gameObject);
-        }
-        gameObjectsToBeAdded.clear();
     }
 }
