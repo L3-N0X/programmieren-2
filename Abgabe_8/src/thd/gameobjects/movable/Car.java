@@ -14,25 +14,18 @@ import java.util.LinkedList;
  * A background tile of a rock formation with many rocks.
  */
 public class Car extends CollidingGameObject implements MainCharacter {
-    /**
-     * State variable if the car is currently breaking.
-     */
-    public boolean isBreaking;
-    /**
-     * State variable if the car already started driving.
-     */
-    public boolean startedDriving;
-
-    private static final double MAX_SPEED = 5;
-    private static final double ACCELERATION = 0.1;
-    private static final double BREAK_RATE = 1.3;
+    private static final double MAX_SPEED = 14;
+    private static final double ACCELERATION = 0.26;
+    private static final double BREAK_RATE = 2.6;
     private static final double STEERING_THRESHOLD = 0.4;
+
+    private static final int STEERING_COOLDOWN_IN_MILLISECONDS = 350;
     private static final int SHOT_DURATION_IN_MILLISECONDS = 300;
 
     private static final int ROTATION_STEPS = 32;
     private static final int ROTATION_OFFSET = 8;
 
-    private static final int STEERING_COOLDOWN_IN_MILLISECONDS = 200;
+    private State currentState;
 
     private final GameBlockImages.CarTiles[] carTiles;
     private final LinkedList<CollidingGameObject> collidingGameObjectsForPathDecision;
@@ -57,6 +50,7 @@ public class Car extends CollidingGameObject implements MainCharacter {
         width = GameBlockImages.CarTiles.TILE_WIDTH * size;
         height = GameBlockImages.CarTiles.TILE_HEIGHT * size;
         carRotation = ROTATION_OFFSET;
+        currentState = State.IDLE;
         carTiles = GameBlockImages.CarTiles.values();
         collidingGameObjectsForPathDecision = new LinkedList<>();
         distanceToBackground = 10;
@@ -73,7 +67,7 @@ public class Car extends CollidingGameObject implements MainCharacter {
     }
 
     /**
-     * Removes GameObjects to the list of GameObjects the car can collide with.
+     * Removes GameObjects from the list of GameObjects the car can collide with.
      *
      * @param collidingGameObject The gameObjects that should get removed
      */
@@ -120,6 +114,7 @@ public class Car extends CollidingGameObject implements MainCharacter {
      * Decelerates the car until it stays still again.
      */
     public void down() {
+        currentState = State.BREAKING;
         if (speedInPixel > 0) {
             speedInPixel -= BREAK_RATE * timeDeltaInSeconds(lastUpdateTime);
             if (speedInPixel < 0.05) {
@@ -168,6 +163,26 @@ public class Car extends CollidingGameObject implements MainCharacter {
     @Override
     public void updateStatus() {
         super.updateStatus();
+        switch (currentState) {
+            case IDLE, BREAKING, ACCELERATING:
+                break;
+        }
+    }
+
+    /**
+     * Returns <code>true</code> if the current state is anything but idle.
+     *
+     * @return <code>true</code> if the car is not idle.
+     */
+    public boolean isDriving() {
+        return currentState != State.IDLE;
+    }
+
+    /**
+     * This method sets the state to accelerating.
+     */
+    public void startDriving() {
+        currentState = State.ACCELERATING;
     }
 
     /**
@@ -187,6 +202,10 @@ public class Car extends CollidingGameObject implements MainCharacter {
 
     @Override
     public String toString() {
-        return "Car: " + position + "Speed:" + speedInPixel;
+        return "Car: " + position + "Speed: " + speedInPixel + "State: " + currentState;
+    }
+
+    private enum State {
+        IDLE, ACCELERATING, BREAKING
     }
 }

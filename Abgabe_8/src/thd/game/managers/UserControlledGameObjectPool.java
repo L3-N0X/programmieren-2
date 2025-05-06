@@ -1,5 +1,6 @@
 package thd.game.managers;
 
+import thd.game.level.Level;
 import thd.game.utilities.GameView;
 import thd.gameobjects.movable.Car;
 import thd.gameobjects.unmovable.BestTimeDisplay;
@@ -15,14 +16,18 @@ class UserControlledGameObjectPool {
     protected LapTimeDisplay lapTimeDisplay;
     protected LastTimeDisplay lastTimeDisplay;
     protected BestTimeDisplay bestTimeDisplay;
+    protected Level level;
+
+    private boolean currentlyBreaking;
 
     protected UserControlledGameObjectPool(GameView gameView) {
         this.gameView = gameView;
+        currentlyBreaking = false;
     }
 
     protected void gameLoop() {
         Integer[] pressedKeys = gameView.keyCodesOfCurrentlyPressedKeys();
-        car.isBreaking = false;
+        currentlyBreaking = false;
         for (int keyCode : pressedKeys) {
             if (GameViewManager.DEBUG) {
                 gameView.addTextToCanvas("Taste " + ((char) keyCode) + " gedrückt", 0, 0, 18,
@@ -30,7 +35,7 @@ class UserControlledGameObjectPool {
             }
             processKeyCode(keyCode);
         }
-        if (car.startedDriving && !car.isBreaking) {
+        if (car.isDriving() && !currentlyBreaking) {
             car.up();
             car.updateAccelerationTimer();
         }
@@ -42,14 +47,14 @@ class UserControlledGameObjectPool {
         } else if (keyCode == KeyEvent.VK_D || keyCode == KeyEvent.VK_RIGHT) {
             car.right();
         } else if (keyCode == KeyEvent.VK_W || keyCode == KeyEvent.VK_UP) {
-            if (!car.startedDriving) {
-                car.startedDriving = true;
+            if (!car.isDriving()) {
+                car.startDriving();
                 lapTimeDisplay.startLapTimer();
             }
         } else if (keyCode == KeyEvent.VK_SPACE) {
             car.shoot();
         } else if (keyCode == KeyEvent.VK_S || keyCode == KeyEvent.VK_DOWN) {
-            car.isBreaking = true;
+            currentlyBreaking = true;
             car.down();
         }
     }

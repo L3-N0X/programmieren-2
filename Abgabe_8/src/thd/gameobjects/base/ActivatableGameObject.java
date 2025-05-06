@@ -14,4 +14,21 @@ public interface ActivatableGameObject<T> {
      * @return <code>true</code> when the game object gets activated.
      */
     boolean tryToActivate(T info);
+
+    /**
+     * This should despawn the gameObject.
+     */
+    void deactivate();
+
+    /**
+     * This should spawn the gameObject.
+     */
+    void activate();
+
+    /**
+     * Checks if the gameObject is active.
+     *
+     * @return <code>true</code> if the object is active.
+     */
+    boolean isActive();
 }

@@ -11,6 +11,7 @@ import thd.gameobjects.base.ShiftableGameObject;
  */
 public class TrackTile extends GameObject implements ShiftableGameObject, ActivatableGameObject<TrackTile> {
     private final GameBlockImages.TrackTiles trackTile;
+    private boolean active;
 
     /**
      * Creates a new track tile in the game at a default position.
@@ -27,6 +28,7 @@ public class TrackTile extends GameObject implements ShiftableGameObject, Activa
         size = GameBlockImages.BLOCK_SIZE;
         width = GameBlockImages.TrackTiles.TILE_WIDTH * GameBlockImages.BLOCK_SIZE;
         height = GameBlockImages.TrackTiles.TILE_HEIGHT * GameBlockImages.BLOCK_SIZE;
+        active = false;
         this.trackTile = trackTile;
     }
 
@@ -41,17 +43,6 @@ public class TrackTile extends GameObject implements ShiftableGameObject, Activa
         return "TrackTile: " + position;
     }
 
-    //@Override
-    //public void updateStatus() {
-    //    if (position.getX() > GameView.WIDTH
-    //        || position.getY() > GameView.HEIGHT
-    //        || position.getX() + height < 0
-    //        || position.getY() + width < 0
-    //    ) {
-    //        gamePlayManager.destroyGameObject(this);
-    //    }
-    //}
-
     @Override
     public boolean tryToActivate(TrackTile trackTile) {
         return position.getX() < GameView.WIDTH
@@ -59,5 +50,20 @@ public class TrackTile extends GameObject implements ShiftableGameObject, Activa
                && position.getX() > -width
                && position.getY() > -height
                && trackTile != null; // wichtel
+    }
+
+    @Override
+    public void deactivate() {
+        active = false;
+    }
+
+    @Override
+    public void activate() {
+        active = true;
+    }
+
+    @Override
+    public boolean isActive() {
+        return active;
     }
 }

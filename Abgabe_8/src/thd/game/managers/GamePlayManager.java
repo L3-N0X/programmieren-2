@@ -10,14 +10,12 @@ import thd.gameobjects.base.GameObject;
 public class GamePlayManager extends WorldShiftManager {
     private final GameObjectManager gameObjectManager;
 
-    private static final int LIVES = 1;
     protected int lives;
     protected int points;
 
     protected GamePlayManager(GameView gameView) {
         super(gameView);
         gameObjectManager = new GameObjectManager();
-        lives = LIVES;
     }
 
     /**
@@ -43,6 +41,15 @@ public class GamePlayManager extends WorldShiftManager {
         if (gameObject instanceof CollidingGameObject) {
             car.removeCollidingGameObjectsForPathDecision((CollidingGameObject) gameObject);
         }
+    }
+
+    /**
+     * This will destroy an existing gameObject in the game, but keep it in shiftable.
+     *
+     * @param gameObject The gameObject that gets destroyed.
+     */
+    public void deactivateGameObject(GameObject gameObject) {
+        gameObjectManager.remove(gameObject);
     }
 
     @Override
