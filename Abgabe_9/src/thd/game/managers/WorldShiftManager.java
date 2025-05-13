@@ -2,7 +2,9 @@ package thd.game.managers;
 
 import thd.game.utilities.GameView;
 import thd.gameobjects.base.GameObject;
+import thd.gameobjects.base.Position;
 import thd.gameobjects.base.ShiftableGameObject;
+import thd.gameobjects.movable.TrackTile;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -12,6 +14,9 @@ import java.util.List;
  */
 public class WorldShiftManager extends UserControlledGameObjectPool {
     private final List<GameObject> shiftableGameObjects;
+
+    protected double mapPixelWidth;
+    protected double mapPixelHeight;
 
     protected WorldShiftManager(GameView gameView) {
         super(gameView);
@@ -80,6 +85,31 @@ public class WorldShiftManager extends UserControlledGameObjectPool {
         for (GameObject gameObject : shiftableGameObjects) {
             gameObject.getPosition().right(shiftX);
             gameObject.getPosition().down(shiftY);
+            if (gameObject instanceof TrackTile trackTile) {
+                teleportTracktileToOtherEnd(trackTile);
+            }
+        }
+    }
+
+    private void teleportTracktileToOtherEnd(TrackTile trackTile) {
+        Position position = trackTile.getPosition();
+
+        double gameViewCenterX = GameView.WIDTH / 2.0;
+        double gameViewCenterY = GameView.HEIGHT / 2.0;
+
+        double tileCenterX = position.getX() + trackTile.getWidth() / 2.0;
+        double tileCenterY = position.getY() + trackTile.getHeight() / 2.0;
+
+        if (tileCenterX < gameViewCenterX - this.mapPixelWidth / 2.0) {
+            position.updateCoordinates(position.getX() + this.mapPixelWidth, position.getY());
+        } else if (tileCenterX > gameViewCenterX + this.mapPixelWidth / 2.0) {
+            position.updateCoordinates(position.getX() - this.mapPixelWidth, position.getY());
+        }
+
+        if (tileCenterY < gameViewCenterY - this.mapPixelHeight / 2.0) {
+            position.updateCoordinates(position.getX(), position.getY() + this.mapPixelHeight);
+        } else if (tileCenterY > gameViewCenterY + this.mapPixelHeight / 2.0) {
+            position.updateCoordinates(position.getX(), position.getY() - this.mapPixelHeight);
         }
     }
 }

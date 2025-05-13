@@ -3,6 +3,7 @@ package thd.game.managers;
 import thd.game.utilities.GameView;
 
 class GameManager extends LevelManager {
+    private int lastPoints = 0;
 
     GameManager(GameView gameView) {
         super(gameView);
@@ -25,7 +26,12 @@ class GameManager extends LevelManager {
     }
 
     private boolean endOfLevel() {
-        return gameView.timer(3000, 0, this);
+        boolean levelEnd = false;
+        if (points > lastPoints) {
+            levelEnd = true;
+        }
+        lastPoints = points;
+        return levelEnd;
     }
 
     private boolean endOfGame() {

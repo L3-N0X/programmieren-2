@@ -26,8 +26,11 @@ public class Car extends CollidingGameObject implements MainCharacter {
     private static final int ROTATION_OFFSET = 8;
 
     private State currentState;
+    private CarBlockImages.Fire currentCrashState;
 
-    private final GameBlockImages.CarTiles[] carTiles;
+    private String blockImage;
+
+    private final CarBlockImages.CarRotation[] carTiles;
     private final LinkedList<CollidingGameObject> collidingGameObjectsForPathDecision;
 
     private int carRotation;
@@ -46,12 +49,14 @@ public class Car extends CollidingGameObject implements MainCharacter {
     public Car(GameView gameView, GamePlayManager gamePlayManager) {
         super(gameView, gamePlayManager);
         position.updateCoordinates(GameView.WIDTH / 2d, GameView.HEIGHT / 2d);
-        size = GameBlockImages.BLOCK_SIZE;
-        width = GameBlockImages.CarTiles.TILE_WIDTH * size;
-        height = GameBlockImages.CarTiles.TILE_HEIGHT * size;
+        size = MapBlockImages.BLOCK_SIZE;
+        width = CarBlockImages.TILE_WIDTH * size;
+        height = CarBlockImages.TILE_HEIGHT * size;
         carRotation = ROTATION_OFFSET;
         currentState = State.IDLE;
-        carTiles = GameBlockImages.CarTiles.values();
+        currentCrashState = CarBlockImages.Fire.FIRE_00;
+        carTiles = CarBlockImages.CarRotation.values();
+        blockImage = carTiles[carRotation].blockImage();
         collidingGameObjectsForPathDecision = new LinkedList<>();
         distanceToBackground = 10;
         hitBoxOffsets(8, 8, -16, -16);
@@ -142,6 +147,9 @@ public class Car extends CollidingGameObject implements MainCharacter {
 
     @Override
     public void updatePosition() {
+        if (currentState == State.CRASHED) {
+            return;
+        }
         rotation = ((double) ((carRotation - ROTATION_OFFSET) % ROTATION_STEPS) / ROTATION_STEPS) * 2 * Math.PI;
         double dx = Math.cos(rotation) * speedInPixel;
         double dy = Math.sin(rotation) * speedInPixel;
@@ -165,6 +173,13 @@ public class Car extends CollidingGameObject implements MainCharacter {
         super.updateStatus();
         switch (currentState) {
             case IDLE, BREAKING, ACCELERATING:
+                blockImage = carTiles[carRotation].blockImage();
+                break;
+            case CRASHED:
+                if (gameView.timer(200, 0, this)) {
+                    blockImage = currentCrashState.blockImage();
+                    switchToNextCrashState();
+                }
                 break;
         }
     }
@@ -186,15 +201,40 @@ public class Car extends CollidingGameObject implements MainCharacter {
     }
 
     /**
+     * Sets the current state to crashed and stops the car.
+     */
+    public void crash() {
+        currentState = State.CRASHED;
+        speedInPixel = 0;
+    }
+
+    /**
      * Update the acceleration timer.
      */
     public void updateAccelerationTimer() {
         lastAcceleratingTime = gameView.gameTimeInMilliseconds();
     }
 
+    private void switchToNextCrashState() {
+        int nextState = (currentCrashState.ordinal() + 1) % CarBlockImages.Fire.values().length;
+        currentCrashState = CarBlockImages.Fire.values()[nextState];
+    }
+
+    /**
+     * Resets the cars rotation and timers.
+     */
+    public void reset() {
+        speedInPixel = 0;
+        rotation = 0;
+        carRotation = ROTATION_OFFSET;
+        lastSteeringTime = 0;
+        lastAcceleratingTime = 0;
+        currentState = State.IDLE;
+    }
+
     @Override
     public void addToCanvas() {
-        gameView.addBlockImageToCanvas(carTiles[carRotation].blockImage(), position.getX(), position.getY(), size, 0);
+        gameView.addBlockImageToCanvas(blockImage, position.getX(), position.getY(), size, 0);
         if (GameViewManager.DEBUG) {
             gameView.addTextToCanvas("Speed: " + speedInPixel, 5, 30, 14, true, Color.BLACK, 0);
         }
@@ -206,6 +246,6 @@ public class Car extends CollidingGameObject implements MainCharacter {
     }
 
     private enum State {
-        IDLE, ACCELERATING, BREAKING
+        IDLE, ACCELERATING, BREAKING, CRASHED
     }
 }

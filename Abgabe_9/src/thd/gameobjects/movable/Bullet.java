@@ -11,6 +11,31 @@ import thd.gameobjects.base.GameObject;
  */
 class Bullet extends CollidingGameObject {
 
+    private enum ProjectileState {
+        PROJECTILE_1("""
+                              HHLLLLL\s
+                             HIILLLLLL\s
+                             H HLLLLL\s
+                             """),
+        PROJECTILE_2("""
+                              HHLLLLL\s
+                             HIHLLLLLL\s
+                              HHLLLLL\s
+                             """),
+        PROJECTILE_3("""
+                               HLLLLL\s
+                             H HLLLLLL\s
+                              HHLLLLL\s
+                             """);
+        private final String blockImage;
+
+        ProjectileState(String blockImage) {
+            this.blockImage = blockImage;
+        }
+    }
+
+    private ProjectileState projectileState;
+
     /**
      * Creates a new bullet in the game at a default position.
      *
@@ -37,6 +62,11 @@ class Bullet extends CollidingGameObject {
         this(gameView, gamePlayManager);
         position.updateCoordinates(x, y);
         this.rotation = rotation;
+    }
+
+    private void switchToNextProjectileState() {
+        int nextState = (currentCrashState.ordinal() + 1) % CarBlockImages.Fire.values().length;
+        currentCrashState = CarBlockImages.Fire.values()[nextState];
     }
 
     @Override

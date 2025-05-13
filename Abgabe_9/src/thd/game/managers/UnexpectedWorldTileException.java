@@ -1,7 +1,15 @@
 package thd.game.managers;
 
-class UnexpectedWorldTileException extends RuntimeException {
-    UnexpectedWorldTileException(String message) {
+/**
+ * An exception that gets thrown once the game runs into unexpected world tiles.
+ */
+public class UnexpectedWorldTileException extends RuntimeException {
+    /**
+     * Creates a new exception for unexpected world tiles.
+     *
+     * @param message the error Message
+     */
+    public UnexpectedWorldTileException(String message) {
         super(message);
     }
 }
