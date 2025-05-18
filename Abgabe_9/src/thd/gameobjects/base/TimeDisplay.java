@@ -33,9 +33,31 @@ public abstract class TimeDisplay extends GameObject {
     public void addToCanvas() {
         gameView.addTextToCanvas(timerLabel, position.getX(), position.getY(), size, true, Color.WHITE, rotation,
                                  "bold.ttf");
-        gameView.addTextToCanvas(guiTimer.timeSinceStartFormatted(), position.getX() - 8,
-                                 position.getY() + size * 1.4, size, true, Color.WHITE,
-                                 rotation, "bold.ttf");
+
+        gameView.addTextToCanvas(guiTimer.minutesSinceStart(),
+                                 position.getX() - size,
+                                 position.getY() + size * 1.4,
+                                 size, true, Color.WHITE, rotation, "bold.ttf");
+
+        gameView.addTextToCanvas(":",
+                                 position.getX() + size * 1.2,
+                                 position.getY() + size * 1.4,
+                                 size, true, Color.WHITE, rotation, "bold.ttf");
+
+        gameView.addTextToCanvas(guiTimer.secondsSinceStart(),
+                                 position.getX() + size * 1.6,
+                                 position.getY() + size * 1.4,
+                                 size, true, Color.WHITE, rotation, "bold.ttf");
+
+        gameView.addTextToCanvas(":",
+                                 position.getX() + size * 4,
+                                 position.getY() + size * 1.4,
+                                 size, true, Color.WHITE, rotation, "bold.ttf");
+
+        gameView.addTextToCanvas(guiTimer.hundredthSinceStart(),
+                                 position.getX() + size * 4.5,
+                                 position.getY() + size * 1.4,
+                                 size, true, Color.WHITE, rotation, "bold.ttf");
     }
 
     @Override
