@@ -55,7 +55,7 @@ public class Car extends CollidingGameObject implements MainCharacter {
     public Car(GameView gameView, GamePlayManager gamePlayManager) {
         super(gameView, gamePlayManager);
         position.updateCoordinates(GameView.WIDTH / 2d, GameView.HEIGHT / 2d);
-        size = MapBlockImages.BLOCK_SIZE;
+        size = GamePlayManager.BLOCK_SIZE;
         width = CarBlockImages.TILE_WIDTH * size;
         height = CarBlockImages.TILE_HEIGHT * size;
         carRotation = ROTATION_OFFSET;
@@ -333,8 +333,8 @@ public class Car extends CollidingGameObject implements MainCharacter {
             double lastTrackTileWorldX = lastTrackTile.getPosition().getX();
             double lastTrackTileWorldY = lastTrackTile.getPosition().getY();
 
-            double tileWidthInPixels = MapBlockImages.BLOCK_SIZE * MapBlockImages.MapTileImage.TILE_WIDTH; // Use exact tile size
-            double tileHeightInPixels = MapBlockImages.BLOCK_SIZE * MapBlockImages.MapTileImage.TILE_HEIGHT; // Use exact tile size
+            double tileWidthInPixels = GamePlayManager.BLOCK_SIZE * GamePlayManager.MAP_TILE_WIDTH; // Use exact tile size
+            double tileHeightInPixels = GamePlayManager.BLOCK_SIZE * GamePlayManager.MAP_TILE_HEIGHT; // Use exact tile size
 
             double screenCenterX = GameView.WIDTH / 2.0;
             double screenCenterY = GameView.HEIGHT / 2.0;

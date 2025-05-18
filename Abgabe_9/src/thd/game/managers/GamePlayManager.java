@@ -10,8 +10,20 @@ import thd.gameobjects.base.GameObject;
 public class GamePlayManager extends WorldShiftManager {
     private final GameObjectManager gameObjectManager;
 
-    public static final int TILE_OFFSET_COLUMNS_IN_BLOCKS = 0;
-    public static final int TILE_OFFSET_LINES_IN_BLOCKS = 68;
+    static final int TILE_OFFSET_COLUMNS_IN_BLOCKS = 0;
+    static final int TILE_OFFSET_LINES_IN_BLOCKS = 68;
+    /**
+     * The size of one Pixel, equal for all BlockImages.
+     */
+    public static final double BLOCK_SIZE = 4;
+    /**
+     * The width of a CarTile in blocks.
+     */
+    public static final int MAP_TILE_HEIGHT = 112;
+    /**
+     * The height of a CarTile in blocks.
+     */
+    public static final int MAP_TILE_WIDTH = 128;
 
     protected int lives;
     protected int points;

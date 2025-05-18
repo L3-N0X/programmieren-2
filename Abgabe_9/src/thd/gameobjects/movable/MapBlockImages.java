@@ -1,25 +1,22 @@
 package thd.gameobjects.movable;
 
+import thd.game.managers.GamePlayManager;
+
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * This class contains all block images from the game.
  */
-public final class MapBlockImages {
+final class MapBlockImages {
 
     private MapBlockImages() {
     }
 
     /**
-     * The size of one Pixel, equal for all BlockImages.
-     */
-    public static final double BLOCK_SIZE = 4;
-
-    /**
      * This enum contains all track tiles like House, Curve and Rocks.
      */
-    public enum MapTileImage {
+    enum MapTileImage {
         TRACK_BEND_LE("""
                               DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD\s
                               DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD\s
@@ -3330,15 +3327,6 @@ public final class MapBlockImages {
         private char[][] blockArray;
         private ArrayList<Integer> possibleRotations;
 
-        /**
-         * The width of a CarTile in blocks.
-         */
-        public static final int TILE_HEIGHT = 112;
-        /**
-         * The height of a CarTile in blocks.
-         */
-        public static final int TILE_WIDTH = 128;
-
         MapTileImage(String tile, List<Integer> possibleRotations) {
             this(tile);
             this.possibleRotations = new ArrayList<>(possibleRotations);
@@ -3346,7 +3334,7 @@ public final class MapBlockImages {
 
         MapTileImage(String tile) {
             this.tile = tile;
-            this.blockArray = new char[TILE_HEIGHT][TILE_WIDTH];
+            this.blockArray = new char[GamePlayManager.MAP_TILE_HEIGHT][GamePlayManager.MAP_TILE_WIDTH];
             this.possibleRotations = new ArrayList<>();
             precalculateBlockArray();
         }

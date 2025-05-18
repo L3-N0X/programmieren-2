@@ -153,7 +153,7 @@ class Driver extends GameObject {
         super(gameView, gamePlayManager);
         position.updateCoordinates(100, 100);
         speedInPixel = 5;
-        size = MapBlockImages.BLOCK_SIZE;
+        size = GamePlayManager.BLOCK_SIZE;
         width = DriverBlockImages.TILE_WIDTH * size;
         height = DriverBlockImages.TILE_HEIGHT * size;
         distanceToBackground = 8;
