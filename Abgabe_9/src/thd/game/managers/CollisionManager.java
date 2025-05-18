@@ -1,7 +1,6 @@
 package thd.game.managers;
 
 import thd.gameobjects.base.CollidingGameObject;
-import thd.gameobjects.base.CollidingObject;
 import thd.gameobjects.base.GameObject;
 
 import java.util.LinkedList;

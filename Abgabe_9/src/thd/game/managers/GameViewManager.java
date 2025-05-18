@@ -24,7 +24,7 @@ public class GameViewManager {
         gameView.updateStatusText("Leon Gött - Java Programmierung SS 2025");
         gameView.updateWindowIcon("icon.png");
         gameView.updateBackgroundColor(new Color(0x62d532));
-        
+
         gameView.updateColorForBlockImage('A', new Color(44, 61, 236));
         gameView.updateColorForBlockImage('D', new Color(98, 213, 50));
         gameView.updateColorForBlockImage('E', new Color(175, 60, 88));

@@ -3,7 +3,7 @@ package thd.game.managers;
 import thd.game.utilities.GameView;
 
 class GameManager extends LevelManager {
-    private int lastPoints = 0;
+    private int lastPoints;
 
     GameManager(GameView gameView) {
         super(gameView);

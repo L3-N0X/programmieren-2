@@ -3,7 +3,6 @@ package thd.game.managers;
 import thd.game.level.Level;
 import thd.game.utilities.GameView;
 import thd.gameobjects.movable.Car;
-import thd.gameobjects.movable.Jimmy;
 import thd.gameobjects.unmovable.BestTimeDisplay;
 import thd.gameobjects.unmovable.LapTimeDisplay;
 import thd.gameobjects.unmovable.LastTimeDisplay;
@@ -18,7 +17,6 @@ class UserControlledGameObjectPool {
     protected LastTimeDisplay lastTimeDisplay;
     protected BestTimeDisplay bestTimeDisplay;
     protected Level level;
-    protected Jimmy jimmy;
 
     private boolean currentlyBreaking;
 
@@ -57,7 +55,9 @@ class UserControlledGameObjectPool {
             car.shoot();
         } else if (keyCode == KeyEvent.VK_S || keyCode == KeyEvent.VK_DOWN) {
             currentlyBreaking = true;
-            car.down();
+            if (car.isDriving()) {
+                car.down();
+            }
         }
     }
 }

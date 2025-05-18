@@ -3,7 +3,6 @@ package thd.gameobjects.movable;
 import thd.game.managers.GamePlayManager;
 import thd.game.utilities.GameView;
 import thd.gameobjects.base.CollidingGameObject;
-import thd.gameobjects.base.CollidingObject;
 import thd.gameobjects.base.GameObject;
 
 /**
@@ -11,7 +10,7 @@ import thd.gameobjects.base.GameObject;
  */
 class Bullet extends CollidingGameObject {
 
-    private enum ProjectileState {
+    private enum State {
         PROJECTILE_1("""
                               HHLLLLL\s
                              HIILLLLLL\s
@@ -29,12 +28,12 @@ class Bullet extends CollidingGameObject {
                              """);
         private final String blockImage;
 
-        ProjectileState(String blockImage) {
+        State(String blockImage) {
             this.blockImage = blockImage;
         }
     }
 
-    private ProjectileState projectileState;
+    private State currentState;
 
     /**
      * Creates a new bullet in the game at a default position.
@@ -50,11 +49,12 @@ class Bullet extends CollidingGameObject {
         width = 6 * size;
         height = 3 * size;
         distanceToBackground = 20;
+        currentState = State.PROJECTILE_1;
         hitBoxOffsets(width / 4, height / 4, -width / 2, -height / 2);
     }
 
     @Override
-    public void reactToCollisionWith(CollidingObject other) {
+    public void reactToCollisionWith(CollidingGameObject other) {
 
     }
 
@@ -64,9 +64,9 @@ class Bullet extends CollidingGameObject {
         this.rotation = rotation;
     }
 
-    private void switchToNextProjectileState() {
-        int nextState = (currentCrashState.ordinal() + 1) % CarBlockImages.Fire.values().length;
-        currentCrashState = CarBlockImages.Fire.values()[nextState];
+    private void switchToNextState() {
+        int nextState = (currentState.ordinal() + 1) % State.values().length;
+        currentState = State.values()[nextState];
     }
 
     @Override
@@ -85,11 +85,15 @@ class Bullet extends CollidingGameObject {
         ) {
             gamePlayManager.destroyGameObject(this);
         }
+
+        if (gameView.timer(150, 0, this)) {
+            switchToNextState();
+        }
     }
 
     @Override
     public void addToCanvas() {
-        gameView.addBlockImageToCanvas("LLLLL\nLLLLLL\nLLLLL", position.getX(), position.getY(), size,
+        gameView.addBlockImageToCanvas(currentState.blockImage, position.getX(), position.getY(), size,
                                        rotation / (2 * Math.PI) * 360);
     }
 

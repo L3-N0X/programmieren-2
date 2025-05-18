@@ -1,6 +1,6 @@
 package thd.gameobjects.movable;
 
-public class PlayerBlockImages {
+class DriverBlockImages {
 
     static final int TILE_HEIGHT = 11;
     static final int TILE_WIDTH = 14;

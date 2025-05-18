@@ -4,7 +4,7 @@ import thd.game.utilities.GameView;
 import thd.gameobjects.base.GameObject;
 import thd.gameobjects.base.Position;
 import thd.gameobjects.base.ShiftableGameObject;
-import thd.gameobjects.movable.TrackTile;
+import thd.gameobjects.movable.MapTile;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -85,20 +85,20 @@ public class WorldShiftManager extends UserControlledGameObjectPool {
         for (GameObject gameObject : shiftableGameObjects) {
             gameObject.getPosition().right(shiftX);
             gameObject.getPosition().down(shiftY);
-            if (gameObject instanceof TrackTile trackTile) {
-                teleportTracktileToOtherEnd(trackTile);
+            if (gameObject instanceof MapTile mapTile) {
+                teleportTrackTileToOtherEnd(mapTile);
             }
         }
     }
 
-    private void teleportTracktileToOtherEnd(TrackTile trackTile) {
-        Position position = trackTile.getPosition();
+    private void teleportTrackTileToOtherEnd(MapTile mapTile) {
+        Position position = mapTile.getPosition();
 
         double gameViewCenterX = GameView.WIDTH / 2.0;
         double gameViewCenterY = GameView.HEIGHT / 2.0;
 
-        double tileCenterX = position.getX() + trackTile.getWidth() / 2.0;
-        double tileCenterY = position.getY() + trackTile.getHeight() / 2.0;
+        double tileCenterX = position.getX() + mapTile.getWidth() / 2.0;
+        double tileCenterY = position.getY() + mapTile.getHeight() / 2.0;
 
         if (tileCenterX < gameViewCenterX - this.mapPixelWidth / 2.0) {
             position.updateCoordinates(position.getX() + this.mapPixelWidth, position.getY());

@@ -10,6 +10,9 @@ import thd.gameobjects.base.GameObject;
 public class GamePlayManager extends WorldShiftManager {
     private final GameObjectManager gameObjectManager;
 
+    public static final int TILE_OFFSET_COLUMNS_IN_BLOCKS = 0;
+    public static final int TILE_OFFSET_LINES_IN_BLOCKS = 68;
+
     protected int lives;
     protected int points;
 

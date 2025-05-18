@@ -1,10 +1,15 @@
 package thd.gameobjects.movable;
 
-public class CarBlockImages {
+import thd.gameobjects.base.Position;
+
+import java.util.ArrayList;
+import java.util.List;
+
+class CarBlockImages {
     static final int TILE_HEIGHT = 20;
     static final int TILE_WIDTH = 32;
 
-    public enum CarRotation {
+    enum CarRotation {
         ROT_00("""
                                  LL      LL          \s
                                  LLIIIIIILL          \s
@@ -26,7 +31,10 @@ public class CarBlockImages {
                                                      \s
                                                      \s
                                                      \s
-                       """),
+                       """, List.of(new Position(10, 0),
+                                    new Position(19, 0),
+                                    new Position(6, 9),
+                                    new Position(23, 9))),
         ROT_01("""
                                    LL                \s
                                    LLII    LL        \s
@@ -48,7 +56,10 @@ public class CarBlockImages {
                                                      \s
                                                      \s
                                                      \s
-                       """),
+                       """, List.of(new Position(12, 0),
+                                    new Position(21, 1),
+                                    new Position(6, 9),
+                                    new Position(23, 10))),
         ROT_02("""
                                       LL             \s
                                       LL             \s
@@ -70,7 +81,10 @@ public class CarBlockImages {
                                                      \s
                                                      \s
                                                      \s
-                       """),
+                       """, List.of(new Position(16, 0),
+                                    new Position(24, 2),
+                                    new Position(8, 6),
+                                    new Position(24, 12))),
         ROT_03("""
                                                      \s
                                         LL           \s
@@ -92,7 +106,10 @@ public class CarBlockImages {
                                         LL           \s
                                                      \s
                                                      \s
-                       """),
+                       """, List.of(new Position(18, 1),
+                                    new Position(26, 4),
+                                    new Position(9, 5),
+                                    new Position(22, 13))),
         ROT_04("""
                                                      \s
                                           LL         \s
@@ -114,7 +131,10 @@ public class CarBlockImages {
                                       LL             \s
                                                      \s
                                                      \s
-                       """),
+                       """, List.of(new Position(20, 1),
+                                    new Position(26, 6),
+                                    new Position(10, 5),
+                                    new Position(20, 14))),
         ROT_05("""
                                                      \s
                                                      \s
@@ -136,7 +156,10 @@ public class CarBlockImages {
                                       LL             \s
                                                      \s
                                                      \s
-                       """),
+                       """, List.of(new Position(22, 2),
+                                    new Position(26, 7),
+                                    new Position(10, 5),
+                                    new Position(20, 14))),
         ROT_06("""
                                                      \s
                                                      \s
@@ -158,7 +181,10 @@ public class CarBlockImages {
                                    LLLL              \s
                                                      \s
                                                      \s
-                       """),
+                       """, List.of(new Position(23, 3),
+                                    new Position(27, 8),
+                                    new Position(13, 4),
+                                    new Position(19, 15))),
         ROT_07("""
                                                      \s
                                                      \s
@@ -180,7 +206,10 @@ public class CarBlockImages {
                                  LLLLLLLL            \s
                                                      \s
                                                      \s
-                       """),
+                       """, List.of(new Position(27, 5),
+                                    new Position(29, 12),
+                                    new Position(17, 17),
+                                    new Position(15, 4))),
         ROT_08("""
                                                      \s
                                                      \s
@@ -202,7 +231,10 @@ public class CarBlockImages {
                                                      \s
                                                      \s
                                                      \s
-                       """),
+                       """, List.of(new Position(15, 3),
+                                    new Position(15, 16),
+                                    new Position(27, 5),
+                                    new Position(27, 14))),
         ROT_09("""
                                                      \s
                                                      \s
@@ -224,7 +256,10 @@ public class CarBlockImages {
                                                      \s
                                                      \s
                                                      \s
-                       """),
+                       """, List.of(new Position(17, 2),
+                                    new Position(15, 15),
+                                    new Position(29, 7),
+                                    new Position(27, 14))),
         ROT_10("""
                                                      \s
                                                      \s
@@ -246,7 +281,10 @@ public class CarBlockImages {
                                                      \s
                                                      \s
                                                      \s
-                       """),
+                       """, List.of(new Position(19, 4),
+                                    new Position(27, 11),
+                                    new Position(23, 16),
+                                    new Position(13, 15))),
         ROT_11("""
                                                      \s
                                                      \s
@@ -268,7 +306,10 @@ public class CarBlockImages {
                                             LL       \s
                                                      \s
                                                      \s
-                       """),
+                       """, List.of(new Position(26, 12),
+                                    new Position(22, 17),
+                                    new Position(10, 15),
+                                    new Position(20, 5))),
         ROT_12("""
                                                      \s
                                                      \s
@@ -290,7 +331,10 @@ public class CarBlockImages {
                                         LLLL         \s
                                           LL         \s
                                                      \s
-                       """),
+                       """, List.of(new Position(26, 13),
+                                    new Position(20, 18),
+                                    new Position(20, 5),
+                                    new Position(10, 15))),
         ROT_13("""
                                                      \s
                                                      \s
@@ -312,7 +356,10 @@ public class CarBlockImages {
                                       LLLL           \s
                                         LL           \s
                                                      \s
-                       """),
+                       """, List.of(new Position(26, 15),
+                                    new Position(17, 18),
+                                    new Position(22, 6),
+                                    new Position(8, 14))),
         ROT_14("""
                                                      \s
                                                      \s
@@ -334,7 +381,10 @@ public class CarBlockImages {
                                     LLLLIIII  LL     \s
                                       LL             \s
                                       LL             \s
-                       """),
+                       """, List.of(new Position(16, 19),
+                                    new Position(24, 17),
+                                    new Position(24, 7),
+                                    new Position(8, 13))),
         ROT_15("""
                                                      \s
                                                      \s
@@ -356,7 +406,10 @@ public class CarBlockImages {
                                    LLIIIIIILL        \s
                                    LLII    LL        \s
                                    LL                \s
-                       """),
+                       """, List.of(new Position(21, 18),
+                                    new Position(12, 19),
+                                    new Position(6, 10),
+                                    new Position(23, 9))),
         ROT_16("""
                                                      \s
                                                      \s
@@ -378,7 +431,10 @@ public class CarBlockImages {
                                  LLIIIIIILL          \s
                                  LLIIIIIILL          \s
                                  LL      LL          \s
-                       """),
+                       """, List.of(new Position(19, 19),
+                                    new Position(10, 19),
+                                    new Position(6, 10),
+                                    new Position(23, 10))),
         ROT_17("""
                                                      \s
                                                      \s
@@ -400,7 +456,10 @@ public class CarBlockImages {
                                LLIIIIIILL            \s
                                LL    IILL            \s
                                        LL            \s
-                       """),
+                       """, List.of(new Position(17, 19),
+                                    new Position(8, 18),
+                                    new Position(6, 9),
+                                    new Position(23, 10))),
         ROT_18("""
                                                      \s
                                                      \s
@@ -422,7 +481,10 @@ public class CarBlockImages {
                              LL  IIIILLLL            \s
                                      LL              \s
                                      LL              \s
-                       """),
+                       """, List.of(new Position(15, 19),
+                                    new Position(6, 17),
+                                    new Position(22, 13),
+                                    new Position(6, 7))),
         ROT_19("""
                                                      \s
                                                      \s
@@ -444,7 +506,10 @@ public class CarBlockImages {
                                    LLLL              \s
                                    LL                \s
                                                      \s
-                       """),
+                       """, List.of(new Position(4, 15),
+                                    new Position(12, 17),
+                                    new Position(8, 6),
+                                    new Position(22, 13))),
         ROT_20("""
                                                      \s
                                                      \s
@@ -466,7 +531,10 @@ public class CarBlockImages {
                                  LLLL                \s
                                  LL                  \s
                                                      \s
-                       """),
+                       """, List.of(new Position(4, 13),
+                                    new Position(10, 18),
+                                    new Position(10, 5),
+                                    new Position(20, 14))),
         ROT_21("""
                                                      \s
                                                      \s
@@ -488,7 +556,10 @@ public class CarBlockImages {
                                LL                    \s
                                                      \s
                                                      \s
-                       """),
+                       """, List.of(new Position(8, 17),
+                                    new Position(4, 12),
+                                    new Position(10, 5),
+                                    new Position(19, 15))),
         ROT_22("""
                                                      \s
                                                      \s
@@ -510,7 +581,10 @@ public class CarBlockImages {
                                                      \s
                                                      \s
                                                      \s
-                       """),
+                       """, List.of(new Position(6, 16),
+                                    new Position(2, 11),
+                                    new Position(10, 4),
+                                    new Position(16, 15))),
         ROT_23("""
                                                      \s
                                                      \s
@@ -532,7 +606,10 @@ public class CarBlockImages {
                                                      \s
                                                      \s
                                                      \s
-                       """),
+                       """, List.of(new Position(2, 14),
+                                    new Position(0, 7),
+                                    new Position(12, 2),
+                                    new Position(14, 15))),
         ROT_24("""
                                                      \s
                                                      \s
@@ -554,7 +631,10 @@ public class CarBlockImages {
                                                      \s
                                                      \s
                                                      \s
-                       """),
+                       """, List.of(new Position(2, 5),
+                                    new Position(2, 14),
+                                    new Position(14, 3),
+                                    new Position(14, 16))),
         ROT_25("""
                                                      \s
                                                      \s
@@ -576,7 +656,10 @@ public class CarBlockImages {
                                    LLLLLLLL          \s
                                                      \s
                                                      \s
-                       """),
+                       """, List.of(new Position(2, 5),
+                                    new Position(0, 12),
+                                    new Position(14, 4),
+                                    new Position(12, 17))),
         ROT_26("""
                                                      \s
                                                      \s
@@ -598,7 +681,10 @@ public class CarBlockImages {
                                      LLLL            \s
                                                      \s
                                                      \s
-                       """),
+                       """, List.of(new Position(6, 3),
+                                    new Position(2, 8),
+                                    new Position(17, 4),
+                                    new Position(10, 15))),
         ROT_27("""
                                                      \s
                                                      \s
@@ -620,7 +706,10 @@ public class CarBlockImages {
                                     LL               \s
                                                      \s
                                                      \s
-                       """),
+                       """, List.of(new Position(7, 2),
+                                    new Position(3, 7),
+                                    new Position(19, 4),
+                                    new Position(9, 14))),
         ROT_28("""
                                                      \s
                                 LL                   \s
@@ -642,7 +731,10 @@ public class CarBlockImages {
                                                      \s
                                                      \s
                                                      \s
-                       """),
+                       """, List.of(new Position(9, 1),
+                                    new Position(3, 6),
+                                    new Position(19, 4),
+                                    new Position(9, 14))),
         ROT_29("""
                                                      \s
                                   LL                 \s
@@ -664,7 +756,10 @@ public class CarBlockImages {
                                   LL                 \s
                                                      \s
                                                      \s
-                       """),
+                       """, List.of(new Position(11, 1),
+                                    new Position(3, 4),
+                                    new Position(7, 13),
+                                    new Position(21, 5))),
         ROT_30("""
                                     LL               \s
                                     LL               \s
@@ -686,7 +781,10 @@ public class CarBlockImages {
                                                      \s
                                                      \s
                                                      \s
-                       """),
+                       """, List.of(new Position(14, 0),
+                                    new Position(5, 2),
+                                    new Position(5, 12),
+                                    new Position(21, 6))),
         ROT_31("""
                                        LL            \s
                                LL    IILL            \s
@@ -708,19 +806,28 @@ public class CarBlockImages {
                                                      \s
                                                      \s
                                                      \s
-                       """);
+                       """, List.of(new Position(8, 1),
+                                    new Position(17, 0),
+                                    new Position(6, 10),
+                                    new Position(23, 9)));
         private final String tile;
+        private final ArrayList<Position> collisionPointsInBlocks;
 
-        CarRotation(String tile) {
+        CarRotation(String tile, List<Position> collisionPointsInBlocks) {
             this.tile = tile;
+            this.collisionPointsInBlocks = new ArrayList<>(collisionPointsInBlocks);
         }
 
         String blockImage() {
             return tile;
         }
+
+        ArrayList<Position> getCollisionPositionsInBlocks() {
+            return collisionPointsInBlocks;
+        }
     }
 
-    public enum Fire {
+    enum Fire {
         FIRE_00("""
                                     HHHHHHHHHHHH        \s
                                     HHHHHHHHHHHH        \s

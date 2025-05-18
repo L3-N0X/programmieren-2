@@ -4,22 +4,23 @@ import thd.game.managers.GamePlayManager;
 import thd.game.managers.GameViewManager;
 import thd.game.utilities.GameView;
 import thd.gameobjects.base.CollidingGameObject;
-import thd.gameobjects.base.CollidingObject;
 import thd.gameobjects.base.MainCharacter;
+import thd.gameobjects.base.Position;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 /**
  * A background tile of a rock formation with many rocks.
  */
 public class Car extends CollidingGameObject implements MainCharacter {
-    private static final double MAX_SPEED = 14;
-    private static final double ACCELERATION = 0.26;
-    private static final double BREAK_RATE = 2.6;
+    private static final double MAX_SPEED = 17;
+    private static final double ACCELERATION = 0.3;
+    private static final double BREAK_RATE = 2.8;
     private static final double STEERING_THRESHOLD = 0.4;
 
-    private static final int STEERING_COOLDOWN_IN_MILLISECONDS = 350;
+    private static final int STEERING_COOLDOWN_IN_MILLISECONDS = 300;
     private static final int SHOT_DURATION_IN_MILLISECONDS = 300;
 
     private static final int ROTATION_STEPS = 32;
@@ -30,10 +31,15 @@ public class Car extends CollidingGameObject implements MainCharacter {
 
     private String blockImage;
 
-    private final CarBlockImages.CarRotation[] carTiles;
+    private Driver driver;
+
+    private final CarBlockImages.CarRotation[] carRotationTiles;
     private final LinkedList<CollidingGameObject> collidingGameObjectsForPathDecision;
 
     private int carRotation;
+
+    private MapTile lastTrackTile;
+    private int lastCarRotationOnTrack;
 
     private int lastSteeringTime;
     private int lastAcceleratingTime;
@@ -55,8 +61,8 @@ public class Car extends CollidingGameObject implements MainCharacter {
         carRotation = ROTATION_OFFSET;
         currentState = State.IDLE;
         currentCrashState = CarBlockImages.Fire.FIRE_00;
-        carTiles = CarBlockImages.CarRotation.values();
-        blockImage = carTiles[carRotation].blockImage();
+        carRotationTiles = CarBlockImages.CarRotation.values();
+        blockImage = carRotationTiles[carRotation].blockImage();
         collidingGameObjectsForPathDecision = new LinkedList<>();
         distanceToBackground = 10;
         hitBoxOffsets(8, 8, -16, -16);
@@ -67,7 +73,7 @@ public class Car extends CollidingGameObject implements MainCharacter {
      *
      * @param collidingGameObject The gameObjects that should get added
      */
-    private void addCollidingGameObjectsForPathDecision(CollidingGameObject collidingGameObject) {
+    public void addCollidingGameObjectsForPathDecision(CollidingGameObject collidingGameObject) {
         collidingGameObjectsForPathDecision.add(collidingGameObject);
     }
 
@@ -81,8 +87,52 @@ public class Car extends CollidingGameObject implements MainCharacter {
     }
 
     @Override
-    public void reactToCollisionWith(CollidingObject other) {
+    public void reactToCollisionWith(CollidingGameObject other) {
+        if (other instanceof MapTile mapTile) {
+            for (MapSurface mapSurface : mapTile.mapSurfacesAtCarPosition(this)) {
+                handleCollisionWithMapTile(mapSurface, mapTile);
 
+                MapBlockImages.MapTileImage mapTileImage = mapTile.getMapTileImage();
+                handleMapSurface(mapSurface, mapTileImage);
+            }
+        }
+    }
+
+    private void handleCollisionWithMapTile(MapSurface mapSurface, MapTile mapTile) {
+        if (mapTile.isTrackTile() && mapSurface == MapSurface.TRACK) {
+            lastTrackTile = mapTile;
+            lastCarRotationOnTrack = carRotation;
+        }
+    }
+
+    private void handleMapSurface(MapSurface mapSurface, MapBlockImages.MapTileImage mapTileImage) {
+        if (currentState == State.GRASS || currentState == State.WATER) {
+            currentState = State.ACCELERATING;
+        }
+        switch (mapSurface) {
+            case BRICK -> {
+                switch (mapTileImage) {
+                    case HOUSE_BIG, HOUSE_CORNER:
+                        crash();
+                        break;
+                    case ROCKS_FEW, ROCKS_MANY, ROCKS_NOT_SO_MANY, ROCKS_VERY_MANY:
+                        if (speedInPixel > MAX_SPEED / 4) {
+                            crash();
+                        }
+                        break;
+                }
+            }
+            case GRASS -> {
+                if (isDriving()) {
+                    currentState = State.GRASS;
+                }
+            }
+            case WATER -> {
+                if (isDriving()) {
+                    currentState = State.WATER;
+                }
+            }
+        }
     }
 
     /**
@@ -111,7 +161,22 @@ public class Car extends CollidingGameObject implements MainCharacter {
      * Accelerates the car to a maximum speed.
      */
     public void up() {
+        double speedIncrease = ACCELERATION * Math.sqrt(timeDeltaInSeconds(lastAcceleratingTime));
         speedInPixel += ACCELERATION * Math.sqrt(timeDeltaInSeconds(lastAcceleratingTime));
+        switch (currentState) {
+            case GRASS:
+                if (speedInPixel > MAX_SPEED * 0.7) {
+                    speedInPixel -= speedIncrease;
+                    speedInPixel *= 0.9;
+                }
+                break;
+            case WATER:
+                if (speedInPixel > MAX_SPEED * 0.6) {
+                    speedInPixel -= speedIncrease;
+                    speedInPixel *= 0.8;
+                }
+                break;
+        }
         speedInPixel = Math.min(speedInPixel, MAX_SPEED);
     }
 
@@ -153,18 +218,9 @@ public class Car extends CollidingGameObject implements MainCharacter {
         rotation = ((double) ((carRotation - ROTATION_OFFSET) % ROTATION_STEPS) / ROTATION_STEPS) * 2 * Math.PI;
         double dx = Math.cos(rotation) * speedInPixel;
         double dy = Math.sin(rotation) * speedInPixel;
+
         gamePlayManager.moveWorldToLeft(dx);
         gamePlayManager.moveWorldUp(dy);
-
-        for (CollidingGameObject collidingGameObject : collidingGameObjectsForPathDecision) {
-            if (collidesWith(collidingGameObject)) {
-                gamePlayManager.moveWorldToLeft(-dx);
-                gamePlayManager.moveWorldUp(-dy);
-                speedInPixel = 0;
-                gamePlayManager.lifeLost();
-                break;
-            }
-        }
         lastUpdateTime = gameView.gameTimeInMilliseconds();
     }
 
@@ -172,14 +228,18 @@ public class Car extends CollidingGameObject implements MainCharacter {
     public void updateStatus() {
         super.updateStatus();
         switch (currentState) {
-            case IDLE, BREAKING, ACCELERATING:
-                blockImage = carTiles[carRotation].blockImage();
-                break;
             case CRASHED:
                 if (gameView.timer(200, 0, this)) {
                     blockImage = currentCrashState.blockImage();
                     switchToNextCrashState();
                 }
+                if (gameView.timer(5000, 0, this)) {
+                    gamePlayManager.destroyGameObject(driver);
+                    respawn();
+                }
+                break;
+            default:
+                blockImage = carRotationTiles[carRotation].blockImage();
                 break;
         }
     }
@@ -190,21 +250,48 @@ public class Car extends CollidingGameObject implements MainCharacter {
      * @return <code>true</code> if the car is not idle.
      */
     public boolean isDriving() {
-        return currentState != State.IDLE;
+        return currentState != State.IDLE && currentState != State.CRASHED;
     }
 
     /**
      * This method sets the state to accelerating.
      */
     public void startDriving() {
-        currentState = State.ACCELERATING;
+        if (currentState != State.CRASHED) {
+            currentState = State.ACCELERATING;
+        }
     }
 
     /**
      * Sets the current state to crashed and stops the car.
      */
-    public void crash() {
+    private void crash() {
+        if (currentState == State.CRASHED) {
+            return;
+        }
         currentState = State.CRASHED;
+
+        double dx = Math.cos(rotation) * speedInPixel;
+        double dy = Math.sin(rotation) * speedInPixel;
+        gamePlayManager.moveWorldToLeft(-dx);
+        gamePlayManager.moveWorldUp(-dy);
+
+        driver = new Driver(gameView, gamePlayManager, position.getX(), position.getY());
+        gamePlayManager.spawnGameObject(driver);
+
+        if (carRotation <= 16) {
+            if (speedInPixel > MAX_SPEED * 0.7) {
+                driver.crashRollRight();
+            } else {
+                driver.crashRight();
+            }
+        } else {
+            if (speedInPixel > MAX_SPEED * 0.7) {
+                driver.crashRollLeft();
+            } else {
+                driver.crashLeft();
+            }
+        }
         speedInPixel = 0;
     }
 
@@ -224,12 +311,78 @@ public class Car extends CollidingGameObject implements MainCharacter {
      * Resets the cars rotation and timers.
      */
     public void reset() {
-        speedInPixel = 0;
         rotation = 0;
-        carRotation = ROTATION_OFFSET;
+        speedInPixel = 0;
         lastSteeringTime = 0;
         lastAcceleratingTime = 0;
         currentState = State.IDLE;
+
+        carRotation = ROTATION_OFFSET;
+    }
+
+    ArrayList<Position> carCollisionPositionsInBlocks() {
+        return carRotationTiles[carRotation].getCollisionPositionsInBlocks();
+    }
+
+    private void respawn() {
+        speedInPixel = 0;
+        if (lastTrackTile != null) {
+            ArrayList<Integer> possibleSpawnRotations = lastTrackTile.getMapTileImage().getPossibleRotations();
+            carRotation = findClosestRotation(lastCarRotationOnTrack, possibleSpawnRotations);
+
+            double lastTrackTileWorldX = lastTrackTile.getPosition().getX();
+            double lastTrackTileWorldY = lastTrackTile.getPosition().getY();
+
+            double tileWidthInPixels = MapBlockImages.BLOCK_SIZE * MapBlockImages.MapTileImage.TILE_WIDTH; // Use exact tile size
+            double tileHeightInPixels = MapBlockImages.BLOCK_SIZE * MapBlockImages.MapTileImage.TILE_HEIGHT; // Use exact tile size
+
+            double screenCenterX = GameView.WIDTH / 2.0;
+            double screenCenterY = GameView.HEIGHT / 2.0;
+
+            double carOffsetX = width / 2.0;
+            double carOffsetY = height / 2.0;
+
+            // Treat diagonal tiles special
+            if (lastTrackTile.getMapTileImage() == MapBlockImages.MapTileImage.TRACK_DIAGONAL_SW) {
+                carOffsetX += tileWidthInPixels / 4;
+                carOffsetY -= tileHeightInPixels / 4;
+            } else if (lastTrackTile.getMapTileImage() == MapBlockImages.MapTileImage.TRACK_DIAGONAL_NE) {
+                carOffsetX -= tileWidthInPixels / 4;
+                carOffsetY += tileHeightInPixels / 4;
+            } else if (lastTrackTile.getMapTileImage() == MapBlockImages.MapTileImage.TRACK_DIAGONAL_NW) {
+                carOffsetX += tileWidthInPixels / 4;
+                carOffsetY += tileHeightInPixels / 4;
+            } else if (lastTrackTile.getMapTileImage() == MapBlockImages.MapTileImage.TRACK_DIAGONAL_SE) {
+                carOffsetX -= tileWidthInPixels / 4;
+                carOffsetY -= tileHeightInPixels / 4;
+            }
+
+            double tileOffsetX = screenCenterX - (lastTrackTileWorldX + tileWidthInPixels / 2.0) + carOffsetX;
+            double tileOffsetY = screenCenterY - (lastTrackTileWorldY + tileHeightInPixels / 2.0) + carOffsetY;
+
+            gamePlayManager.moveWorldToRight(tileOffsetX);
+            gamePlayManager.moveWorldDown(tileOffsetY);
+        }
+        lastSteeringTime = 0;
+        lastAcceleratingTime = 0;
+        currentState = State.IDLE;
+    }
+
+    private int findClosestRotation(int targetRotation, ArrayList<Integer> validRotations) {
+        int closestRotation = -1;
+        int minDifference = Integer.MAX_VALUE;
+
+        for (int validRotation : validRotations) {
+            int rotationDifference = Math.abs(targetRotation - validRotation);
+            int rotationWithoutDirection = Math.min(rotationDifference, 32 - rotationDifference);
+
+            if (rotationWithoutDirection < minDifference) {
+                minDifference = rotationWithoutDirection;
+                closestRotation = validRotation;
+            }
+        }
+
+        return closestRotation;
     }
 
     @Override
@@ -237,6 +390,9 @@ public class Car extends CollidingGameObject implements MainCharacter {
         gameView.addBlockImageToCanvas(blockImage, position.getX(), position.getY(), size, 0);
         if (GameViewManager.DEBUG) {
             gameView.addTextToCanvas("Speed: " + speedInPixel, 5, 30, 14, true, Color.BLACK, 0);
+            if (lastTrackTile != null) {
+                gameView.addTextToCanvas(lastTrackTile.getPosition().toString(), 5, 60, 14, true, Color.BLACK, 0);
+            }
         }
     }
 
@@ -246,6 +402,6 @@ public class Car extends CollidingGameObject implements MainCharacter {
     }
 
     private enum State {
-        IDLE, ACCELERATING, BREAKING, CRASHED
+        IDLE, ACCELERATING, BREAKING, CRASHED, GRASS, WATER
     }
 }
