@@ -1,15 +1,14 @@
 package thd.gameobjects.movable;
 
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
 import thd.game.managers.GamePlayManager;
 import thd.game.managers.GameViewManager;
 import thd.game.utilities.GameView;
 import thd.gameobjects.base.CollidingGameObject;
 import thd.gameobjects.base.MainCharacter;
 import thd.gameobjects.base.Position;
-
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.LinkedList;
 
 /**
  * A background tile of a rock formation with many rocks.
@@ -49,7 +48,8 @@ public class Car extends CollidingGameObject implements MainCharacter {
     /**
      * Creates a new moving Rock tile in the game at a default position.
      *
-     * @param gameView        the main {@link GameView} where the text later gets added to
+     * @param gameView        the main {@link GameView} where the text later gets
+     *                        added to
      * @param gamePlayManager Manages the game with spawning, despawning and more.
      */
     public Car(GameView gameView, GamePlayManager gamePlayManager) {
@@ -112,14 +112,14 @@ public class Car extends CollidingGameObject implements MainCharacter {
         switch (mapSurface) {
             case BRICK -> {
                 switch (mapTileImage) {
-                    case HOUSE_BIG, HOUSE_CORNER:
-                        crash();
-                        break;
-                    case ROCKS_FEW, ROCKS_MANY, ROCKS_NOT_SO_MANY, ROCKS_VERY_MANY:
+                    case HOUSE_BIG, HOUSE_CORNER -> crash();
+                    case ROCKS_FEW, ROCKS_MANY, ROCKS_NOT_SO_MANY, ROCKS_VERY_MANY -> {
                         if (speedInPixel > MAX_SPEED / 4) {
                             crash();
                         }
-                        break;
+                    }
+                    default -> {
+                    }
                 }
             }
             case GRASS -> {
@@ -131,6 +131,8 @@ public class Car extends CollidingGameObject implements MainCharacter {
                 if (isDriving()) {
                     currentState = State.WATER;
                 }
+            }
+            default -> {
             }
         }
     }
@@ -164,18 +166,20 @@ public class Car extends CollidingGameObject implements MainCharacter {
         double speedIncrease = ACCELERATION * Math.sqrt(timeDeltaInSeconds(lastAcceleratingTime));
         speedInPixel += ACCELERATION * Math.sqrt(timeDeltaInSeconds(lastAcceleratingTime));
         switch (currentState) {
-            case GRASS:
+            case GRASS -> {
                 if (speedInPixel > MAX_SPEED * 0.7) {
                     speedInPixel -= speedIncrease;
                     speedInPixel *= 0.9;
                 }
-                break;
-            case WATER:
+            }
+            case WATER -> {
                 if (speedInPixel > MAX_SPEED * 0.6) {
                     speedInPixel -= speedIncrease;
                     speedInPixel *= 0.8;
                 }
-                break;
+            }
+            default -> {
+            }
         }
         speedInPixel = Math.min(speedInPixel, MAX_SPEED);
     }
@@ -200,7 +204,7 @@ public class Car extends CollidingGameObject implements MainCharacter {
     public void shoot() {
         if (gameView.timer(shotDurationInMilliseconds, 1, this)) {
             Bullet bullet = new Bullet(gameView, gamePlayManager, position.getX() + width / 2,
-                                       position.getY() + height / 3, rotation);
+                    position.getY() + height / 3, rotation);
             gamePlayManager.spawnGameObject(bullet);
             shotDurationInMilliseconds = SHOT_DURATION_IN_MILLISECONDS;
         }
@@ -228,7 +232,7 @@ public class Car extends CollidingGameObject implements MainCharacter {
     public void updateStatus() {
         super.updateStatus();
         switch (currentState) {
-            case CRASHED:
+            case CRASHED -> {
                 if (gameView.timer(200, 0, this)) {
                     blockImage = currentCrashState.blockImage();
                     switchToNextCrashState();
@@ -237,10 +241,8 @@ public class Car extends CollidingGameObject implements MainCharacter {
                     gamePlayManager.destroyGameObject(driver);
                     respawn();
                 }
-                break;
-            default:
-                blockImage = carRotationTiles[carRotation].blockImage();
-                break;
+            }
+            default -> blockImage = carRotationTiles[carRotation].blockImage();
         }
     }
 
@@ -333,8 +335,10 @@ public class Car extends CollidingGameObject implements MainCharacter {
             double lastTrackTileWorldX = lastTrackTile.getPosition().getX();
             double lastTrackTileWorldY = lastTrackTile.getPosition().getY();
 
-            double tileWidthInPixels = GamePlayManager.BLOCK_SIZE * GamePlayManager.MAP_TILE_WIDTH; // Use exact tile size
-            double tileHeightInPixels = GamePlayManager.BLOCK_SIZE * GamePlayManager.MAP_TILE_HEIGHT; // Use exact tile size
+            double tileWidthInPixels = GamePlayManager.BLOCK_SIZE * GamePlayManager.MAP_TILE_WIDTH; // Use exact tile
+                                                                                                    // size
+            double tileHeightInPixels = GamePlayManager.BLOCK_SIZE * GamePlayManager.MAP_TILE_HEIGHT; // Use exact tile
+                                                                                                      // size
 
             double screenCenterX = GameView.WIDTH / 2.0;
             double screenCenterY = GameView.HEIGHT / 2.0;
@@ -342,20 +346,27 @@ public class Car extends CollidingGameObject implements MainCharacter {
             double carOffsetX = width / 2.0;
             double carOffsetY = height / 2.0;
 
-            // Treat diagonal tiles special
-            if (lastTrackTile.getMapTileImage() == MapBlockImages.MapTileImage.TRACK_DIAGONAL_SW) {
-                carOffsetX += tileWidthInPixels / 4;
-                carOffsetY -= tileHeightInPixels / 4;
-            } else if (lastTrackTile.getMapTileImage() == MapBlockImages.MapTileImage.TRACK_DIAGONAL_NE) {
-                carOffsetX -= tileWidthInPixels / 4;
-                carOffsetY += tileHeightInPixels / 4;
-            } else if (lastTrackTile.getMapTileImage() == MapBlockImages.MapTileImage.TRACK_DIAGONAL_NW) {
-                carOffsetX += tileWidthInPixels / 4;
-                carOffsetY += tileHeightInPixels / 4;
-            } else if (lastTrackTile.getMapTileImage() == MapBlockImages.MapTileImage.TRACK_DIAGONAL_SE) {
-                carOffsetX -= tileWidthInPixels / 4;
-                carOffsetY -= tileHeightInPixels / 4;
-            }
+            if (null != lastTrackTile.getMapTileImage()) // Treat diagonal tiles special
+                switch (lastTrackTile.getMapTileImage()) {
+                    case TRACK_DIAGONAL_SW -> {
+                        carOffsetX += tileWidthInPixels / 4;
+                        carOffsetY -= tileHeightInPixels / 4;
+                    }
+                    case TRACK_DIAGONAL_NE -> {
+                        carOffsetX -= tileWidthInPixels / 4;
+                        carOffsetY += tileHeightInPixels / 4;
+                    }
+                    case TRACK_DIAGONAL_NW -> {
+                        carOffsetX += tileWidthInPixels / 4;
+                        carOffsetY += tileHeightInPixels / 4;
+                    }
+                    case TRACK_DIAGONAL_SE -> {
+                        carOffsetX -= tileWidthInPixels / 4;
+                        carOffsetY -= tileHeightInPixels / 4;
+                    }
+                    default -> {
+                    }
+                }
 
             double tileOffsetX = screenCenterX - (lastTrackTileWorldX + tileWidthInPixels / 2.0) + carOffsetX;
             double tileOffsetY = screenCenterY - (lastTrackTileWorldY + tileHeightInPixels / 2.0) + carOffsetY;
