@@ -17,6 +17,7 @@ class LevelManager extends GameWorldManager {
     protected void initializeLevel() {
         super.initializeLevel();
         initializeGameObjects();
+        overlay.showMessage(level.name, 4);
     }
 
     protected boolean hasNextLevel() {

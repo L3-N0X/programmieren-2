@@ -1,5 +1,7 @@
 package thd.game.managers;
 
+import thd.game.level.Difficulty;
+import thd.game.level.Level;
 import thd.game.utilities.GameView;
 
 class GameManager extends LevelManager {
@@ -7,7 +9,7 @@ class GameManager extends LevelManager {
 
     GameManager(GameView gameView) {
         super(gameView);
-        initializeGame();
+        startNewGame();
     }
 
     @Override
@@ -18,24 +20,35 @@ class GameManager extends LevelManager {
 
     private void gameManagement() {
         if (endOfGame()) {
-            initializeGame();
+            overlay.showMessage("GAME OVER");
+            System.out.println("still end of game");
+            if (gameView.timer(2000, 0, this)) {
+                overlay.stopShowing();
+                startNewGame();
+            }
         } else if (endOfLevel()) {
-            switchToNextLevel();
-            initializeLevel();
+            overlay.showMessage("GREAT JOB!");
+            System.out.println("still end of level");
+            if (gameView.timer(2000, 0, this)) {
+                lastPoints = points;
+                overlay.stopShowing();
+                switchToNextLevel();
+                initializeLevel();
+            }
         }
     }
 
     private boolean endOfLevel() {
-        boolean levelEnd = false;
-        if (points > lastPoints) {
-            levelEnd = true;
-        }
-        lastPoints = points;
-        return levelEnd;
+        return points > lastPoints;
     }
 
     private boolean endOfGame() {
         return lives == 0 || (!hasNextLevel() && endOfLevel());
+    }
+
+    public void startNewGame() {
+        Level.difficulty = Difficulty.EASY;
+        initializeGame();
     }
 
     @Override

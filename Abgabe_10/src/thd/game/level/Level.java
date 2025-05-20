@@ -26,6 +26,11 @@ public class Level {
     public int worldOffsetLines;
 
     /**
+     * The difficulty of the level
+     */
+    public static Difficulty difficulty = Difficulty.STANDARD;
+
+    /**
      * This uses the start tile form the world and calculates the offset correctly.
      */
     public void calculateOffsetsFromWorldString() {

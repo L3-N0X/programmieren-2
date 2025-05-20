@@ -6,6 +6,7 @@ import thd.gameobjects.movable.Car;
 import thd.gameobjects.unmovable.BestTimeDisplay;
 import thd.gameobjects.unmovable.LapTimeDisplay;
 import thd.gameobjects.unmovable.LastTimeDisplay;
+import thd.gameobjects.unmovable.Overlay;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -17,6 +18,7 @@ class UserControlledGameObjectPool {
     protected LastTimeDisplay lastTimeDisplay;
     protected BestTimeDisplay bestTimeDisplay;
     protected Level level;
+    protected Overlay overlay;
 
     private boolean currentlyBreaking;
 
