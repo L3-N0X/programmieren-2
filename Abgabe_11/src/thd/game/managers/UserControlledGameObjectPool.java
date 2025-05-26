@@ -31,7 +31,7 @@ class UserControlledGameObjectPool {
         Integer[] pressedKeys = gameView.keyCodesOfCurrentlyPressedKeys();
         currentlyBreaking = false;
         for (int keyCode : pressedKeys) {
-            if (GameViewManager.DEBUG) {
+            if (GameViewManager.debug) {
                 gameView.addTextToCanvas("Taste " + ((char) keyCode) + " gedrückt", 0, 0, 18,
                                          true, Color.WHITE, 0);
             }
@@ -61,7 +61,7 @@ class UserControlledGameObjectPool {
                 car.down();
             }
         } else if (keyCode == KeyEvent.VK_F3) {
-            GameViewManager.DEBUG = !GameViewManager.DEBUG;
+            GameViewManager.debug = !GameViewManager.debug;
         }
     }
 }

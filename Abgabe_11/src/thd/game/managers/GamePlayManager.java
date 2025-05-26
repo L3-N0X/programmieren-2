@@ -63,7 +63,7 @@ public class GamePlayManager extends WorldShiftManager {
      *
      * @param gameObject The gameObject that gets destroyed.
      */
-    public void deactivateGameObject(GameObject gameObject) {
+    protected void deactivateGameObject(GameObject gameObject) {
         gameObjectManager.remove(gameObject);
     }
 
@@ -85,7 +85,7 @@ public class GamePlayManager extends WorldShiftManager {
     /**
      * Decreases the life counter by one.
      */
-    public void lifeLost() {
+    private void lifeLost() {
         this.lives--;
     }
 

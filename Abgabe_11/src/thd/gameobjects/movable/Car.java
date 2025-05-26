@@ -36,8 +36,7 @@ public class Car extends CollidingGameObject implements MainCharacter {
                                  double driftAngleRecoveryStep,
                                  double maxSpeed,
                                  double acceleration,
-                                 double breakRate
-    ) {
+                                 double breakRate) {
     }
 
     static {
@@ -75,8 +74,8 @@ public class Car extends CollidingGameObject implements MainCharacter {
     private int lastCarSound;
     private String lastSoundFile;
 
-    double driftAngle;
-    double driftFactor;
+    private double driftAngle;
+    private double driftFactor;
 
     private int lastSteeringTime;
     private int lastAcceleratingTime;
@@ -110,6 +109,7 @@ public class Car extends CollidingGameObject implements MainCharacter {
         driftFactor = 0.0;
         carParameters = DIFFICULTY_PARAMETERS.get(Level.difficulty);
         hitBoxOffsets(8, 8, -16, -16);
+        gameView.playSound("speed_0.wav", true);
     }
 
     /**
@@ -117,9 +117,6 @@ public class Car extends CollidingGameObject implements MainCharacter {
      */
     public void updateParameters() {
         carParameters = DIFFICULTY_PARAMETERS.get(Level.difficulty);
-        if (GameViewManager.DEBUG) {
-            System.out.println("Car parameters updated for difficulty: " + Level.difficulty);
-        }
     }
 
     /**
@@ -170,6 +167,10 @@ public class Car extends CollidingGameObject implements MainCharacter {
                     case ROCKS_FEW, ROCKS_MANY, ROCKS_NOT_SO_MANY, ROCKS_VERY_MANY -> {
                         if (speedInPixel > carParameters.maxSpeed / 4) {
                             crash();
+                        } else if (speedInPixel > carParameters.maxSpeed / 8) {
+                            if (gameView.timer((int) (Math.random() * 300 + 200), 0, this)) {
+                                gameView.playSound("rocks.wav", false);
+                            }
                         }
                     }
                     default -> {
@@ -222,7 +223,8 @@ public class Car extends CollidingGameObject implements MainCharacter {
     }
 
     private void calculateDriftFactor() {
-        double normalizedSpeed = (speedInPixel - carParameters.driftInitiationSpeedThreshold) / (carParameters.maxSpeed - carParameters.driftInitiationSpeedThreshold);
+        double normalizedSpeed = (speedInPixel - carParameters.driftInitiationSpeedThreshold)
+                                 / (carParameters.maxSpeed - carParameters.driftInitiationSpeedThreshold);
 
         if (normalizedSpeed < 0) {
             normalizedSpeed = 0;
@@ -233,6 +235,9 @@ public class Car extends CollidingGameObject implements MainCharacter {
         driftFactor += quadraticDriftAddition;
         if (driftFactor > 1.0) {
             driftFactor = 1.0;
+            if (gameView.timer((int) (Math.random() * 200 + 100), 0, this)) {
+                gameView.playSound("drift.wav", false);
+            }
         }
     }
 
@@ -328,16 +333,6 @@ public class Car extends CollidingGameObject implements MainCharacter {
 
         double effectiveMovementAngleRad = normalizeAngle(rotation + (driftAngle * driftFactor));
 
-        if (GameViewManager.DEBUG) {
-            System.out.printf(
-                    "Car Update: Speed=%.2f, Rotation=%.2f, DriftAngle=%.2f, DriftFactor=%.2f, EffectiveAngle=%.2f%n",
-                    speedInPixel,
-                    Math.toDegrees(rotation),
-                    Math.toDegrees(driftAngle),
-                    driftFactor,
-                    Math.toDegrees(effectiveMovementAngleRad));
-        }
-
         double dx = Math.cos(effectiveMovementAngleRad) * speedInPixel;
         double dy = Math.sin(effectiveMovementAngleRad) * speedInPixel;
 
@@ -347,9 +342,14 @@ public class Car extends CollidingGameObject implements MainCharacter {
     }
 
     private double normalizeAngle(double angle) {
-        while (angle < 0) angle += 2 * Math.PI;
-        while (angle >= 2 * Math.PI) angle -= 2 * Math.PI;
-        return angle;
+        double newAngle = angle;
+        while (newAngle < 0) {
+            newAngle += 2 * Math.PI;
+        }
+        while (newAngle >= 2 * Math.PI) {
+            newAngle -= 2 * Math.PI;
+        }
+        return newAngle;
     }
 
     @Override
@@ -367,7 +367,6 @@ public class Car extends CollidingGameObject implements MainCharacter {
                     respawn();
                 }
             }
-            case IDLE -> blockImage = carRotationTiles[carRotation].blockImage();
             default -> {
                 blockImage = carRotationTiles[carRotation].blockImage();
                 if (gameView.timer(100 - (int) Math.ceil(speedInPixel / carParameters.maxSpeed * 6), 0, this)) {
@@ -379,8 +378,8 @@ public class Car extends CollidingGameObject implements MainCharacter {
         if (!soundFile.isEmpty() && !lastSoundFile.equals(soundFile)) {
             gameView.stopSound(lastCarSound);
             lastCarSound = gameView.playSound(soundFile, true);
+            lastSoundFile = soundFile;
         }
-        lastSoundFile = soundFile;
     }
 
     /**
@@ -407,11 +406,18 @@ public class Car extends CollidingGameObject implements MainCharacter {
     private void crash() {
         if (currentState == State.CRASHED) {
             return;
-        } else if (GameViewManager.DEBUG) {
+        } else if (GameViewManager.debug) {
             return;
         }
         currentState = State.CRASHED;
         gamePlayManager.pauseLapTimer();
+
+        if (lastCarSound != -1) {
+            gameView.stopSound(lastCarSound);
+            lastCarSound = -1;
+            lastSoundFile = "";
+        }
+
         gameView.stopAllSounds();
 
         gameView.playSound("crash.wav", false);
@@ -548,7 +554,7 @@ public class Car extends CollidingGameObject implements MainCharacter {
     @Override
     public void addToCanvas() {
         gameView.addBlockImageToCanvas(blockImage, position.getX(), position.getY(), size, 0);
-        if (GameViewManager.DEBUG) {
+        if (GameViewManager.debug) {
             gameView.addTextToCanvas(
                     "Speed: " + Math.round(speedInPixel * 100) / 100.0 + " Rotation: " + Math.toDegrees(rotation), 5,
                     30, 14,

@@ -2,6 +2,7 @@ package thd.game.managers;
 
 import thd.game.level.Difficulty;
 import thd.game.level.Level;
+import thd.game.utilities.FileAccess;
 import thd.game.utilities.GameView;
 
 class GameManager extends LevelManager {
@@ -21,6 +22,7 @@ class GameManager extends LevelManager {
     private void gameManagement() {
         if (endOfGame()) {
             if (!overlay.isMessageShown()) {
+                gameView.playSound("gameover.wav", false);
                 overlay.showMessage("GAME OVER");
             }
             if (gameView.timer(2000, 0, this)) {
@@ -29,6 +31,7 @@ class GameManager extends LevelManager {
             }
         } else if (endOfLevel()) {
             if (!overlay.isMessageShown()) {
+                gameView.playSound("complete.wav", false);
                 overlay.showMessage("GREAT JOB!");
             }
             if (gameView.timer(2000, 0, this)) {
@@ -49,7 +52,9 @@ class GameManager extends LevelManager {
     }
 
     private void startNewGame() {
+        Level.difficulty = FileAccess.readDifficultyFromDisc();
         Level.difficulty = Difficulty.STANDARD;
+        FileAccess.writeDifficultyToDisc(Level.difficulty);
         car.updateParameters();
         initializeGame();
     }

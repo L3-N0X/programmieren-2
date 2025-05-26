@@ -40,7 +40,7 @@ class GameObjectManager extends CollisionManager {
             gameObject.updatePosition();
             gameObject.addToCanvas();
         }
-        manageCollisions(GameViewManager.DEBUG);
+        manageCollisions(GameViewManager.debug);
     }
 
     private void updateLists() {
