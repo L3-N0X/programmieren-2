@@ -26,6 +26,12 @@ public class Car extends CollidingGameObject implements MainCharacter {
     private static final int ROTATION_STEPS = 32;
     private static final int ROTATION_OFFSET = 8;
 
+    private static final double DRIFT_INITIATION_SPEED_THRESHOLD = 8.5;
+    private static final double DRIFT_ANGULAR_VELOCITY = Math.toRadians(-2.0);
+    private static final double DRIFT_FRICTION = 0.2;
+    private static final double DRIFT_RECOVERY_RATE = 0.032;
+    private static final double DRIFT_ANGLE_RECOVERY_STEP = Math.toRadians(0.2);
+
     private State currentState;
     private CarBlockImages.Fire currentCrashState;
 
@@ -40,6 +46,12 @@ public class Car extends CollidingGameObject implements MainCharacter {
 
     private MapTile lastTrackTile;
     private int lastCarRotationOnTrack;
+    private double lastCarSpeed;
+    private int lastCarSound;
+    private String lastSoundFile;
+
+    double driftAngle;
+    double driftFactor;
 
     private int lastSteeringTime;
     private int lastAcceleratingTime;
@@ -65,6 +77,12 @@ public class Car extends CollidingGameObject implements MainCharacter {
         blockImage = carRotationTiles[carRotation].blockImage();
         collidingGameObjectsForPathDecision = new LinkedList<>();
         distanceToBackground = 10;
+        rotation = 0;
+        lastCarSpeed = 0;
+        lastCarSound = -1;
+        lastSoundFile = "";
+        driftAngle = 0.0;
+        driftFactor = 0.0;
         hitBoxOffsets(8, 8, -16, -16);
     }
 
@@ -144,7 +162,12 @@ public class Car extends CollidingGameObject implements MainCharacter {
         if (gameView.gameTimeInMilliseconds() > lastSteeringTime + STEERING_COOLDOWN_IN_MILLISECONDS * (1 / Math.sqrt(
                 speedInPixel)) && speedInPixel > STEERING_THRESHOLD) {
             carRotation = (carRotation - 1 + ROTATION_STEPS) % ROTATION_STEPS;
+            //rotation = ((double) ((carRotation - ROTATION_OFFSET) % ROTATION_STEPS) / ROTATION_STEPS) * 2.0 * Math.PI;
             lastSteeringTime = gameView.gameTimeInMilliseconds();
+        }
+        if (speedInPixel > DRIFT_INITIATION_SPEED_THRESHOLD) {
+            calculateDriftFactor();
+            driftAngle -= DRIFT_ANGULAR_VELOCITY * driftFactor;
         }
     }
 
@@ -155,7 +178,27 @@ public class Car extends CollidingGameObject implements MainCharacter {
         if (gameView.gameTimeInMilliseconds() > lastSteeringTime + STEERING_COOLDOWN_IN_MILLISECONDS * (1 / Math.sqrt(
                 speedInPixel)) && speedInPixel > STEERING_THRESHOLD) {
             carRotation = (carRotation + 1) % ROTATION_STEPS;
+            //rotation = ((double) ((carRotation - ROTATION_OFFSET) % ROTATION_STEPS) / ROTATION_STEPS) * 2.0 * Math.PI;
             lastSteeringTime = gameView.gameTimeInMilliseconds();
+        }
+        if (speedInPixel > DRIFT_INITIATION_SPEED_THRESHOLD) {
+            calculateDriftFactor();
+            driftAngle += DRIFT_ANGULAR_VELOCITY * driftFactor;
+        }
+    }
+
+    private void calculateDriftFactor() {
+        double normalizedSpeed = (speedInPixel - DRIFT_INITIATION_SPEED_THRESHOLD) / (MAX_SPEED - DRIFT_INITIATION_SPEED_THRESHOLD);
+
+        if (normalizedSpeed < 0) {
+            normalizedSpeed = 0;
+        }
+
+        double quadraticDriftAddition = 0.12 * normalizedSpeed * normalizedSpeed;
+
+        driftFactor += quadraticDriftAddition;
+        if (driftFactor > 1.0) {
+            driftFactor = 1.0;
         }
     }
 
@@ -219,18 +262,68 @@ public class Car extends CollidingGameObject implements MainCharacter {
         if (currentState == State.CRASHED) {
             return;
         }
-        rotation = ((double) ((carRotation - ROTATION_OFFSET) % ROTATION_STEPS) / ROTATION_STEPS) * 2 * Math.PI;
-        double dx = Math.cos(rotation) * speedInPixel;
-        double dy = Math.sin(rotation) * speedInPixel;
+
+        rotation = ((double) ((carRotation - ROTATION_OFFSET) % ROTATION_STEPS) / ROTATION_STEPS) * 2.0 * Math.PI;
+
+        if (driftFactor > 0) {
+            // Apply a sideways friction effect
+            speedInPixel -= DRIFT_FRICTION * driftFactor;
+            if (speedInPixel < 0) {
+                speedInPixel = 0;
+            }
+
+            // Gradually recover from drift
+            driftFactor -= DRIFT_RECOVERY_RATE;
+
+            if (driftAngle > DRIFT_ANGLE_RECOVERY_STEP) {
+                driftAngle -= DRIFT_ANGLE_RECOVERY_STEP;
+            } else if (driftAngle < -DRIFT_ANGLE_RECOVERY_STEP) {
+                driftAngle += DRIFT_ANGLE_RECOVERY_STEP;
+            } else {
+                driftAngle = 0; // Snap to 0 if very close
+            }
+
+            if (driftFactor <= 0) { // If driftFactor has fully recovered
+                driftFactor = 0;
+                driftAngle = 0;    // Also reset driftAngle completely
+            }
+        } else {
+            driftFactor = 0;
+            driftAngle = 0;
+        }
+
+        rotation = normalizeAngle(rotation);
+        //driftAngle = normalizeAngle(driftAngle);
+
+        double effectiveMovementAngleRad = normalizeAngle(
+                rotation + (driftAngle * driftFactor)); // Normalize the final angle
+
+        System.out.printf(
+                "Car Update: Speed=%.2f, Rotation=%.2f, DriftAngle=%.2f, DriftFactor=%.2f, EffectiveAngle=%.2f%n",
+                speedInPixel,
+                Math.toDegrees(rotation),
+                Math.toDegrees(driftAngle), // This is the raw driftAngle variable
+                driftFactor,
+                Math.toDegrees(effectiveMovementAngleRad));
+
+        double dx = Math.cos(effectiveMovementAngleRad) * speedInPixel;
+        double dy = Math.sin(effectiveMovementAngleRad) * speedInPixel;
 
         gamePlayManager.moveWorldToLeft(dx);
         gamePlayManager.moveWorldUp(dy);
         lastUpdateTime = gameView.gameTimeInMilliseconds();
     }
 
+    private double normalizeAngle(double angle) {
+        while (angle < 0) angle += 2 * Math.PI;
+        while (angle >= 2 * Math.PI) angle -= 2 * Math.PI;
+        return angle;
+    }
+
     @Override
     public void updateStatus() {
         super.updateStatus();
+        String soundFile = "";
         switch (currentState) {
             case CRASHED -> {
                 if (gameView.timer(200, 0, this)) {
@@ -242,8 +335,20 @@ public class Car extends CollidingGameObject implements MainCharacter {
                     respawn();
                 }
             }
-            default -> blockImage = carRotationTiles[carRotation].blockImage();
+            case IDLE -> blockImage = carRotationTiles[carRotation].blockImage();
+            default -> {
+                blockImage = carRotationTiles[carRotation].blockImage();
+                if (gameView.timer(100 - (int) Math.ceil(speedInPixel / MAX_SPEED * 6), 0, this)) {
+                    soundFile = "speed_" + (int) Math.ceil(speedInPixel / MAX_SPEED * 10) + ".wav";
+                }
+            }
         }
+
+        if (!soundFile.isEmpty() && !lastSoundFile.equals(soundFile)) {
+            gameView.stopAllSounds();
+            lastCarSound = gameView.playSound(soundFile, true);
+        }
+        lastSoundFile = soundFile;
     }
 
     /**
@@ -270,10 +375,14 @@ public class Car extends CollidingGameObject implements MainCharacter {
     private void crash() {
         if (currentState == State.CRASHED) {
             return;
+        } else if (currentState != State.CRASHED) {
+            return;
         }
         currentState = State.CRASHED;
         gamePlayManager.pauseLapTimer();
+        gameView.stopAllSounds();
 
+        gameView.playSound("crash.wav", false);
         double dx = Math.cos(rotation) * speedInPixel;
         double dy = Math.sin(rotation) * speedInPixel;
         gamePlayManager.moveWorldToLeft(-dx);
@@ -317,9 +426,11 @@ public class Car extends CollidingGameObject implements MainCharacter {
         speedInPixel = 0;
         lastSteeringTime = 0;
         lastAcceleratingTime = 0;
+        lastCarSpeed = 0;
         currentState = State.IDLE;
 
         lastUpdateTime = 0;
+        gameView.stopAllSounds();
 
         carRotation = ROTATION_OFFSET;
         lastCarRotationOnTrack = ROTATION_OFFSET;
@@ -346,6 +457,8 @@ public class Car extends CollidingGameObject implements MainCharacter {
 
             double carOffsetX = width / 2.0;
             double carOffsetY = height / 2.0;
+
+            gameView.stopAllSounds();
 
             if (null != lastTrackTile.getMapTileImage()) {
                 switch (lastTrackTile.getMapTileImage()) {
@@ -378,6 +491,8 @@ public class Car extends CollidingGameObject implements MainCharacter {
         }
         lastSteeringTime = 0;
         lastAcceleratingTime = 0;
+        lastUpdateTime = 0;
+        lastCarSpeed = 0;
         currentState = State.IDLE;
     }
 
@@ -402,7 +517,21 @@ public class Car extends CollidingGameObject implements MainCharacter {
     public void addToCanvas() {
         gameView.addBlockImageToCanvas(blockImage, position.getX(), position.getY(), size, 0);
         if (GameViewManager.DEBUG) {
-            gameView.addTextToCanvas("Speed: " + speedInPixel, 5, 30, 14, true, Color.BLACK, 0);
+            gameView.addTextToCanvas(
+                    "Speed: " + Math.round(speedInPixel * 100) / 100.0 + " Rotation: " + Math.toDegrees(rotation), 5,
+                    30, 14,
+                    true, Color.BLACK,
+                    0);
+            gameView.addTextToCanvas(
+                    "DriftAngle: " + Math.round(Math.toDegrees(driftAngle) * 100) / 100.0, 5,
+                    45, 14, true, Color.BLACK, 0);
+            gameView.addTextToCanvas(
+                    "DriftFactor: " + Math.round(driftFactor * 100) / 100.0, 5,
+                    80, 14, true, Color.BLACK, 0);
+            double currentEffectiveAngleRad = normalizeAngle(rotation + (driftAngle * driftFactor));
+            gameView.addTextToCanvas(
+                    "EffectiveAngle: " + Math.round(Math.toDegrees(currentEffectiveAngleRad) * 100) / 100.0,
+                    5, 95, 14, true, Color.BLACK, 0);
             if (lastTrackTile != null) {
                 gameView.addTextToCanvas(lastTrackTile.getPosition().toString(), 5, 60, 14, true, Color.BLACK, 0);
             }

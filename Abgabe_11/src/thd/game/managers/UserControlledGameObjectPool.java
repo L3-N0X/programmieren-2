@@ -60,6 +60,8 @@ class UserControlledGameObjectPool {
             if (car.isDriving()) {
                 car.down();
             }
+        } else if (keyCode == KeyEvent.VK_F3) {
+            GameViewManager.DEBUG = !GameViewManager.DEBUG;
         }
     }
 }
