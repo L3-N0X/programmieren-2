@@ -11,5 +11,9 @@ public enum Difficulty {
     /**
      * The medium difficulty level.
      */
-    STANDARD;
+    STANDARD,
+    /**
+     * The hard difficulty level.
+     */
+    HARD;
 }

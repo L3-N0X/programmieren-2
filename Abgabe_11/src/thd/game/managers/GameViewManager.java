@@ -13,7 +13,7 @@ public class GameViewManager {
     /**
      * When enabled adds some additional values in the ui & console for debugging.
      */
-    public static boolean DEBUG = true;
+    public static boolean DEBUG = false;
 
     /**
      * Creates a new GameView, does its setup and starts the main game loop.

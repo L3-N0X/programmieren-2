@@ -1,5 +1,7 @@
 package thd.gameobjects.movable;
 
+import thd.game.level.Difficulty;
+import thd.game.level.Level;
 import thd.game.managers.GamePlayManager;
 import thd.game.managers.GameViewManager;
 import thd.game.utilities.GameView;
@@ -9,15 +11,14 @@ import thd.gameobjects.base.Position;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.LinkedList;
+import java.util.Map;
 
 /**
  * A background tile of a rock formation with many rocks.
  */
 public class Car extends CollidingGameObject implements MainCharacter {
-    private static final double MAX_SPEED = 17;
-    private static final double ACCELERATION = 0.3;
-    private static final double BREAK_RATE = 2.8;
     private static final double STEERING_THRESHOLD = 0.4;
 
     private static final int STEERING_COOLDOWN_IN_MILLISECONDS = 350;
@@ -26,11 +27,35 @@ public class Car extends CollidingGameObject implements MainCharacter {
     private static final int ROTATION_STEPS = 32;
     private static final int ROTATION_OFFSET = 8;
 
-    private static final double DRIFT_INITIATION_SPEED_THRESHOLD = 8.5;
-    private static final double DRIFT_ANGULAR_VELOCITY = Math.toRadians(-2.0);
-    private static final double DRIFT_FRICTION = 0.2;
-    private static final double DRIFT_RECOVERY_RATE = 0.032;
-    private static final double DRIFT_ANGLE_RECOVERY_STEP = Math.toRadians(0.2);
+    private static final Map<Difficulty, CarParameters> DIFFICULTY_PARAMETERS = new EnumMap<>(Difficulty.class);
+
+    private record CarParameters(double driftInitiationSpeedThreshold,
+                                 double driftAngularVelocity,
+                                 double driftFriction,
+                                 double driftRecoveryRate,
+                                 double driftAngleRecoveryStep,
+                                 double maxSpeed,
+                                 double acceleration,
+                                 double breakRate
+    ) {
+    }
+
+    static {
+        DIFFICULTY_PARAMETERS.put(Difficulty.EASY,
+                                  new CarParameters(7.0, Math.toRadians(-1.5), 0.15,
+                                                    0.04, Math.toRadians(0.3), 12.0,
+                                                    0.2, 2.5));
+        DIFFICULTY_PARAMETERS.put(Difficulty.STANDARD,
+                                  new CarParameters(8.5, Math.toRadians(-2.0), 0.2,
+                                                    0.032, Math.toRadians(0.2), 17.0,
+                                                    0.3, 2.8));
+        DIFFICULTY_PARAMETERS.put(Difficulty.HARD,
+                                  new CarParameters(10.0, Math.toRadians(-2.5), 0.25,
+                                                    0.025, Math.toRadians(0.15), 22.0,
+                                                    0.4, 3.2));
+    }
+
+    private CarParameters carParameters;
 
     private State currentState;
     private CarBlockImages.Fire currentCrashState;
@@ -83,7 +108,18 @@ public class Car extends CollidingGameObject implements MainCharacter {
         lastSoundFile = "";
         driftAngle = 0.0;
         driftFactor = 0.0;
+        carParameters = DIFFICULTY_PARAMETERS.get(Level.difficulty);
         hitBoxOffsets(8, 8, -16, -16);
+    }
+
+    /**
+     * Updates the car parameters based on the current difficulty level.
+     */
+    public void updateParameters() {
+        carParameters = DIFFICULTY_PARAMETERS.get(Level.difficulty);
+        if (GameViewManager.DEBUG) {
+            System.out.println("Car parameters updated for difficulty: " + Level.difficulty);
+        }
     }
 
     /**
@@ -132,7 +168,7 @@ public class Car extends CollidingGameObject implements MainCharacter {
                 switch (mapTileImage) {
                     case HOUSE_BIG, HOUSE_CORNER -> crash();
                     case ROCKS_FEW, ROCKS_MANY, ROCKS_NOT_SO_MANY, ROCKS_VERY_MANY -> {
-                        if (speedInPixel > MAX_SPEED / 4) {
+                        if (speedInPixel > carParameters.maxSpeed / 4) {
                             crash();
                         }
                     }
@@ -162,12 +198,11 @@ public class Car extends CollidingGameObject implements MainCharacter {
         if (gameView.gameTimeInMilliseconds() > lastSteeringTime + STEERING_COOLDOWN_IN_MILLISECONDS * (1 / Math.sqrt(
                 speedInPixel)) && speedInPixel > STEERING_THRESHOLD) {
             carRotation = (carRotation - 1 + ROTATION_STEPS) % ROTATION_STEPS;
-            //rotation = ((double) ((carRotation - ROTATION_OFFSET) % ROTATION_STEPS) / ROTATION_STEPS) * 2.0 * Math.PI;
             lastSteeringTime = gameView.gameTimeInMilliseconds();
         }
-        if (speedInPixel > DRIFT_INITIATION_SPEED_THRESHOLD) {
+        if (speedInPixel > carParameters.driftInitiationSpeedThreshold) {
             calculateDriftFactor();
-            driftAngle -= DRIFT_ANGULAR_VELOCITY * driftFactor;
+            driftAngle -= carParameters.driftAngularVelocity * driftFactor;
         }
     }
 
@@ -178,17 +213,16 @@ public class Car extends CollidingGameObject implements MainCharacter {
         if (gameView.gameTimeInMilliseconds() > lastSteeringTime + STEERING_COOLDOWN_IN_MILLISECONDS * (1 / Math.sqrt(
                 speedInPixel)) && speedInPixel > STEERING_THRESHOLD) {
             carRotation = (carRotation + 1) % ROTATION_STEPS;
-            //rotation = ((double) ((carRotation - ROTATION_OFFSET) % ROTATION_STEPS) / ROTATION_STEPS) * 2.0 * Math.PI;
             lastSteeringTime = gameView.gameTimeInMilliseconds();
         }
-        if (speedInPixel > DRIFT_INITIATION_SPEED_THRESHOLD) {
+        if (speedInPixel > carParameters.driftInitiationSpeedThreshold) {
             calculateDriftFactor();
-            driftAngle += DRIFT_ANGULAR_VELOCITY * driftFactor;
+            driftAngle += carParameters.driftAngularVelocity * driftFactor;
         }
     }
 
     private void calculateDriftFactor() {
-        double normalizedSpeed = (speedInPixel - DRIFT_INITIATION_SPEED_THRESHOLD) / (MAX_SPEED - DRIFT_INITIATION_SPEED_THRESHOLD);
+        double normalizedSpeed = (speedInPixel - carParameters.driftInitiationSpeedThreshold) / (carParameters.maxSpeed - carParameters.driftInitiationSpeedThreshold);
 
         if (normalizedSpeed < 0) {
             normalizedSpeed = 0;
@@ -206,17 +240,17 @@ public class Car extends CollidingGameObject implements MainCharacter {
      * Accelerates the car to a maximum speed.
      */
     public void up() {
-        double speedIncrease = ACCELERATION * Math.sqrt(timeDeltaInSeconds(lastAcceleratingTime));
-        speedInPixel += ACCELERATION * Math.sqrt(timeDeltaInSeconds(lastAcceleratingTime));
+        double speedIncrease = carParameters.acceleration * Math.sqrt(timeDeltaInSeconds(lastAcceleratingTime));
+        speedInPixel += carParameters.acceleration * Math.sqrt(timeDeltaInSeconds(lastAcceleratingTime));
         switch (currentState) {
             case GRASS -> {
-                if (speedInPixel > MAX_SPEED * 0.7) {
+                if (speedInPixel > carParameters.maxSpeed * 0.7) {
                     speedInPixel -= speedIncrease;
                     speedInPixel *= 0.9;
                 }
             }
             case WATER -> {
-                if (speedInPixel > MAX_SPEED * 0.6) {
+                if (speedInPixel > carParameters.maxSpeed * 0.6) {
                     speedInPixel -= speedIncrease;
                     speedInPixel *= 0.8;
                 }
@@ -224,7 +258,7 @@ public class Car extends CollidingGameObject implements MainCharacter {
             default -> {
             }
         }
-        speedInPixel = Math.min(speedInPixel, MAX_SPEED);
+        speedInPixel = Math.min(speedInPixel, carParameters.maxSpeed);
     }
 
     /**
@@ -233,7 +267,7 @@ public class Car extends CollidingGameObject implements MainCharacter {
     public void down() {
         currentState = State.BREAKING;
         if (speedInPixel > 0) {
-            speedInPixel -= BREAK_RATE * timeDeltaInSeconds(lastUpdateTime);
+            speedInPixel -= carParameters.breakRate * timeDeltaInSeconds(lastUpdateTime);
             if (speedInPixel < 0.05) {
                 speedInPixel = 0;
             }
@@ -266,26 +300,24 @@ public class Car extends CollidingGameObject implements MainCharacter {
         rotation = ((double) ((carRotation - ROTATION_OFFSET) % ROTATION_STEPS) / ROTATION_STEPS) * 2.0 * Math.PI;
 
         if (driftFactor > 0) {
-            // Apply a sideways friction effect
-            speedInPixel -= DRIFT_FRICTION * driftFactor;
+            speedInPixel -= carParameters.driftFriction * driftFactor;
             if (speedInPixel < 0) {
                 speedInPixel = 0;
             }
 
-            // Gradually recover from drift
-            driftFactor -= DRIFT_RECOVERY_RATE;
+            driftFactor -= carParameters.driftRecoveryRate;
 
-            if (driftAngle > DRIFT_ANGLE_RECOVERY_STEP) {
-                driftAngle -= DRIFT_ANGLE_RECOVERY_STEP;
-            } else if (driftAngle < -DRIFT_ANGLE_RECOVERY_STEP) {
-                driftAngle += DRIFT_ANGLE_RECOVERY_STEP;
+            if (driftAngle > carParameters.driftAngleRecoveryStep) {
+                driftAngle -= carParameters.driftAngleRecoveryStep;
+            } else if (driftAngle < -carParameters.driftAngleRecoveryStep) {
+                driftAngle += carParameters.driftAngleRecoveryStep;
             } else {
-                driftAngle = 0; // Snap to 0 if very close
+                driftAngle = 0;
             }
 
-            if (driftFactor <= 0) { // If driftFactor has fully recovered
+            if (driftFactor <= 0) {
                 driftFactor = 0;
-                driftAngle = 0;    // Also reset driftAngle completely
+                driftAngle = 0;
             }
         } else {
             driftFactor = 0;
@@ -293,18 +325,18 @@ public class Car extends CollidingGameObject implements MainCharacter {
         }
 
         rotation = normalizeAngle(rotation);
-        //driftAngle = normalizeAngle(driftAngle);
 
-        double effectiveMovementAngleRad = normalizeAngle(
-                rotation + (driftAngle * driftFactor)); // Normalize the final angle
+        double effectiveMovementAngleRad = normalizeAngle(rotation + (driftAngle * driftFactor));
 
-        System.out.printf(
-                "Car Update: Speed=%.2f, Rotation=%.2f, DriftAngle=%.2f, DriftFactor=%.2f, EffectiveAngle=%.2f%n",
-                speedInPixel,
-                Math.toDegrees(rotation),
-                Math.toDegrees(driftAngle), // This is the raw driftAngle variable
-                driftFactor,
-                Math.toDegrees(effectiveMovementAngleRad));
+        if (GameViewManager.DEBUG) {
+            System.out.printf(
+                    "Car Update: Speed=%.2f, Rotation=%.2f, DriftAngle=%.2f, DriftFactor=%.2f, EffectiveAngle=%.2f%n",
+                    speedInPixel,
+                    Math.toDegrees(rotation),
+                    Math.toDegrees(driftAngle),
+                    driftFactor,
+                    Math.toDegrees(effectiveMovementAngleRad));
+        }
 
         double dx = Math.cos(effectiveMovementAngleRad) * speedInPixel;
         double dy = Math.sin(effectiveMovementAngleRad) * speedInPixel;
@@ -338,14 +370,14 @@ public class Car extends CollidingGameObject implements MainCharacter {
             case IDLE -> blockImage = carRotationTiles[carRotation].blockImage();
             default -> {
                 blockImage = carRotationTiles[carRotation].blockImage();
-                if (gameView.timer(100 - (int) Math.ceil(speedInPixel / MAX_SPEED * 6), 0, this)) {
-                    soundFile = "speed_" + (int) Math.ceil(speedInPixel / MAX_SPEED * 10) + ".wav";
+                if (gameView.timer(100 - (int) Math.ceil(speedInPixel / carParameters.maxSpeed * 6), 0, this)) {
+                    soundFile = "speed_" + (int) Math.ceil(speedInPixel / carParameters.maxSpeed * 10) + ".wav";
                 }
             }
         }
 
         if (!soundFile.isEmpty() && !lastSoundFile.equals(soundFile)) {
-            gameView.stopAllSounds();
+            gameView.stopSound(lastCarSound);
             lastCarSound = gameView.playSound(soundFile, true);
         }
         lastSoundFile = soundFile;
@@ -375,7 +407,7 @@ public class Car extends CollidingGameObject implements MainCharacter {
     private void crash() {
         if (currentState == State.CRASHED) {
             return;
-        } else if (currentState != State.CRASHED) {
+        } else if (GameViewManager.DEBUG) {
             return;
         }
         currentState = State.CRASHED;
@@ -391,13 +423,13 @@ public class Car extends CollidingGameObject implements MainCharacter {
         driver = new Driver(gameView, gamePlayManager, position.getX(), position.getY());
         gamePlayManager.spawnGameObject(driver);
         if (carRotation <= 16) {
-            if (speedInPixel > MAX_SPEED * 0.7) {
+            if (speedInPixel > carParameters.maxSpeed * 0.7) {
                 driver.crashRollRight();
             } else {
                 driver.crashRight();
             }
         } else {
-            if (speedInPixel > MAX_SPEED * 0.7) {
+            if (speedInPixel > carParameters.maxSpeed * 0.7) {
                 driver.crashRollLeft();
             } else {
                 driver.crashLeft();

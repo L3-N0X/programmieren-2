@@ -49,7 +49,8 @@ class GameManager extends LevelManager {
     }
 
     private void startNewGame() {
-        Level.difficulty = Difficulty.EASY;
+        Level.difficulty = Difficulty.STANDARD;
+        car.updateParameters();
         initializeGame();
     }
 
