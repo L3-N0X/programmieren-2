@@ -53,7 +53,7 @@ class GameManager extends LevelManager {
 
     private void startNewGame() {
         Level.difficulty = FileAccess.readDifficultyFromDisc();
-        Level.difficulty = Difficulty.STANDARD;
+        Level.difficulty = Difficulty.EASY;
         FileAccess.writeDifficultyToDisc(Level.difficulty);
         car.updateParameters();
         initializeGame();
