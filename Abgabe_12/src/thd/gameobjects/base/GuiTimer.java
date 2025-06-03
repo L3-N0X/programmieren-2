@@ -84,9 +84,6 @@ public class GuiTimer implements Comparable<GuiTimer> {
      * @return The total elapsed duration in milliseconds.
      */
     public long timeDuration() {
-        System.out.println(
-                "GuiTimer.timeDuration() called, state: " + this.state + ", startTimeMillis: " + this.startTimeMillis
-                + ", beforePauseTimeMillis: " + this.beforePauseTimeMillis);
         if (this.state == State.RUNNING) {
             return beforePauseTimeMillis + (gameView.gameTimeInMilliseconds() - this.startTimeMillis);
         } else {
