@@ -1,0 +1,73 @@
+package thd.game.managers;
+
+import thd.game.level.Difficulty;
+import thd.game.level.Level;
+import thd.game.utilities.FileAccess;
+import thd.game.utilities.GameView;
+
+class GameManager extends LevelManager {
+    private int lastPoints;
+
+    GameManager(GameView gameView) {
+        super(gameView);
+        startNewGame();
+    }
+
+    @Override
+    protected void gameLoop() {
+        super.gameLoop();
+        gameManagement();
+    }
+
+    private void gameManagement() {
+        if (endOfGame()) {
+            if (!overlay.isMessageShown()) {
+                gameView.playSound("gameover.wav", false);
+                overlay.showMessage("GAME OVER");
+            }
+            if (gameView.timer(2000, 0, this)) {
+                overlay.stopShowing();
+                startNewGame();
+            }
+        } else if (endOfLevel()) {
+            if (!overlay.isMessageShown()) {
+                gameView.playSound("complete.wav", false);
+                overlay.showMessage("GREAT JOB!");
+            }
+            if (gameView.timer(2000, 0, this)) {
+                lastPoints = points;
+                overlay.stopShowing();
+                switchToNextLevel();
+                initializeLevel();
+            }
+        }
+    }
+
+    private boolean endOfLevel() {
+        return points > lastPoints;
+    }
+
+    private boolean endOfGame() {
+        return lives == 0 || (!hasNextLevel() && endOfLevel());
+    }
+
+    private void startNewGame() {
+        Level.difficulty = FileAccess.readDifficultyFromDisc();
+        Level.difficulty = Difficulty.EASY;
+        FileAccess.writeDifficultyToDisc(Level.difficulty);
+        car.updateParameters();
+        initializeGame();
+    }
+
+    @Override
+    protected void initializeLevel() {
+        overlay.showMessage(level.name, 2);
+        super.initializeLevel();
+    }
+
+    @Override
+    protected void initializeGame() {
+        super.initializeGame();
+        initializeLevel();
+    }
+}
