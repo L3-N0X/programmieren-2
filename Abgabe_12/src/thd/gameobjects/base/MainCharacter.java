@@ -6,7 +6,7 @@ package thd.gameobjects.base;
 public interface MainCharacter {
 
     /**
-     * This fires some kind of bullet when called.
+     * Main character can start driving.
      */
-    void shoot();
+    void startDriving();
 }

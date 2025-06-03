@@ -1,5 +1,9 @@
 package thd.gameobjects.movable;
 
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.Map;
 import thd.game.level.Difficulty;
 import thd.game.level.Level;
 import thd.game.managers.GamePlayManager;
@@ -9,12 +13,6 @@ import thd.gameobjects.base.CollidingGameObject;
 import thd.gameobjects.base.MainCharacter;
 import thd.gameobjects.base.Position;
 
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.LinkedList;
-import java.util.Map;
-
 /**
  * A background tile of a rock formation with many rocks.
  */
@@ -22,7 +20,6 @@ public class Car extends CollidingGameObject implements MainCharacter {
     private static final double STEERING_THRESHOLD = 0.4;
 
     private static final int STEERING_COOLDOWN_IN_MILLISECONDS = 350;
-    private static final int SHOT_DURATION_IN_MILLISECONDS = 300;
 
     private static final int ROTATION_STEPS = 32;
     private static final int ROTATION_OFFSET = 8;
@@ -30,28 +27,28 @@ public class Car extends CollidingGameObject implements MainCharacter {
     private static final Map<Difficulty, CarParameters> DIFFICULTY_PARAMETERS = new EnumMap<>(Difficulty.class);
 
     private record CarParameters(double driftInitiationSpeedThreshold,
-                                 double driftAngularVelocity,
-                                 double driftFriction,
-                                 double driftRecoveryRate,
-                                 double driftAngleRecoveryStep,
-                                 double maxSpeed,
-                                 double acceleration,
-                                 double breakRate) {
+            double driftAngularVelocity,
+            double driftFriction,
+            double driftRecoveryRate,
+            double driftAngleRecoveryStep,
+            double maxSpeed,
+            double acceleration,
+            double breakRate) {
     }
 
     static {
         DIFFICULTY_PARAMETERS.put(Difficulty.EASY,
-                                  new CarParameters(7.0, Math.toRadians(-1.5), 0.15,
-                                                    0.04, Math.toRadians(0.3), 12.0,
-                                                    0.2, 2.5));
+                new CarParameters(7.0, Math.toRadians(-1.5), 0.15,
+                        0.04, Math.toRadians(0.3), 12.0,
+                        0.2, 2.5));
         DIFFICULTY_PARAMETERS.put(Difficulty.STANDARD,
-                                  new CarParameters(8.5, Math.toRadians(-2.0), 0.2,
-                                                    0.032, Math.toRadians(0.2), 17.0,
-                                                    0.3, 2.8));
+                new CarParameters(8.5, Math.toRadians(-2.0), 0.2,
+                        0.032, Math.toRadians(0.2), 17.0,
+                        0.3, 2.8));
         DIFFICULTY_PARAMETERS.put(Difficulty.HARD,
-                                  new CarParameters(10.0, Math.toRadians(-2.5), 0.25,
-                                                    0.025, Math.toRadians(0.15), 22.0,
-                                                    0.4, 3.2));
+                new CarParameters(10.0, Math.toRadians(-2.5), 0.25,
+                        0.025, Math.toRadians(0.15), 22.0,
+                        0.4, 3.2));
     }
 
     private CarParameters carParameters;
@@ -64,13 +61,11 @@ public class Car extends CollidingGameObject implements MainCharacter {
     private Driver driver;
 
     private final CarBlockImages.CarRotation[] carRotationTiles;
-    private final LinkedList<CollidingGameObject> collidingGameObjectsForPathDecision;
 
     private int carRotation;
 
     private MapTile lastTrackTile;
     private int lastCarRotationOnTrack;
-    private double lastCarSpeed;
     private int lastCarSound;
     private String lastSoundFile;
 
@@ -80,12 +75,12 @@ public class Car extends CollidingGameObject implements MainCharacter {
     private int lastSteeringTime;
     private int lastAcceleratingTime;
     private int lastUpdateTime;
-    private int shotDurationInMilliseconds;
 
     /**
      * Creates a new moving Rock tile in the game at a default position.
      *
-     * @param gameView        the main {@link GameView} where the text later gets added to
+     * @param gameView        the main {@link GameView} where the text later gets
+     *                        added to
      * @param gamePlayManager Manages the game with spawning, despawning and more.
      */
     public Car(GameView gameView, GamePlayManager gamePlayManager) {
@@ -99,10 +94,8 @@ public class Car extends CollidingGameObject implements MainCharacter {
         currentCrashState = CarBlockImages.Fire.FIRE_00;
         carRotationTiles = CarBlockImages.CarRotation.values();
         blockImage = carRotationTiles[carRotation].blockImage();
-        collidingGameObjectsForPathDecision = new LinkedList<>();
         distanceToBackground = 10;
         rotation = 0;
-        lastCarSpeed = 0;
         lastCarSound = -1;
         lastSoundFile = "";
         driftAngle = 0.0;
@@ -117,24 +110,6 @@ public class Car extends CollidingGameObject implements MainCharacter {
      */
     public void updateParameters() {
         carParameters = DIFFICULTY_PARAMETERS.get(Level.difficulty);
-    }
-
-    /**
-     * Adds GameObjects to the list of GameObjects the car can collide with.
-     *
-     * @param collidingGameObject The gameObjects that should get added
-     */
-    public void addCollidingGameObjectsForPathDecision(CollidingGameObject collidingGameObject) {
-        collidingGameObjectsForPathDecision.add(collidingGameObject);
-    }
-
-    /**
-     * Removes GameObjects from the list of GameObjects the car can collide with.
-     *
-     * @param collidingGameObject The gameObjects that should get removed
-     */
-    public void removeCollidingGameObjectsForPathDecision(CollidingGameObject collidingGameObject) {
-        collidingGameObjectsForPathDecision.remove(collidingGameObject);
     }
 
     @Override
@@ -224,7 +199,7 @@ public class Car extends CollidingGameObject implements MainCharacter {
 
     private void calculateDriftFactor() {
         double normalizedSpeed = (speedInPixel - carParameters.driftInitiationSpeedThreshold)
-                                 / (carParameters.maxSpeed - carParameters.driftInitiationSpeedThreshold);
+                / (carParameters.maxSpeed - carParameters.driftInitiationSpeedThreshold);
 
         if (normalizedSpeed < 0) {
             normalizedSpeed = 0;
@@ -276,19 +251,6 @@ public class Car extends CollidingGameObject implements MainCharacter {
             if (speedInPixel < 0.05) {
                 speedInPixel = 0;
             }
-        }
-    }
-
-    /**
-     * Spawns a new bullet into the currently facing direction.
-     */
-    @Override
-    public void shoot() {
-        if (gameView.timer(shotDurationInMilliseconds, 1, this)) {
-            Bullet bullet = new Bullet(gameView, gamePlayManager, position.getX() + width / 2,
-                                       position.getY() + height / 3, rotation);
-            gamePlayManager.spawnGameObject(bullet);
-            shotDurationInMilliseconds = SHOT_DURATION_IN_MILLISECONDS;
         }
     }
 
@@ -394,6 +356,7 @@ public class Car extends CollidingGameObject implements MainCharacter {
     /**
      * This method sets the state to accelerating.
      */
+    @Override
     public void startDriving() {
         if (currentState != State.CRASHED) {
             currentState = State.ACCELERATING;
@@ -464,7 +427,6 @@ public class Car extends CollidingGameObject implements MainCharacter {
         speedInPixel = 0;
         lastSteeringTime = 0;
         lastAcceleratingTime = 0;
-        lastCarSpeed = 0;
         currentState = State.IDLE;
 
         lastUpdateTime = 0;
@@ -530,7 +492,6 @@ public class Car extends CollidingGameObject implements MainCharacter {
         lastSteeringTime = 0;
         lastAcceleratingTime = 0;
         lastUpdateTime = 0;
-        lastCarSpeed = 0;
         currentState = State.IDLE;
     }
 

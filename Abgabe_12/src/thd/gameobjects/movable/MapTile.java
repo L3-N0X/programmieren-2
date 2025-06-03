@@ -167,7 +167,7 @@ public class MapTile extends CollidingGameObject implements ShiftableGameObject,
     public void reactToCollisionWith(CollidingGameObject other) {
         if (other instanceof Car) {
             if (mapTileImage == MapBlockImages.MapTileImage.TRACK_START_FINISH && position.getX() > GamePlayManager.MAP_TILE_WIDTH * GamePlayManager.BLOCK_SIZE + 20) {
-                gamePlayManager.addPoints(1);
+                gamePlayManager.roundCompleted();
             }
         }
     }

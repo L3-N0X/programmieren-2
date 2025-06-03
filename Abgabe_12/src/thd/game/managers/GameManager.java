@@ -4,6 +4,11 @@ import thd.game.level.Difficulty;
 import thd.game.level.Level;
 import thd.game.utilities.FileAccess;
 import thd.game.utilities.GameView;
+import thd.screens.GameInfo;
+import thd.screens.Screens;
+
+import java.awt.*;
+import java.util.Objects;
 
 class GameManager extends LevelManager {
     private int lastPoints;
@@ -27,6 +32,9 @@ class GameManager extends LevelManager {
             }
             if (gameView.timer(2000, 0, this)) {
                 overlay.stopShowing();
+                Screens.showEndScreen(
+                        gameView,
+                        "Rennen erfolgreich beendet! Sie haben " + points + " Punkte erreicht.");
                 startNewGame();
             }
         } else if (endOfLevel()) {
@@ -53,7 +61,12 @@ class GameManager extends LevelManager {
 
     private void startNewGame() {
         Level.difficulty = FileAccess.readDifficultyFromDisc();
-        Level.difficulty = Difficulty.EASY;
+        String selection = Screens.showStartScreen(gameView, GameInfo.TITLE, GameInfo.DESCRIPTION,
+                                                   Level.difficulty.name);
+        if (!Objects.equals(selection, "Beenden")) {
+            Level.difficulty = Difficulty.fromName(selection);
+        }
+
         FileAccess.writeDifficultyToDisc(Level.difficulty);
         car.updateParameters();
         initializeGame();
@@ -68,6 +81,7 @@ class GameManager extends LevelManager {
     @Override
     protected void initializeGame() {
         super.initializeGame();
+        gameView.updateBackgroundColor(new Color(0x62d532));
         initializeLevel();
     }
 }

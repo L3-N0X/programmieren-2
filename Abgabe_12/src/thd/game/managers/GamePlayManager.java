@@ -1,7 +1,6 @@
 package thd.game.managers;
 
 import thd.game.utilities.GameView;
-import thd.gameobjects.base.CollidingGameObject;
 import thd.gameobjects.base.GameObject;
 
 /**
@@ -53,13 +52,11 @@ public class GamePlayManager extends WorldShiftManager {
     public void destroyGameObject(GameObject gameObject) {
         super.destroyGameObject(gameObject);
         gameObjectManager.remove(gameObject);
-        if (gameObject instanceof CollidingGameObject) {
-            car.removeCollidingGameObjectsForPathDecision((CollidingGameObject) gameObject);
-        }
     }
 
     /**
-     * This will destroy an existing gameObject in the game, but keep it in shiftable.
+     * This will destroy an existing gameObject in the game, but keep it in
+     * shiftable.
      *
      * @param gameObject The gameObject that gets destroyed.
      */
@@ -78,7 +75,7 @@ public class GamePlayManager extends WorldShiftManager {
      *
      * @param points the amount to be added
      */
-    public void addPoints(int points) {
+    private void addPoints(int points) {
         this.points += points;
     }
 
@@ -90,10 +87,27 @@ public class GamePlayManager extends WorldShiftManager {
     }
 
     /**
-     * Starts the lap timer.
+     * Pauses the lap timer.
      */
     public void pauseLapTimer() {
         lapTimeDisplay.getGuiTimer().pause();
+    }
+
+    /**
+     * Updates the timers after a round is completed.
+     */
+    public void roundCompleted() {
+        if (gameView.timer(0, 1000, this)) {
+            return;
+        }
+        lapTimeDisplay.getGuiTimer().pause();
+        if (bestTimeDisplay.getGuiTimer().timeDuration() == 0
+                || lapTimeDisplay.getGuiTimer().timeDuration() < bestTimeDisplay.getGuiTimer().timeDuration()) {
+            bestTimeDisplay.getGuiTimer().updateTimeDuration(lapTimeDisplay.getGuiTimer().timeDuration());
+        }
+        lastTimeDisplay.getGuiTimer().updateTimeDuration(lapTimeDisplay.getGuiTimer().timeDuration());
+        lapTimeDisplay.getGuiTimer().reset();
+        lapTimeDisplay.getGuiTimer().start();
     }
 
     @Override

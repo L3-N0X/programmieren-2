@@ -44,7 +44,6 @@ class GameWorldManager extends GamePlayManager {
             for (int j = 0; j < lines[i].length(); j++) {
                 char trackTileChar = lines[i].charAt(j);
                 MapTile mapMapTile = new MapTile(gameView, this, trackTileChar);
-                car.addCollidingGameObjectsForPathDecision(mapMapTile);
 
                 double tileWidthInPixels = BLOCK_SIZE * MAP_TILE_WIDTH - 1;
                 double tileHeightInPixels = BLOCK_SIZE * MAP_TILE_HEIGHT - 1;

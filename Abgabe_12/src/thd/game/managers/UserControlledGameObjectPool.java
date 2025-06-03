@@ -53,15 +53,25 @@ class UserControlledGameObjectPool {
                 car.startDriving();
                 lapTimeDisplay.getGuiTimer().start();
             }
-        } else if (keyCode == KeyEvent.VK_SPACE) {
-            car.shoot();
-        } else if (keyCode == KeyEvent.VK_S || keyCode == KeyEvent.VK_DOWN) {
+        } else if (keyCode == KeyEvent.VK_S || keyCode == KeyEvent.VK_DOWN || keyCode == KeyEvent.VK_SPACE) {
             currentlyBreaking = true;
             if (car.isDriving()) {
                 car.down();
             }
-        } else if (keyCode == KeyEvent.VK_F3) {
+        } else if (keyCode == KeyEvent.VK_E && gameView.timer(2000, 0, this)) {
+            cycleToNextLevel();
+        } else if (keyCode == KeyEvent.VK_Q && gameView.timer(2000, 0, this)) {
+            cycleToPreviousLevel();
+        } else if (keyCode == KeyEvent.VK_F3 && gameView.timer(100, 0, this)) {
             GameViewManager.debug = !GameViewManager.debug;
         }
+    }
+
+    protected void cycleToNextLevel() {
+
+    }
+
+    protected void cycleToPreviousLevel() {
+
     }
 }

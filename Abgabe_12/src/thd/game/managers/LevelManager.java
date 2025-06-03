@@ -17,9 +17,6 @@ class LevelManager extends GameWorldManager {
     protected void initializeLevel() {
         super.initializeLevel();
         initializeGameObjects();
-        if (lapTimeDisplay.getGuiTimer().timeDuration() > 0) {
-            lastTimeDisplay.getGuiTimer().updateTimeDuration(lapTimeDisplay.getGuiTimer().timeDuration());
-        }
         lapTimeDisplay.getGuiTimer().reset();
     }
 
@@ -34,6 +31,24 @@ class LevelManager extends GameWorldManager {
             throw new NoMoreLevelsAvailableException(
                     "You've reached the last level! There are no further levels implemented yet!");
         }
+    }
+
+    /**
+     * Cycles to the next level in the list of levels.
+     */
+    @Override
+    public void cycleToNextLevel() {
+        level = levels.get((levels.indexOf(level) + 1) % levels.size());
+        initializeLevel();
+    }
+
+    /**
+     * Cycles to the previous level in the list of levels.
+     */
+    @Override
+    public void cycleToPreviousLevel() {
+        level = levels.get((levels.indexOf(level) - 1 + levels.size()) % levels.size());
+        initializeLevel();
     }
 
     private void initializeGameObjects() {
