@@ -27,8 +27,13 @@ public class GamePlayManager extends WorldShiftManager {
     public static final int MAP_TILE_WIDTH = 128;
 
     protected int currentLap;
-    protected static final int MAX_LAPS = 3;
+    /**
+     * The maximum number of laps in a race.
+     */
+    public static final int MAX_LAPS = 3;
     protected boolean raceCompleted;
+    private boolean lapJustCompleted;
+    private int justCompletedLapNumber;
 
     protected GamePlayManager(GameView gameView) {
         super(gameView);
@@ -36,6 +41,8 @@ public class GamePlayManager extends WorldShiftManager {
         sectorTracker = new WorldSectorTracker();
         currentLap = 0;
         raceCompleted = false;
+        lapJustCompleted = false;
+        justCompletedLapNumber = 0;
     }
 
     /**
@@ -64,8 +71,7 @@ public class GamePlayManager extends WorldShiftManager {
     }
 
     /**
-     * This will destroy an existing gameObject in the game, but keep it in
-     * shiftable.
+     * This will destroy an existing gameObject in the game, but keep it in shiftable.
      *
      * @param gameObject The gameObject that gets destroyed.
      */
@@ -87,8 +93,7 @@ public class GamePlayManager extends WorldShiftManager {
     }
 
     /**
-     * Updates the timers after a round is completed. Only processes if all sectors
-     * have been visited.
+     * Updates the timers after a round is completed. Only processes if all sectors have been visited.
      */
     public void roundCompleted() {
         boolean allSectorsVisited = sectorTracker.allSectorsVisited();
@@ -99,12 +104,17 @@ public class GamePlayManager extends WorldShiftManager {
 
         lapTimeDisplay.getGuiTimer().pause();
         if (bestTimeDisplay.getGuiTimer().timeDuration() == 0
-                || lapTimeDisplay.getGuiTimer().timeDuration() < bestTimeDisplay.getGuiTimer().timeDuration()) {
+            || lapTimeDisplay.getGuiTimer().timeDuration() < bestTimeDisplay.getGuiTimer().timeDuration()) {
             bestTimeDisplay.getGuiTimer().updateTimeDuration(lapTimeDisplay.getGuiTimer().timeDuration());
         }
         lastTimeDisplay.getGuiTimer().updateTimeDuration(lapTimeDisplay.getGuiTimer().timeDuration());
 
         currentLap++;
+
+        // Set lap completion flag for all lap completions (including final lap)
+        lapJustCompleted = true;
+        justCompletedLapNumber = currentLap;
+
         if (currentLap > MAX_LAPS) {
             raceCompleted = true;
         } else {
@@ -118,14 +128,24 @@ public class GamePlayManager extends WorldShiftManager {
     public void resetLapCounter() {
         currentLap = 0;
         raceCompleted = false;
+        lapJustCompleted = false;
+        justCompletedLapNumber = 0;
     }
 
     public int getCurrentLap() {
         return currentLap;
     }
 
-    public int getMaxLaps() {
-        return MAX_LAPS;
+    public boolean isLapJustCompleted() {
+        return lapJustCompleted;
+    }
+
+    public int getJustCompletedLapNumber() {
+        return justCompletedLapNumber;
+    }
+
+    public void clearLapCompletionFlag() {
+        lapJustCompleted = false;
     }
 
     @Override

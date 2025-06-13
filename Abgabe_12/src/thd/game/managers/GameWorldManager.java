@@ -123,18 +123,19 @@ class GameWorldManager extends GamePlayManager {
         // The car starts centered on screen, which corresponds to the start tile
         // position
         // Since the world is positioned relative to the start tile, the car's virtual
-        // position
-        // in world coordinates is at the start tile's world coordinate
+        // position in world coordinates needs to be calculated correctly
         double tileWidthInPixels = BLOCK_SIZE * MAP_TILE_WIDTH - 1;
         double tileHeightInPixels = BLOCK_SIZE * MAP_TILE_HEIGHT - 1;
 
-        // Find the start tile position in world coordinates
-        double startTileX = -level.worldOffsetColumns * tileWidthInPixels - offsetXInPixels;
-        double startTileY = -level.worldOffsetLines * tileHeightInPixels - offsetYInPixels;
+        // Find the actual start tile position in world coordinates
+        // The start tile is at the world offset position, which corresponds to
+        // where the 'S' character is located in the level string
+        double startTileWorldX = minX + (level.worldOffsetColumns * tileWidthInPixels);
+        double startTileWorldY = minY + (level.worldOffsetLines * tileHeightInPixels);
 
         // Car starts at the center of the start tile
-        double carStartX = startTileX + (tileWidthInPixels / 2.0);
-        double carStartY = startTileY + (tileHeightInPixels / 2.0);
+        double carStartX = startTileWorldX + (tileWidthInPixels / 2.0);
+        double carStartY = startTileWorldY + (tileHeightInPixels / 2.0);
 
         // Initialize the sector tracker with proper bounds and starting position
         getSectorTracker().initializeForNewLevel(minX, maxX, minY, maxY, carStartX, carStartY);

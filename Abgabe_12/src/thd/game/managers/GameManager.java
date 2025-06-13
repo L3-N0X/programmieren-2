@@ -26,7 +26,21 @@ class GameManager extends LevelManager {
     }
 
     private void gameManagement() {
-        if (endOfGame()) {
+        if (lapCompleted()) {
+            if (!overlay.isMessageShown()) {
+                gameView.playSound("complete.wav", false);
+                overlay.showMessage(lapCompletionMessage(getJustCompletedLapNumber()));
+            }
+            if (gameView.timer(2000, 0, this)) {
+                overlay.stopShowing();
+                clearLapCompletionFlag();
+                if (endOfGame()) {
+
+                    return;
+                }
+            }
+        } else if (endOfGame()) {
+            gameView.updateBackgroundColor(Color.BLACK);
             if (!overlay.isMessageShown()) {
                 gameView.playSound("gameover.wav", false);
                 overlay.showMessage("GAME OVER");
@@ -35,9 +49,9 @@ class GameManager extends LevelManager {
                 overlay.stopShowing();
                 Screens.showEndScreen(
                         gameView,
-                        "Rennen auf Map Nr. " + level.number + " erfolgreich beendet!"
-                                + "\nIhre beste Zeit: " + bestTimeDisplay.getGuiTimer().timeDurationFormatted()
-                                + "\n\nWählen Sie neues Spiel, um ein neues Rennen zu starten.");
+                        "Rennen auf Map " + level.name + " erfolgreich beendet!"
+                        + "\nIhre beste Zeit: " + bestTimeDisplay.getGuiTimer().timeDurationFormatted()
+                        + "\n\nWählen Sie \"Neues Spiel\", um ein weiteres Rennen zu starten!");
                 startNewGame();
             }
         } else if (endOfLevel()) {
@@ -53,18 +67,31 @@ class GameManager extends LevelManager {
         }
     }
 
+    private boolean lapCompleted() {
+        return isLapJustCompleted();
+    }
+
     private boolean endOfLevel() {
-        return currentLap == MAX_LAPS;
+        return false; // Individual lap completion handled separately
     }
 
     private boolean endOfGame() {
         return currentLap == MAX_LAPS;
     }
 
+    private String lapCompletionMessage(int lapNumber) {
+        return switch (lapNumber) {
+            case 1 -> "Lap 1 Complete!";
+            case 2 -> "Lap 2 Complete!";
+            case 3 -> "Final Lap Complete!";
+            default -> "Lap Complete!";
+        };
+    }
+
     private void startNewGame() {
         Level.difficulty = FileAccess.readDifficultyFromDisc();
         String selection = Screens.showStartScreen(gameView, GameInfo.TITLE, GameInfo.DESCRIPTION,
-                Level.difficulty.name);
+                                                   Level.difficulty.name);
         if (!Objects.equals(selection, "Beenden")) {
             Level.difficulty = Difficulty.fromName(selection);
         }

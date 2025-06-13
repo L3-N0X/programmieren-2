@@ -9,7 +9,7 @@ import java.awt.*;
 
 public class LapCounterDisplay extends GameObject {
 
-    protected final Position defaultPosition;
+    private final Position defaultPosition;
 
     public LapCounterDisplay(GameView gameView, GamePlayManager gamePlayManager) {
         super(gameView, gamePlayManager);
@@ -31,7 +31,7 @@ public class LapCounterDisplay extends GameObject {
 
     @Override
     public void addToCanvas() {
-        gameView.addTextToCanvas(gamePlayManager.getCurrentLap() + "/" + gamePlayManager.getMaxLaps(), position.getX(),
+        gameView.addTextToCanvas(gamePlayManager.getCurrentLap() + "/" + GamePlayManager.MAX_LAPS, position.getX(),
                 position.getY(), size,
                 true,
                 Color.WHITE, rotation,

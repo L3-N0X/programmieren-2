@@ -107,13 +107,13 @@ public class WorldSectorTracker {
 
         int currentSector;
         if (!inRightHalf && !inBottomHalf) {
-            currentSector = 1;
+            currentSector = 1; // Top-Left
         } else if (inRightHalf && !inBottomHalf) {
-            currentSector = 2;
-        } else if (!inRightHalf) {
-            currentSector = 3;
+            currentSector = 2; // Top-Right
+        } else if (!inRightHalf && inBottomHalf) {
+            currentSector = 4; // Bottom-Left
         } else {
-            currentSector = 4;
+            currentSector = 3; // Bottom-Right
         }
 
         visitedSectors.add(currentSector);
@@ -157,5 +157,43 @@ public class WorldSectorTracker {
 
         // Use a smaller threshold and check both axes
         return distanceX < FINISH_LINE_THRESHOLD && distanceY < FINISH_LINE_THRESHOLD;
+    }
+
+    /**
+     * Gets the visited sectors for debugging purposes.
+     *
+     * @return A defensive copy of the visited sectors set
+     */
+    public java.util.Set<Integer> getVisitedSectors() {
+        return new java.util.HashSet<>(visitedSectors);
+    }
+
+    /**
+     * Gets the current sector the car is in for debugging purposes.
+     *
+     * @return The current sector number (1-4), or 0 if not calculated yet
+     */
+    public int currentSector() {
+        if (!worldBoundsCalculated) {
+            return 0;
+        }
+
+        double worldWidth = worldMaxX - worldMinX;
+        double worldHeight = worldMaxY - worldMinY;
+        double sectorWidth = worldWidth / 2.0;
+        double sectorHeight = worldHeight / 2.0;
+
+        boolean inRightHalf = (virtualCarX - worldMinX) > sectorWidth;
+        boolean inBottomHalf = (virtualCarY - worldMinY) > sectorHeight;
+
+        if (!inRightHalf && !inBottomHalf) {
+            return 1; // Top-Left
+        } else if (inRightHalf && !inBottomHalf) {
+            return 2; // Top-Right
+        } else if (!inRightHalf && inBottomHalf) {
+            return 4; // Bottom-Left
+        } else {
+            return 3; // Bottom-Right
+        }
     }
 }
