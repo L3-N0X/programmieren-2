@@ -1,5 +1,8 @@
 package thd.game.managers;
 
+import java.util.LinkedList;
+import java.util.List;
+import javax.sound.sampled.LineUnavailableException;
 import thd.game.utilities.GameView;
 import thd.gameobjects.base.GameObject;
 import thd.gameobjects.movable.Car;
@@ -8,10 +11,6 @@ import thd.gameobjects.unmovable.BestTimeDisplay;
 import thd.gameobjects.unmovable.LapTimeDisplay;
 import thd.gameobjects.unmovable.LastTimeDisplay;
 import thd.gameobjects.unmovable.Overlay;
-
-import javax.sound.sampled.LineUnavailableException;
-import java.util.LinkedList;
-import java.util.List;
 
 class GameWorldManager extends GamePlayManager {
     private final List<GameObject> activatableGameObjects;
@@ -106,9 +105,35 @@ class GameWorldManager extends GamePlayManager {
         spawnGameObjects();
         spawnGameObjectsFromWorldString();
         calculateMapPixelSize();
-        clearListsForPathDecisionsInGameObjects();
-    }
 
-    private void clearListsForPathDecisionsInGameObjects() {
+        // Calculate the proper world bounds including offsets
+        double offsetXInPixels = TILE_OFFSET_COLUMNS_IN_BLOCKS * BLOCK_SIZE;
+        double offsetYInPixels = TILE_OFFSET_LINES_IN_BLOCKS * BLOCK_SIZE;
+
+        // Calculate min/max coordinates considering the tile positioning
+        double minX = -level.worldOffsetColumns * (BLOCK_SIZE * MAP_TILE_WIDTH - 1) - offsetXInPixels;
+        double maxX = minX + mapPixelWidth;
+        double minY = -level.worldOffsetLines * (BLOCK_SIZE * MAP_TILE_HEIGHT - 1) - offsetYInPixels;
+        double maxY = minY + mapPixelHeight;
+
+        // Calculate the car's starting position based on the start tile location
+        // The car starts centered on screen, which corresponds to the start tile
+        // position
+        // Since the world is positioned relative to the start tile, the car's virtual
+        // position
+        // in world coordinates is at the start tile's world coordinate
+        double tileWidthInPixels = BLOCK_SIZE * MAP_TILE_WIDTH - 1;
+        double tileHeightInPixels = BLOCK_SIZE * MAP_TILE_HEIGHT - 1;
+
+        // Find the start tile position in world coordinates
+        double startTileX = -level.worldOffsetColumns * tileWidthInPixels - offsetXInPixels;
+        double startTileY = -level.worldOffsetLines * tileHeightInPixels - offsetYInPixels;
+
+        // Car starts at the center of the start tile
+        double carStartX = startTileX + (tileWidthInPixels / 2.0);
+        double carStartY = startTileY + (tileHeightInPixels / 2.0);
+
+        // Initialize the sector tracker with proper bounds and starting position
+        getSectorTracker().initializeForNewLevel(minX, maxX, minY, maxY, carStartX, carStartY);
     }
 }

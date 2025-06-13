@@ -3,7 +3,6 @@ package thd.game.managers;
 import thd.game.utilities.GameView;
 import thd.gameobjects.base.CollidingGameObject;
 import thd.gameobjects.base.GameObject;
-import thd.gameobjects.movable.MapTile;
 
 /**
  * The {@link GamePlayManager} handles spawning and destroying gameObjects.
@@ -45,11 +44,6 @@ public class GamePlayManager extends WorldShiftManager {
     public void spawnGameObject(GameObject gameObject) {
         super.spawnGameObject(gameObject);
         gameObjectManager.add(gameObject);
-
-        // Update world bounds when spawning map tiles
-        if (gameObject instanceof MapTile) {
-            sectorTracker.updateWorldBounds((MapTile) gameObject);
-        }
     }
 
     /**

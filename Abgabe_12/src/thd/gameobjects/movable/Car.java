@@ -1,5 +1,11 @@
 package thd.gameobjects.movable;
 
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.LinkedList;
+import java.util.Map;
+import javax.sound.sampled.LineUnavailableException;
 import thd.game.level.Difficulty;
 import thd.game.level.Level;
 import thd.game.managers.GamePlayManager;
@@ -10,19 +16,15 @@ import thd.gameobjects.base.EngineAudioGenerator;
 import thd.gameobjects.base.MainCharacter;
 import thd.gameobjects.base.Position;
 
-import javax.sound.sampled.LineUnavailableException;
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.LinkedList;
-import java.util.Map;
-
 /**
- * A car that can be controlled by the player. It can drive, steer, accelerate, and crash. It reacts to collisions with
+ * A car that can be controlled by the player. It can drive, steer, accelerate,
+ * and crash. It reacts to collisions with
  * map tiles and can drift when driving at high speeds.
  * <p>
- * This class extends {@link CollidingGameObject} and implements {@link MainCharacter}. It manages the car's state,
- * speed, rotation, and interactions with the game world. It also handles the car's visual representation and sound
+ * This class extends {@link CollidingGameObject} and implements
+ * {@link MainCharacter}. It manages the car's state,
+ * speed, rotation, and interactions with the game world. It also handles the
+ * car's visual representation and sound
  * effects based on its state.
  */
 public class Car extends CollidingGameObject implements MainCharacter {
@@ -36,28 +38,28 @@ public class Car extends CollidingGameObject implements MainCharacter {
     private static final Map<Difficulty, CarParameters> DIFFICULTY_PARAMETERS = new EnumMap<>(Difficulty.class);
 
     private record CarParameters(double driftInitiationSpeedThreshold,
-                                 double driftAngularVelocity,
-                                 double driftFriction,
-                                 double driftRecoveryRate,
-                                 double driftAngleRecoveryStep,
-                                 double maxSpeed,
-                                 double acceleration,
-                                 double breakRate) {
+            double driftAngularVelocity,
+            double driftFriction,
+            double driftRecoveryRate,
+            double driftAngleRecoveryStep,
+            double maxSpeed,
+            double acceleration,
+            double breakRate) {
     }
 
     static {
         DIFFICULTY_PARAMETERS.put(Difficulty.EASY,
-                                  new CarParameters(7.0, Math.toRadians(-1.5), 0.15,
-                                                    0.04, Math.toRadians(0.3), 12.0,
-                                                    0.2, 2.5));
+                new CarParameters(7.0, Math.toRadians(-1.5), 0.15,
+                        0.04, Math.toRadians(0.3), 12.0,
+                        0.2, 2.5));
         DIFFICULTY_PARAMETERS.put(Difficulty.STANDARD,
-                                  new CarParameters(8.5, Math.toRadians(-2.0), 0.2,
-                                                    0.032, Math.toRadians(0.2), 17.0,
-                                                    0.3, 2.8));
+                new CarParameters(8.5, Math.toRadians(-2.0), 0.2,
+                        0.032, Math.toRadians(0.2), 17.0,
+                        0.3, 2.8));
         DIFFICULTY_PARAMETERS.put(Difficulty.HARD,
-                                  new CarParameters(10.0, Math.toRadians(-2.5), 0.25,
-                                                    0.025, Math.toRadians(0.15), 22.0,
-                                                    0.4, 3.2));
+                new CarParameters(10.0, Math.toRadians(-2.5), 0.25,
+                        0.025, Math.toRadians(0.15), 22.0,
+                        0.4, 3.2));
     }
 
     private CarParameters carParameters;
@@ -89,7 +91,8 @@ public class Car extends CollidingGameObject implements MainCharacter {
     /**
      * Creates a new moving Rock tile in the game at a default position.
      *
-     * @param gameView        the main {@link GameView} where the text later gets added to
+     * @param gameView        the main {@link GameView} where the text later gets
+     *                        added to
      * @param gamePlayManager Manages the game with spawning, despawning and more.
      */
     public Car(GameView gameView, GamePlayManager gamePlayManager) throws LineUnavailableException {
@@ -110,6 +113,7 @@ public class Car extends CollidingGameObject implements MainCharacter {
         driftFactor = 0.0;
         carParameters = DIFFICULTY_PARAMETERS.get(Level.difficulty);
         hitBoxOffsets(8, 8, -16, -16);
+        lastAcceleratingTime = gameView.gameTimeInMilliseconds();
 
         engineAudio = new EngineAudioGenerator();
     }
@@ -226,7 +230,7 @@ public class Car extends CollidingGameObject implements MainCharacter {
 
     private void calculateDriftFactor() {
         double normalizedSpeed = (speedInPixel - carParameters.driftInitiationSpeedThreshold)
-                                 / (carParameters.maxSpeed - carParameters.driftInitiationSpeedThreshold);
+                / (carParameters.maxSpeed - carParameters.driftInitiationSpeedThreshold);
 
         if (normalizedSpeed < 0) {
             normalizedSpeed = 0;
@@ -436,7 +440,7 @@ public class Car extends CollidingGameObject implements MainCharacter {
         rotation = 0;
         speedInPixel = 0;
         lastSteeringTime = 0;
-        lastAcceleratingTime = 0;
+        lastAcceleratingTime = gameView.gameTimeInMilliseconds();
         currentState = State.IDLE;
 
         lastUpdateTime = 0;
@@ -503,7 +507,7 @@ public class Car extends CollidingGameObject implements MainCharacter {
             gamePlayManager.moveWorldDown(tileOffsetY);
         }
         lastSteeringTime = 0;
-        lastAcceleratingTime = 0;
+        lastAcceleratingTime = gameView.gameTimeInMilliseconds();
         lastUpdateTime = 0;
         currentState = State.IDLE;
     }

@@ -1,5 +1,7 @@
 package thd.game.managers;
 
+import java.awt.*;
+import java.awt.event.KeyEvent;
 import thd.game.level.Level;
 import thd.game.utilities.GameView;
 import thd.gameobjects.movable.Car;
@@ -7,9 +9,6 @@ import thd.gameobjects.unmovable.BestTimeDisplay;
 import thd.gameobjects.unmovable.LapTimeDisplay;
 import thd.gameobjects.unmovable.LastTimeDisplay;
 import thd.gameobjects.unmovable.Overlay;
-
-import java.awt.*;
-import java.awt.event.KeyEvent;
 
 class UserControlledGameObjectPool {
     protected final GameView gameView;
@@ -33,7 +32,7 @@ class UserControlledGameObjectPool {
         for (int keyCode : pressedKeys) {
             if (GameViewManager.debug) {
                 gameView.addTextToCanvas("Taste " + ((char) keyCode) + " gedrückt", 0, 0, 18,
-                                         true, Color.WHITE, 0);
+                        true, Color.WHITE, 0);
             }
             processKeyCode(keyCode);
         }

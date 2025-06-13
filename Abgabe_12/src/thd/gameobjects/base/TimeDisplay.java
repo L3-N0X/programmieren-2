@@ -12,6 +12,9 @@ public abstract class TimeDisplay extends GameObject {
     private final GuiTimer guiTimer;
     protected String timerLabel;
 
+    private Color textColor;
+    private int flashCount;
+
     /**
      * Creates a new TimeDisplay Object with the correct size and position.
      *
@@ -25,39 +28,49 @@ public abstract class TimeDisplay extends GameObject {
         height = size * 1.5;
         distanceToBackground = 30;
         timerLabel = "Timer";
+        textColor = Color.WHITE;
         position.updateCoordinates(new Position(30, (int) (GameView.HEIGHT - size - height)));
         guiTimer = new GuiTimer(gameView);
     }
 
     @Override
     public void addToCanvas() {
-        gameView.addTextToCanvas(timerLabel, position.getX(), position.getY(), size, true, Color.WHITE, rotation,
+        if (guiTimer.isUpdated() && gameView.timer(500, 0, this)) {
+            textColor = textColor.equals(Color.WHITE) ? Color.RED : Color.WHITE;
+            flashCount++;
+        }
+        gameView.addTextToCanvas(timerLabel, position.getX(), position.getY(), size, true, textColor, rotation,
                                  "kongtext.ttf");
 
         gameView.addTextToCanvas(guiTimer.minutesSinceStart(),
                                  position.getX() - size,
                                  position.getY() + size * 1.2,
-                                 size, true, Color.WHITE, rotation, "kongtext.ttf");
+                                 size, true, textColor, rotation, "kongtext.ttf");
 
         gameView.addTextToCanvas(":",
                                  position.getX() + size * 0.8,
                                  position.getY() + size * 1.2,
-                                 size, true, Color.WHITE, rotation, "kongtext.ttf");
+                                 size, true, textColor, rotation, "kongtext.ttf");
 
         gameView.addTextToCanvas(guiTimer.secondsSinceStart(),
                                  position.getX() + size * 1.6,
                                  position.getY() + size * 1.2,
-                                 size, true, Color.WHITE, rotation, "kongtext.ttf");
+                                 size, true, textColor, rotation, "kongtext.ttf");
 
         gameView.addTextToCanvas(":",
                                  position.getX() + size * 3.5,
                                  position.getY() + size * 1.2,
-                                 size, true, Color.WHITE, rotation, "kongtext.ttf");
+                                 size, true, textColor, rotation, "kongtext.ttf");
 
         gameView.addTextToCanvas(guiTimer.hundredthSinceStart(),
                                  position.getX() + size * 4.3,
                                  position.getY() + size * 1.2,
-                                 size, true, Color.WHITE, rotation, "kongtext.ttf");
+                                 size, true, textColor, rotation, "kongtext.ttf");
+
+        if (flashCount > 5) {
+            flashCount = 0;
+            guiTimer.resetUpdated();
+        }
     }
 
     /**

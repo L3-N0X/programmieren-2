@@ -11,7 +11,7 @@ import java.util.Set;
  * sectors and requires the car to visit all sectors before allowing lap completion.
  */
 public class WorldSectorTracker {
-    private static final double FINISH_LINE_THRESHOLD = 50.0; // Distance threshold for finish line detection
+    private static final double FINISH_LINE_THRESHOLD = 100.0; // Distance threshold for finish line detection
 
     private final Set<Integer> visitedSectors;
     private double worldMinX;
@@ -40,7 +40,6 @@ public class WorldSectorTracker {
      * @param worldDeltaY How much the world moved vertically
      */
     void updateVirtualCarPosition(double worldDeltaX, double worldDeltaY) {
-        // Invert the world movement to get virtual car movement
         virtualCarX -= worldDeltaX;
         virtualCarY -= worldDeltaY;
 
@@ -50,30 +49,44 @@ public class WorldSectorTracker {
     }
 
     /**
-     * Calculates world bounds from the given map tile and updates if needed.
+     * Sets the world bounds to calculate sectors correctly.
      *
-     * @param mapTile The map tile to consider for world bounds
+     * @param minX Minimum X coordinate of the world
+     * @param maxX Maximum X coordinate of the world
+     * @param minY Minimum Y coordinate of the world
+     * @param maxY Maximum Y coordinate of the world
      */
-    void updateWorldBounds(MapTile mapTile) {
-        double tileX = mapTile.getPosition().getX();
-        double tileY = mapTile.getPosition().getY();
-        double tileWidth = GamePlayManager.MAP_TILE_WIDTH * GamePlayManager.BLOCK_SIZE;
-        double tileHeight = GamePlayManager.MAP_TILE_HEIGHT * GamePlayManager.BLOCK_SIZE;
+    public void updateWorldBounds(double minX, double maxX, double minY, double maxY) {
+        this.worldMinX = minX;
+        this.worldMaxX = maxX;
+        this.worldMinY = minY;
+        this.worldMaxY = maxY;
+        this.worldBoundsCalculated = true;
 
-        if (!worldBoundsCalculated) {
-            worldMinX = tileX;
-            worldMaxX = tileX + tileWidth;
-            worldMinY = tileY;
-            worldMaxY = tileY + tileHeight;
-            worldBoundsCalculated = true;
-        } else {
-            worldMinX = Math.min(worldMinX, tileX);
-            worldMaxX = Math.max(worldMaxX, tileX + tileWidth);
-            worldMinY = Math.min(worldMinY, tileY);
-            worldMaxY = Math.max(worldMaxY, tileY + tileHeight);
-        }
-
+        // Reset visited sectors when world bounds are updated
+        visitedSectors.clear();
         updateCurrentSector();
+    }
+
+    /**
+     * Initializes the sector tracker for a new level. This should be called when switching levels to reset the virtual
+     * car position and clear visited sectors.
+     *
+     * @param minX   Minimum X coordinate of the world
+     * @param maxX   Maximum X coordinate of the world
+     * @param minY   Minimum Y coordinate of the world
+     * @param maxY   Maximum Y coordinate of the world
+     * @param startX Starting X position of the car in world coordinates
+     * @param startY Starting Y position of the car in world coordinates
+     */
+    public void initializeForNewLevel(double minX, double maxX, double minY, double maxY, double startX,
+                                      double startY) {
+        // Reset virtual car position to starting position
+        this.virtualCarX = startX;
+        this.virtualCarY = startY;
+
+        // Update world bounds
+        updateWorldBounds(minX, maxX, minY, maxY);
     }
 
     /**
@@ -138,9 +151,11 @@ public class WorldSectorTracker {
         double tileCenterY = finishLineTile.getPosition().getY()
                              + (GamePlayManager.MAP_TILE_HEIGHT * GamePlayManager.BLOCK_SIZE) / 2.0;
 
-        double distance = Math.sqrt(Math.pow(carCenterX - tileCenterX, 2)
-                                    + Math.pow(carCenterY - tileCenterY, 2));
+        // Calculate distance in both X and Y directions for more accurate detection
+        double distanceX = Math.abs(carCenterX - tileCenterX);
+        double distanceY = Math.abs(carCenterY - tileCenterY);
 
-        return distance < FINISH_LINE_THRESHOLD;
+        // Use a smaller threshold and check both axes
+        return distanceX < FINISH_LINE_THRESHOLD && distanceY < FINISH_LINE_THRESHOLD;
     }
 }

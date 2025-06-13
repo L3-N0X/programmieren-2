@@ -20,6 +20,7 @@ public class GuiTimer implements Comparable<GuiTimer> {
     private State state;
     private long startTimeMillis;
     private long beforePauseTimeMillis;
+    private boolean updated;
 
     /**
      * Creates a new GuiTimer for the GUI.
@@ -31,6 +32,7 @@ public class GuiTimer implements Comparable<GuiTimer> {
         state = State.STOPPED;
         startTimeMillis = 0;
         beforePauseTimeMillis = 0;
+        updated = false;
     }
 
     /**
@@ -103,6 +105,15 @@ public class GuiTimer implements Comparable<GuiTimer> {
         this.beforePauseTimeMillis = durationMillis;
         this.startTimeMillis = 0;
         this.state = State.PAUSED;
+        this.updated = true;
+    }
+
+    public boolean isUpdated() {
+        return updated;
+    }
+
+    public void resetUpdated() {
+        this.updated = false;
     }
 
     /**
