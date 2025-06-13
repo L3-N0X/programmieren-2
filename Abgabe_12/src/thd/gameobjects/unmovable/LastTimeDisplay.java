@@ -18,8 +18,9 @@ public class LastTimeDisplay extends TimeDisplay {
     public LastTimeDisplay(GameView gameView, GamePlayManager gamePlayManager) {
         super(gameView, gamePlayManager);
         timerLabel = "LAST";
-        position.updateCoordinates(new Position(
+        defaultPosition.updateCoordinates(new Position(
                 (double) GameView.WIDTH / 2 - width / 2,
                 (int) (GameView.HEIGHT - size - height)));
+        placeAtDefaultPosition();
     }
 }

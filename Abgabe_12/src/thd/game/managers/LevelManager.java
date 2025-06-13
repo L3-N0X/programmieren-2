@@ -1,10 +1,9 @@
 package thd.game.managers;
 
+import java.util.List;
+import javax.sound.sampled.LineUnavailableException;
 import thd.game.level.*;
 import thd.game.utilities.GameView;
-
-import javax.sound.sampled.LineUnavailableException;
-import java.util.List;
 
 class LevelManager extends GameWorldManager {
     private List<Level> levels;
@@ -49,6 +48,14 @@ class LevelManager extends GameWorldManager {
     @Override
     protected void cycleToPreviousLevel() {
         level = levels.get((levels.indexOf(level) - 1 + levels.size()) % levels.size());
+        initializeLevel();
+    }
+
+    /**
+     * Resets the current level without changing to a different level.
+     */
+    @Override
+    protected void resetCurrentLevel() {
         initializeLevel();
     }
 

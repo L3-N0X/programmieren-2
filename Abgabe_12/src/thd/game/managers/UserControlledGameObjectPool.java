@@ -78,6 +78,8 @@ class UserControlledGameObjectPool {
                     cycleToNextLevel();
                 } else if (keyEvent.getKeyCode() == KeyEvent.VK_Q) {
                     cycleToPreviousLevel();
+                } else if (keyEvent.getKeyCode() == KeyEvent.VK_R) {
+                    resetCurrentLevel();
                 } else if (keyEvent.getKeyCode() == KeyEvent.VK_F3) {
                     GameViewManager.debug = !GameViewManager.debug;
                 }
@@ -90,6 +92,10 @@ class UserControlledGameObjectPool {
     }
 
     protected void cycleToPreviousLevel() {
+
+    }
+
+    protected void resetCurrentLevel() {
 
     }
 }

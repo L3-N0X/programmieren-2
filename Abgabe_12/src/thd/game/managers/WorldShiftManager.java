@@ -5,6 +5,7 @@ import thd.gameobjects.base.GameObject;
 import thd.gameobjects.base.Position;
 import thd.gameobjects.base.ShiftableGameObject;
 import thd.gameobjects.movable.MapTile;
+import thd.gameobjects.movable.ShakeMovementPattern;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -18,9 +19,12 @@ public class WorldShiftManager extends UserControlledGameObjectPool {
     protected double mapPixelWidth;
     protected double mapPixelHeight;
 
+    private final ShakeMovementPattern shakeMovementPattern;
+
     protected WorldShiftManager(GameView gameView) {
         super(gameView);
         shiftableGameObjects = new LinkedList<>();
+        shakeMovementPattern = new ShakeMovementPattern();
     }
 
     protected void addToShiftableGameObjectsIfShiftable(GameObject gameObject) {
@@ -79,6 +83,16 @@ public class WorldShiftManager extends UserControlledGameObjectPool {
      */
     public void moveWorldDown(double pixels) {
         shiftGameObjects(0, pixels);
+    }
+
+    /**
+     * Gets the offset for the shake effect of the car.
+     *
+     * @return the offset for the shake effect of the car
+     */
+    public Position getShakeOffset() {
+        double shakeDistance = car.getShakeDistance();
+        return shakeMovementPattern.nextPosition(shakeDistance);
     }
 
     private void shiftGameObjects(double shiftX, double shiftY) {

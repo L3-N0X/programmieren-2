@@ -18,5 +18,6 @@ public class GameInfo {
                                              + "W  = starten, Auto beschleunigt automatisch\n"
                                              + "S oder Leertaste = Bremsen\n"
                                              + "A, D = links, rechts\n"
-                                             + "Q / E = Andere Map\n";
+                                             + "Q / E = Andere Map\n"
+                                             + "R = Level neu starten\n";
 }

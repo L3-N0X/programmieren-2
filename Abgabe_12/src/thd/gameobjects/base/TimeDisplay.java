@@ -12,6 +12,8 @@ public abstract class TimeDisplay extends GameObject {
     private final GuiTimer guiTimer;
     protected String timerLabel;
 
+    protected final Position defaultPosition;
+
     private Color textColor;
     private int flashCount;
 
@@ -29,8 +31,25 @@ public abstract class TimeDisplay extends GameObject {
         distanceToBackground = 30;
         timerLabel = "Timer";
         textColor = Color.WHITE;
-        position.updateCoordinates(new Position(30, (int) (GameView.HEIGHT - size - height)));
+        defaultPosition = new Position(30, (int) (GameView.HEIGHT - size - height));
         guiTimer = new GuiTimer(gameView);
+        placeAtDefaultPosition();
+    }
+
+    /**
+     * Places the timer at the default position.
+     */
+    public void placeAtDefaultPosition() {
+        position.updateCoordinates(defaultPosition.getX(), defaultPosition.getY());
+    }
+
+    @Override
+    public void updatePosition() {
+        Position shakeOffset = gamePlayManager.getShakeOffset();
+        position.updateCoordinates(
+                defaultPosition.getX() + shakeOffset.getX(),
+                defaultPosition.getY() + shakeOffset.getY()
+        );
     }
 
     @Override

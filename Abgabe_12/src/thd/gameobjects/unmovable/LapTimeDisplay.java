@@ -18,6 +18,7 @@ public class LapTimeDisplay extends TimeDisplay {
     public LapTimeDisplay(GameView gameView, GamePlayManager gamePlayManager) {
         super(gameView, gamePlayManager);
         timerLabel = "TIME";
-        position.updateCoordinates(new Position(30, (int) (GameView.HEIGHT - size - height)));
+        defaultPosition.updateCoordinates(new Position(30, (int) (GameView.HEIGHT - size - height)));
+        placeAtDefaultPosition();
     }
 }

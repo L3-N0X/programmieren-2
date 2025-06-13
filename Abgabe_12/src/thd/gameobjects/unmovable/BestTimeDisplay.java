@@ -18,6 +18,8 @@ public class BestTimeDisplay extends TimeDisplay {
     public BestTimeDisplay(GameView gameView, GamePlayManager gamePlayManager) {
         super(gameView, gamePlayManager);
         timerLabel = "BEST";
-        position.updateCoordinates(new Position(GameView.WIDTH - width - 30, (int) (GameView.HEIGHT - size - height)));
+        defaultPosition.updateCoordinates(
+                new Position(GameView.WIDTH - width - 30, (int) (GameView.HEIGHT - size - height)));
+        placeAtDefaultPosition();
     }
 }
