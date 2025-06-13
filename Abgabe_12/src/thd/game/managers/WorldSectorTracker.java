@@ -56,7 +56,7 @@ public class WorldSectorTracker {
      * @param minY Minimum Y coordinate of the world
      * @param maxY Maximum Y coordinate of the world
      */
-    public void updateWorldBounds(double minX, double maxX, double minY, double maxY) {
+    private void updateWorldBounds(double minX, double maxX, double minY, double maxY) {
         this.worldMinX = minX;
         this.worldMaxX = maxX;
         this.worldMinY = minY;
@@ -79,8 +79,8 @@ public class WorldSectorTracker {
      * @param startX Starting X position of the car in world coordinates
      * @param startY Starting Y position of the car in world coordinates
      */
-    public void initializeForNewLevel(double minX, double maxX, double minY, double maxY, double startX,
-                                      double startY) {
+    void initializeForNewLevel(double minX, double maxX, double minY, double maxY, double startX,
+                               double startY) {
         // Reset virtual car position to starting position
         this.virtualCarX = startX;
         this.virtualCarY = startY;

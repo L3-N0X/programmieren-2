@@ -1,6 +1,9 @@
 package thd.game.managers;
 
-import thd.game.level.*;
+import thd.game.level.Level;
+import thd.game.level.Level1;
+import thd.game.level.Level2;
+import thd.game.level.Level3;
 import thd.game.utilities.GameView;
 
 import javax.sound.sampled.LineUnavailableException;
@@ -19,19 +22,6 @@ class LevelManager extends GameWorldManager {
         super.initializeLevel();
         initializeGameObjects();
         lapTimeDisplay.getGuiTimer().reset();
-    }
-
-    protected boolean hasNextLevel() {
-        return level.number < levels.size();
-    }
-
-    protected void switchToNextLevel() {
-        if (hasNextLevel()) {
-            level = levels.get(levels.indexOf(level) + 1);
-        } else {
-            throw new NoMoreLevelsAvailableException(
-                    "You've reached the last level! There are no further levels implemented yet!");
-        }
     }
 
     /**

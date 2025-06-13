@@ -7,10 +7,19 @@ import thd.gameobjects.base.Position;
 
 import java.awt.*;
 
+/**
+ * A Text-Display component to display the current lap in-game.
+ */
 public class LapCounterDisplay extends GameObject {
 
     private final Position defaultPosition;
 
+    /**
+     * Creates a new LapCounterDisplay Object with the correct size and position.
+     *
+     * @param gameView        the main {@link GameView} where the text later gets added to
+     * @param gamePlayManager Manages the game with spawning, despawning and more.
+     */
     public LapCounterDisplay(GameView gameView, GamePlayManager gamePlayManager) {
         super(gameView, gamePlayManager);
         size = 35;
@@ -32,9 +41,9 @@ public class LapCounterDisplay extends GameObject {
     @Override
     public void addToCanvas() {
         gameView.addTextToCanvas(gamePlayManager.getCurrentLap() + "/" + GamePlayManager.MAX_LAPS, position.getX(),
-                position.getY(), size,
-                true,
-                Color.WHITE, rotation,
-                "kongtext.ttf");
+                                 position.getY(), size,
+                                 true,
+                                 Color.WHITE, rotation,
+                                 "kongtext.ttf");
     }
 }

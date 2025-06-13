@@ -108,11 +108,11 @@ public class GuiTimer implements Comparable<GuiTimer> {
         this.updated = true;
     }
 
-    public boolean isUpdated() {
+    boolean isUpdated() {
         return updated;
     }
 
-    public void resetUpdated() {
+    void resetUpdated() {
         this.updated = false;
     }
 

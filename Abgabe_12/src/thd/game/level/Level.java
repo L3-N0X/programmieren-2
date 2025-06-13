@@ -11,7 +11,7 @@ public class Level {
     /**
      * The number of the level.
      */
-    public int number;
+    protected int number;
     /**
      * The world for the level where the user spawns in, as worldString.
      */

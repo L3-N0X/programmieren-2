@@ -54,25 +54,11 @@ class GameManager extends LevelManager {
                         + "\n\nWählen Sie \"Neues Spiel\", um ein weiteres Rennen zu starten!");
                 startNewGame();
             }
-        } else if (endOfLevel()) {
-            if (!overlay.isMessageShown()) {
-                gameView.playSound("complete.wav", false);
-                overlay.showMessage("GREAT JOB!");
-            }
-            if (gameView.timer(2000, 0, this)) {
-                overlay.stopShowing();
-                switchToNextLevel();
-                initializeLevel();
-            }
         }
     }
 
     private boolean lapCompleted() {
         return isLapJustCompleted();
-    }
-
-    private boolean endOfLevel() {
-        return false; // Individual lap completion handled separately
     }
 
     private boolean endOfGame() {

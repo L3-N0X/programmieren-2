@@ -31,7 +31,6 @@ public class GamePlayManager extends WorldShiftManager {
      * The maximum number of laps in a race.
      */
     public static final int MAX_LAPS = 3;
-    protected boolean raceCompleted;
     private boolean lapJustCompleted;
     private int justCompletedLapNumber;
 
@@ -40,7 +39,6 @@ public class GamePlayManager extends WorldShiftManager {
         gameObjectManager = new GameObjectManager();
         sectorTracker = new WorldSectorTracker();
         currentLap = 0;
-        raceCompleted = false;
         lapJustCompleted = false;
         justCompletedLapNumber = 0;
     }
@@ -111,40 +109,34 @@ public class GamePlayManager extends WorldShiftManager {
 
         currentLap++;
 
-        // Set lap completion flag for all lap completions (including final lap)
         lapJustCompleted = true;
         justCompletedLapNumber = currentLap;
 
-        if (currentLap > MAX_LAPS) {
-            raceCompleted = true;
-        } else {
+        if (currentLap < MAX_LAPS) {
             lapTimeDisplay.getGuiTimer().reset();
             lapTimeDisplay.getGuiTimer().start();
-
             sectorTracker.resetForNewLap();
         }
     }
 
-    public void resetLapCounter() {
-        currentLap = 0;
-        raceCompleted = false;
-        lapJustCompleted = false;
-        justCompletedLapNumber = 0;
-    }
-
+    /**
+     * Gets the current lap number.
+     *
+     * @return The current lap number.
+     */
     public int getCurrentLap() {
         return currentLap;
     }
 
-    public boolean isLapJustCompleted() {
+    protected boolean isLapJustCompleted() {
         return lapJustCompleted;
     }
 
-    public int getJustCompletedLapNumber() {
+    protected int getJustCompletedLapNumber() {
         return justCompletedLapNumber;
     }
 
-    public void clearLapCompletionFlag() {
+    protected void clearLapCompletionFlag() {
         lapJustCompleted = false;
     }
 
