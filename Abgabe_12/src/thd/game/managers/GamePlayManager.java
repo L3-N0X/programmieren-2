@@ -1,6 +1,7 @@
 package thd.game.managers;
 
 import thd.game.utilities.GameView;
+import thd.gameobjects.base.CollidingGameObject;
 import thd.gameobjects.base.GameObject;
 import thd.gameobjects.movable.MapTile;
 
@@ -60,6 +61,9 @@ public class GamePlayManager extends WorldShiftManager {
     public void destroyGameObject(GameObject gameObject) {
         super.destroyGameObject(gameObject);
         gameObjectManager.remove(gameObject);
+        if (gameObject instanceof CollidingGameObject) {
+            car.removeCollidingGameObjectsForPathDecision((CollidingGameObject) gameObject);
+        }
     }
 
     /**
@@ -104,10 +108,6 @@ public class GamePlayManager extends WorldShiftManager {
      * Updates the timers after a round is completed. Only processes if all sectors have been visited.
      */
     public void roundCompleted() {
-        if (gameView.timer(0, 1000, this)) {
-            return;
-        }
-
         boolean allSectorsVisited = sectorTracker.allSectorsVisited();
 
         if (!allSectorsVisited) {
