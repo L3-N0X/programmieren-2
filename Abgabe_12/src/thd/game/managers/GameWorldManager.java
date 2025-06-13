@@ -9,13 +9,14 @@ import thd.gameobjects.unmovable.LapTimeDisplay;
 import thd.gameobjects.unmovable.LastTimeDisplay;
 import thd.gameobjects.unmovable.Overlay;
 
+import javax.sound.sampled.LineUnavailableException;
 import java.util.LinkedList;
 import java.util.List;
 
 class GameWorldManager extends GamePlayManager {
     private final List<GameObject> activatableGameObjects;
 
-    protected GameWorldManager(GameView gameView) {
+    protected GameWorldManager(GameView gameView) throws LineUnavailableException {
         super(gameView);
         car = new Car(gameView, this);
         lapTimeDisplay = new LapTimeDisplay(gameView, this);

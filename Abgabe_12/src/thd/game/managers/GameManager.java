@@ -7,13 +7,14 @@ import thd.game.utilities.GameView;
 import thd.screens.GameInfo;
 import thd.screens.Screens;
 
+import javax.sound.sampled.LineUnavailableException;
 import java.awt.*;
 import java.util.Objects;
 
 class GameManager extends LevelManager {
     private int lastPoints;
 
-    GameManager(GameView gameView) {
+    GameManager(GameView gameView) throws LineUnavailableException {
         super(gameView);
         startNewGame();
     }

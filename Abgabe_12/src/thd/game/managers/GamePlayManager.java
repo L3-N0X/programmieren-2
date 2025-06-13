@@ -63,8 +63,7 @@ public class GamePlayManager extends WorldShiftManager {
     }
 
     /**
-     * This will destroy an existing gameObject in the game, but keep it in
-     * shiftable.
+     * This will destroy an existing gameObject in the game, but keep it in shiftable.
      *
      * @param gameObject The gameObject that gets destroyed.
      */
@@ -102,39 +101,28 @@ public class GamePlayManager extends WorldShiftManager {
     }
 
     /**
-     * Updates the timers after a round is completed.
-     * Only processes if all sectors have been visited.
+     * Updates the timers after a round is completed. Only processes if all sectors have been visited.
      */
     public void roundCompleted() {
         if (gameView.timer(0, 1000, this)) {
             return;
         }
 
-        // Debug: Log sector check results
         boolean allSectorsVisited = sectorTracker.allSectorsVisited();
-        System.out
-                .println("[DEBUG GamePlayManager] roundCompleted() called - All sectors visited: " + allSectorsVisited +
-                        ", Sectors count: " + sectorTracker.getSectorsVisitedCount() +
-                        ", Visited sectors: " + sectorTracker.getVisitedSectors());
 
-        // Only complete the round if all sectors have been visited
         if (!allSectorsVisited) {
-            System.out.println("[DEBUG GamePlayManager] Lap completion DENIED - not all sectors visited!");
-            return; // Invalid lap completion - not all sectors visited
+            return;
         }
-
-        System.out.println("[DEBUG GamePlayManager] Lap completion APPROVED - updating timers!");
 
         lapTimeDisplay.getGuiTimer().pause();
         if (bestTimeDisplay.getGuiTimer().timeDuration() == 0
-                || lapTimeDisplay.getGuiTimer().timeDuration() < bestTimeDisplay.getGuiTimer().timeDuration()) {
+            || lapTimeDisplay.getGuiTimer().timeDuration() < bestTimeDisplay.getGuiTimer().timeDuration()) {
             bestTimeDisplay.getGuiTimer().updateTimeDuration(lapTimeDisplay.getGuiTimer().timeDuration());
         }
         lastTimeDisplay.getGuiTimer().updateTimeDuration(lapTimeDisplay.getGuiTimer().timeDuration());
         lapTimeDisplay.getGuiTimer().reset();
         lapTimeDisplay.getGuiTimer().start();
 
-        // Reset sector tracking for the new lap
         sectorTracker.resetForNewLap();
     }
 
@@ -150,22 +138,11 @@ public class GamePlayManager extends WorldShiftManager {
 
     /**
      * Gets the sector tracker for world position monitoring.
-     * 
+     *
      * @return The WorldSectorTracker instance
      */
     public WorldSectorTracker getSectorTracker() {
         return sectorTracker;
-    }
-
-    /**
-     * Updates the virtual car position when the world shifts.
-     * Should be called from moveWorldToLeft/moveWorldUp methods.
-     * 
-     * @param deltaX How much the world moved horizontally
-     * @param deltaY How much the world moved vertically
-     */
-    public void updateCarWorldPosition(double deltaX, double deltaY) {
-        sectorTracker.updateVirtualCarPosition(deltaX, deltaY);
     }
 
     @Override

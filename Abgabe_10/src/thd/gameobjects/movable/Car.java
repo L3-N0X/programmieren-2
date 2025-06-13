@@ -9,7 +9,6 @@ import thd.gameobjects.base.Position;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.LinkedList;
 
 /**
  * A background tile of a rock formation with many rocks.
@@ -34,7 +33,6 @@ public class Car extends CollidingGameObject implements MainCharacter {
     private Driver driver;
 
     private final CarBlockImages.CarRotation[] carRotationTiles;
-    private final LinkedList<CollidingGameObject> collidingGameObjectsForPathDecision;
 
     private int carRotation;
 
@@ -63,27 +61,8 @@ public class Car extends CollidingGameObject implements MainCharacter {
         currentCrashState = CarBlockImages.Fire.FIRE_00;
         carRotationTiles = CarBlockImages.CarRotation.values();
         blockImage = carRotationTiles[carRotation].blockImage();
-        collidingGameObjectsForPathDecision = new LinkedList<>();
         distanceToBackground = 10;
         hitBoxOffsets(8, 8, -16, -16);
-    }
-
-    /**
-     * Adds GameObjects to the list of GameObjects the car can collide with.
-     *
-     * @param collidingGameObject The gameObjects that should get added
-     */
-    public void addCollidingGameObjectsForPathDecision(CollidingGameObject collidingGameObject) {
-        collidingGameObjectsForPathDecision.add(collidingGameObject);
-    }
-
-    /**
-     * Removes GameObjects from the list of GameObjects the car can collide with.
-     *
-     * @param collidingGameObject The gameObjects that should get removed
-     */
-    public void removeCollidingGameObjectsForPathDecision(CollidingGameObject collidingGameObject) {
-        collidingGameObjectsForPathDecision.remove(collidingGameObject);
     }
 
     @Override

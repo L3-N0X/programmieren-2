@@ -2,6 +2,7 @@ package thd.game.managers;
 
 import thd.game.utilities.GameView;
 
+import javax.sound.sampled.LineUnavailableException;
 import java.awt.*;
 
 /**
@@ -18,7 +19,7 @@ public class GameViewManager {
     /**
      * Creates a new GameView, does its setup and starts the main game loop.
      */
-    public GameViewManager() {
+    public GameViewManager() throws LineUnavailableException {
         gameView = new GameView();
         gameView.updateWindowTitle("Rally Speedway");
         gameView.updateStatusText("Leon Gött - Java Programmierung SS 2025");

@@ -2,6 +2,8 @@ package thd.game.bin;
 
 import thd.game.managers.GameViewManager;
 
+import javax.sound.sampled.LineUnavailableException;
+
 class StartGame {
 
     /**
@@ -9,7 +11,7 @@ class StartGame {
      *
      * @param args optional arguments
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws LineUnavailableException {
         new GameViewManager();
     }
 }

@@ -3,13 +3,14 @@ package thd.game.managers;
 import thd.game.level.*;
 import thd.game.utilities.GameView;
 
+import javax.sound.sampled.LineUnavailableException;
 import java.util.List;
 
 class LevelManager extends GameWorldManager {
     private List<Level> levels;
     private static final int LIVES = 1;
 
-    protected LevelManager(GameView gameView) {
+    protected LevelManager(GameView gameView) throws LineUnavailableException {
         super(gameView);
     }
 
@@ -37,7 +38,7 @@ class LevelManager extends GameWorldManager {
      * Cycles to the next level in the list of levels.
      */
     @Override
-    public void cycleToNextLevel() {
+    protected void cycleToNextLevel() {
         level = levels.get((levels.indexOf(level) + 1) % levels.size());
         initializeLevel();
     }
@@ -46,7 +47,7 @@ class LevelManager extends GameWorldManager {
      * Cycles to the previous level in the list of levels.
      */
     @Override
-    public void cycleToPreviousLevel() {
+    protected void cycleToPreviousLevel() {
         level = levels.get((levels.indexOf(level) - 1 + levels.size()) % levels.size());
         initializeLevel();
     }

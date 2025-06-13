@@ -1,6 +1,5 @@
 package thd.gameobjects.movable;
 
-import java.util.ArrayList;
 import thd.game.managers.GamePlayManager;
 import thd.game.managers.UnexpectedWorldTileException;
 import thd.game.utilities.GameView;
@@ -8,6 +7,8 @@ import thd.gameobjects.base.ActivatableGameObject;
 import thd.gameobjects.base.CollidingGameObject;
 import thd.gameobjects.base.Position;
 import thd.gameobjects.base.ShiftableGameObject;
+
+import java.util.ArrayList;
 
 /**
  * A single tile of the track.
@@ -19,8 +20,7 @@ public class MapTile extends CollidingGameObject implements ShiftableGameObject,
     /**
      * Creates a new track tile in the game at a default position.
      *
-     * @param gameView        the main {@link GameView} where the text later gets
-     *                        added to
+     * @param gameView        the main {@link GameView} where the text later gets added to
      * @param gamePlayManager Manages the game with spawning, despawning and more.
      * @param mapTileImage    the track tile which gets rendered
      */
@@ -38,12 +38,10 @@ public class MapTile extends CollidingGameObject implements ShiftableGameObject,
     }
 
     /**
-     * Creates a new track tile in the game at a default position. Uses a char to
-     * parse a mapTile from the string
+     * Creates a new track tile in the game at a default position. Uses a char to parse a mapTile from the string
      * representation.
      *
-     * @param gameView         the main {@link GameView} where the text later gets
-     *                         added to
+     * @param gameView         the main {@link GameView} where the text later gets added to
      * @param gamePlayManager  Manages the game with spawning, despawning and more.
      * @param mapTileImageChar the track tile which gets rendered, as char
      */
@@ -92,9 +90,9 @@ public class MapTile extends CollidingGameObject implements ShiftableGameObject,
 
         for (Position collisionPositionInBlocks : car.carCollisionPositionsInBlocks()) {
             double collisionX = car.getPosition().getX()
-                    + collisionPositionInBlocks.getX() * GamePlayManager.BLOCK_SIZE;
+                                + collisionPositionInBlocks.getX() * GamePlayManager.BLOCK_SIZE;
             double collisionY = car.getPosition().getY()
-                    + collisionPositionInBlocks.getY() * GamePlayManager.BLOCK_SIZE;
+                                + collisionPositionInBlocks.getY() * GamePlayManager.BLOCK_SIZE;
 
             double relativeX = collisionX - position.getX();
             double relativeY = collisionY - position.getY();
@@ -133,7 +131,7 @@ public class MapTile extends CollidingGameObject implements ShiftableGameObject,
     @Override
     public void addToCanvas() {
         gameView.addBlockImageToCanvas(mapTileImage.blockImage(), position.getX(),
-                position.getY(), GamePlayManager.BLOCK_SIZE, rotation);
+                                       position.getY(), GamePlayManager.BLOCK_SIZE, rotation);
     }
 
     @Override
@@ -144,10 +142,10 @@ public class MapTile extends CollidingGameObject implements ShiftableGameObject,
     @Override
     public boolean tryToActivate(MapTile mapTile) {
         return position.getX() < GameView.WIDTH
-                && position.getY() < GameView.HEIGHT
-                && position.getX() > -width
-                && position.getY() > -height
-                && mapTile != null; // wichtel
+               && position.getY() < GameView.HEIGHT
+               && position.getX() > -width
+               && position.getY() > -height
+               && mapTile != null; // wichtel
     }
 
     @Override
@@ -169,23 +167,11 @@ public class MapTile extends CollidingGameObject implements ShiftableGameObject,
     public void reactToCollisionWith(CollidingGameObject other) {
         if (other instanceof Car) {
             if (mapTileImage == MapBlockImages.MapTileImage.TRACK_START_FINISH) {
-                // Debug: Log finish line collision detection
-                System.out.println("[DEBUG] Car hit finish line tile at: " + position +
-                        ", checking sectors and distance...");
-
                 boolean atFinishLine = gamePlayManager.getSectorTracker().isCarAtFinishLine(this);
                 boolean allSectorsVisited = gamePlayManager.getSectorTracker().allSectorsVisited();
 
-                System.out.println("[DEBUG] At finish line: " + atFinishLine +
-                        ", All sectors visited: " + allSectorsVisited +
-                        ", Sectors visited count: " + gamePlayManager.getSectorTracker().getSectorsVisitedCount() +
-                        ", Visited sectors: " + gamePlayManager.getSectorTracker().getVisitedSectors());
-
-                if (atFinishLine) {
-                    System.out.println("[DEBUG] Car is at finish line, calling roundCompleted()...");
+                if (atFinishLine && allSectorsVisited) {
                     gamePlayManager.roundCompleted();
-                } else {
-                    System.out.println("[DEBUG] Car not close enough to finish line center");
                 }
             }
         }
