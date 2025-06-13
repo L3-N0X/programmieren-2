@@ -121,7 +121,7 @@ public class GuiTimer implements Comparable<GuiTimer> {
      *
      * @return The current duration formatted as mm:ss:d
      */
-    String timeDurationFormatted() {
+    public String timeDurationFormatted() {
         String minutes = minutesSinceStart();
         String seconds = secondsSinceStart();
         String hundredth = hundredthSinceStart();

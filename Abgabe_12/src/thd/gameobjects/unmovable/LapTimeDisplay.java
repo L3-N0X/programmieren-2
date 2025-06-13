@@ -12,7 +12,8 @@ public class LapTimeDisplay extends TimeDisplay {
     /**
      * Creates a new TimeDisplay Object with the correct size and position.
      *
-     * @param gameView        the main {@link GameView} where the text later gets added to
+     * @param gameView        the main {@link GameView} where the text later gets
+     *                        added to
      * @param gamePlayManager Manages the game with spawning, despawning and more.
      */
     public LapTimeDisplay(GameView gameView, GamePlayManager gamePlayManager) {

@@ -45,7 +45,7 @@ public abstract class TimeDisplay extends GameObject {
 
     @Override
     public void updatePosition() {
-        Position shakeOffset = gamePlayManager.getShakeOffset();
+        Position shakeOffset = gamePlayManager.carShakeOffset();
         position.updateCoordinates(
                 defaultPosition.getX() + shakeOffset.getX(),
                 defaultPosition.getY() + shakeOffset.getY()

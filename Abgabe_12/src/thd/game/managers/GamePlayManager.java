@@ -26,13 +26,16 @@ public class GamePlayManager extends WorldShiftManager {
      */
     public static final int MAP_TILE_WIDTH = 128;
 
-    protected int lives;
-    protected int points;
+    protected int currentLap;
+    protected static final int MAX_LAPS = 3;
+    protected boolean raceCompleted;
 
     protected GamePlayManager(GameView gameView) {
         super(gameView);
         gameObjectManager = new GameObjectManager();
         sectorTracker = new WorldSectorTracker();
+        currentLap = 0;
+        raceCompleted = false;
     }
 
     /**
@@ -61,7 +64,8 @@ public class GamePlayManager extends WorldShiftManager {
     }
 
     /**
-     * This will destroy an existing gameObject in the game, but keep it in shiftable.
+     * This will destroy an existing gameObject in the game, but keep it in
+     * shiftable.
      *
      * @param gameObject The gameObject that gets destroyed.
      */
@@ -83,7 +87,8 @@ public class GamePlayManager extends WorldShiftManager {
     }
 
     /**
-     * Updates the timers after a round is completed. Only processes if all sectors have been visited.
+     * Updates the timers after a round is completed. Only processes if all sectors
+     * have been visited.
      */
     public void roundCompleted() {
         boolean allSectorsVisited = sectorTracker.allSectorsVisited();
@@ -94,14 +99,33 @@ public class GamePlayManager extends WorldShiftManager {
 
         lapTimeDisplay.getGuiTimer().pause();
         if (bestTimeDisplay.getGuiTimer().timeDuration() == 0
-            || lapTimeDisplay.getGuiTimer().timeDuration() < bestTimeDisplay.getGuiTimer().timeDuration()) {
+                || lapTimeDisplay.getGuiTimer().timeDuration() < bestTimeDisplay.getGuiTimer().timeDuration()) {
             bestTimeDisplay.getGuiTimer().updateTimeDuration(lapTimeDisplay.getGuiTimer().timeDuration());
         }
         lastTimeDisplay.getGuiTimer().updateTimeDuration(lapTimeDisplay.getGuiTimer().timeDuration());
-        lapTimeDisplay.getGuiTimer().reset();
-        lapTimeDisplay.getGuiTimer().start();
 
-        sectorTracker.resetForNewLap();
+        currentLap++;
+        if (currentLap > MAX_LAPS) {
+            raceCompleted = true;
+        } else {
+            lapTimeDisplay.getGuiTimer().reset();
+            lapTimeDisplay.getGuiTimer().start();
+
+            sectorTracker.resetForNewLap();
+        }
+    }
+
+    public void resetLapCounter() {
+        currentLap = 0;
+        raceCompleted = false;
+    }
+
+    public int getCurrentLap() {
+        return currentLap;
+    }
+
+    public int getMaxLaps() {
+        return MAX_LAPS;
     }
 
     @Override

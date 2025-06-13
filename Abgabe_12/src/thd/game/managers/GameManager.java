@@ -35,7 +35,9 @@ class GameManager extends LevelManager {
                 overlay.stopShowing();
                 Screens.showEndScreen(
                         gameView,
-                        "Rennen erfolgreich beendet! Sie haben " + points + " Punkte erreicht.");
+                        "Rennen auf Map Nr. " + level.number + " erfolgreich beendet!"
+                                + "\nIhre beste Zeit: " + bestTimeDisplay.getGuiTimer().timeDurationFormatted()
+                                + "\n\nWählen Sie neues Spiel, um ein neues Rennen zu starten.");
                 startNewGame();
             }
         } else if (endOfLevel()) {
@@ -44,7 +46,6 @@ class GameManager extends LevelManager {
                 overlay.showMessage("GREAT JOB!");
             }
             if (gameView.timer(2000, 0, this)) {
-                lastPoints = points;
                 overlay.stopShowing();
                 switchToNextLevel();
                 initializeLevel();
@@ -53,17 +54,17 @@ class GameManager extends LevelManager {
     }
 
     private boolean endOfLevel() {
-        return points > lastPoints;
+        return currentLap == MAX_LAPS;
     }
 
     private boolean endOfGame() {
-        return lives == 0 || (!hasNextLevel() && endOfLevel());
+        return currentLap == MAX_LAPS;
     }
 
     private void startNewGame() {
         Level.difficulty = FileAccess.readDifficultyFromDisc();
         String selection = Screens.showStartScreen(gameView, GameInfo.TITLE, GameInfo.DESCRIPTION,
-                                                   Level.difficulty.name);
+                Level.difficulty.name);
         if (!Objects.equals(selection, "Beenden")) {
             Level.difficulty = Difficulty.fromName(selection);
         }

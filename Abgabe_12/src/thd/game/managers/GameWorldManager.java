@@ -8,6 +8,7 @@ import thd.gameobjects.base.GameObject;
 import thd.gameobjects.movable.Car;
 import thd.gameobjects.movable.MapTile;
 import thd.gameobjects.unmovable.BestTimeDisplay;
+import thd.gameobjects.unmovable.LapCounterDisplay;
 import thd.gameobjects.unmovable.LapTimeDisplay;
 import thd.gameobjects.unmovable.LastTimeDisplay;
 import thd.gameobjects.unmovable.Overlay;
@@ -21,6 +22,7 @@ class GameWorldManager extends GamePlayManager {
         lapTimeDisplay = new LapTimeDisplay(gameView, this);
         bestTimeDisplay = new BestTimeDisplay(gameView, this);
         lastTimeDisplay = new LastTimeDisplay(gameView, this);
+        lapCounterDisplay = new LapCounterDisplay(gameView, this);
         overlay = new Overlay(gameView, this);
         activatableGameObjects = new LinkedList<>();
     }
@@ -35,6 +37,7 @@ class GameWorldManager extends GamePlayManager {
         spawnGameObject(lapTimeDisplay);
         spawnGameObject(bestTimeDisplay);
         spawnGameObject(lastTimeDisplay);
+        spawnGameObject(lapCounterDisplay);
         spawnGameObject(overlay);
     }
 
