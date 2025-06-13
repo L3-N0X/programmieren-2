@@ -36,6 +36,10 @@ class UserControlledGameObjectPool {
             }
             processKeyCode(keyCode);
         }
+
+        // Handle key press/release events for level changes and debug toggle
+        handleKeyEvents();
+
         if (car.isDriving() && !currentlyBreaking) {
             car.up();
             car.updateAccelerationTimer();
@@ -57,12 +61,27 @@ class UserControlledGameObjectPool {
             if (car.isDriving()) {
                 car.down();
             }
-        } else if (keyCode == KeyEvent.VK_E && gameView.timer(2000, 0, this)) {
-            cycleToNextLevel();
-        } else if (keyCode == KeyEvent.VK_Q && gameView.timer(2000, 0, this)) {
-            cycleToPreviousLevel();
-        } else if (keyCode == KeyEvent.VK_F3 && gameView.timer(100, 0, this)) {
-            GameViewManager.debug = !GameViewManager.debug;
+        }
+        // E, Q, and F3 keys are now handled in handleKeyEvents() method
+    }
+
+    /**
+     * Handles key press/release events for single-press actions like level changes.
+     * Uses GameView's typedKeys() method to get proper key press/release events
+     * instead of continuous key polling, ensuring single-press behavior.
+     */
+    private void handleKeyEvents() {
+        KeyEvent[] keyEvents = gameView.typedKeys();
+        for (KeyEvent keyEvent : keyEvents) {
+            if (keyEvent.getID() == KeyEvent.KEY_RELEASED) { // Only trigger on key release
+                if (keyEvent.getKeyCode() == KeyEvent.VK_E) {
+                    cycleToNextLevel();
+                } else if (keyEvent.getKeyCode() == KeyEvent.VK_Q) {
+                    cycleToPreviousLevel();
+                } else if (keyEvent.getKeyCode() == KeyEvent.VK_F3) {
+                    GameViewManager.debug = !GameViewManager.debug;
+                }
+            }
         }
     }
 

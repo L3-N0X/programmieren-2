@@ -75,6 +75,7 @@ class GameManager extends LevelManager {
 
     @Override
     protected void initializeLevel() {
+        overlay.stopShowing();
         overlay.showMessage(level.name, 2);
         super.initializeLevel();
     }
