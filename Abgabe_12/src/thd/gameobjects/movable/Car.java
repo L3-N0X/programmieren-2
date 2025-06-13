@@ -194,7 +194,7 @@ public class Car extends CollidingGameObject implements MainCharacter {
         }
     }
 
-    public double getShakeDistance() {
+    public double shakeDistanceFromState() {
         return switch (currentState) {
             case IDLE, ACCELERATING, BREAKING -> 0.0;
             case GRASS -> 0.6 * speedInPixel;

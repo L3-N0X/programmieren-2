@@ -17,8 +17,8 @@ public class EngineAudioGenerator {
     private static final float VOLUME_RANGE = MAX_VOLUME - IDLE_VOLUME;
 
     // Frequency constants
-    private static final float IDLE_FREQUENCY = 50.0f;
-    private static final float MAX_FREQUENCY = 180.0f;
+    private static final float IDLE_FREQUENCY = 40.0f;
+    private static final float MAX_FREQUENCY = 130.0f;
     private static final float FREQUENCY_RANGE = MAX_FREQUENCY - IDLE_FREQUENCY;
 
     // Engine roughness

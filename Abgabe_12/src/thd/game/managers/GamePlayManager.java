@@ -76,22 +76,6 @@ public class GamePlayManager extends WorldShiftManager {
     }
 
     /**
-     * Add points to the point counter.
-     *
-     * @param points the amount to be added
-     */
-    private void addPoints(int points) {
-        this.points += points;
-    }
-
-    /**
-     * Decreases the life counter by one.
-     */
-    private void lifeLost() {
-        this.lives--;
-    }
-
-    /**
      * Pauses the lap timer.
      */
     public void pauseLapTimer() {

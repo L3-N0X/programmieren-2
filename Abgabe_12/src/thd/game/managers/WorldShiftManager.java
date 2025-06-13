@@ -90,8 +90,8 @@ public class WorldShiftManager extends UserControlledGameObjectPool {
      *
      * @return the offset for the shake effect of the car
      */
-    public Position getShakeOffset() {
-        double shakeDistance = car.getShakeDistance();
+    public Position carShakeOffset() {
+        double shakeDistance = car.shakeDistanceFromState();
         return shakeMovementPattern.nextPosition(shakeDistance);
     }
 
