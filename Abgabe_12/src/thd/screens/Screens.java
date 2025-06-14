@@ -5,6 +5,8 @@ import thd.game.utilities.GameView;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -68,6 +70,31 @@ public class Screens {
         }
     }
 
+    /**
+     * Shows a name input screen for the player to enter their name.
+     *
+     * @param gameView Das aktuell genutzte GameView.
+     * @param message  Nachricht, die der Benutzer angezeigt bekommt.
+     * @return The entered player name, or empty string if cancelled.
+     */
+    public static String showNameInputScreen(GameView gameView, String message) {
+        NameInputScreen nameInputScreen = new NameInputScreen(gameView, message);
+        gameView.clearKeyEvents();
+        nameInputScreen.startInputLoop();
+        return nameInputScreen.getPlayerName();
+    }
+
+    /**
+     * Shows the best list screen displaying all player scores.
+     *
+     * @param gameView Das aktuell genutzte GameView.
+     */
+    public static void showBestListScreen(GameView gameView) {
+        BestListScreen bestListScreen = new BestListScreen(gameView);
+        gameView.clearKeyEvents();
+        bestListScreen.startViewLoop();
+    }
+
     private static class StartScreen extends Screen {
         private final int bottomHeight;
         private final String title;
@@ -83,14 +110,15 @@ public class Screens {
             this.description = description;
             this.titleFontSize = 75;
             int boxHeight = 40;
-            int boxWidth = 200;
-            int x = (GameView.WIDTH - 4 * boxWidth - 3 * gap) / 2;
+            int boxWidth = 150;
+            int x = (GameView.WIDTH - 5 * boxWidth - 4 * gap) / 2;
             int y = GameView.HEIGHT - boxHeight - gap;
-            ArrayList<SimpleBox> simpleBoxes = new ArrayList<>(3);
+            ArrayList<SimpleBox> simpleBoxes = new ArrayList<>(5);
             simpleBoxes.add(new SimpleBox("Einfach", x, y, boxWidth, boxHeight));
             simpleBoxes.add(new SimpleBox("Standard", x + boxWidth + gap, y, boxWidth, boxHeight));
             simpleBoxes.add(new SimpleBox("Schwer", x + 2 * boxWidth + 2 * gap, y, boxWidth, boxHeight));
-            simpleBoxes.add(new SimpleBox("Beenden", x + 3 * boxWidth + 3 * gap, y, boxWidth, boxHeight));
+            simpleBoxes.add(new SimpleBox("Best Times", x + 3 * boxWidth + 3 * gap, y, boxWidth, boxHeight));
+            simpleBoxes.add(new SimpleBox("Beenden", x + 4 * boxWidth + 4 * gap, y, boxWidth, boxHeight));
             if (preset.equals("Einfach")) {
                 setSimpleBoxes(simpleBoxes, 0);
             } else if (preset.equals("Standard")) {
@@ -176,7 +204,7 @@ public class Screens {
         protected final boolean useMouseBackup;
         protected boolean screenClosed;
         protected ArrayList<SimpleBox> simpleBoxes;
-        private SelectionManager selectionManager;
+        protected SelectionManager selectionManager;
 
         protected Screen(GameView gameView, int gap, int fontSize) {
             this.gameView = gameView;
@@ -278,6 +306,208 @@ public class Screens {
                     x + (width - text.length() * fontSize * 0.65) / 2d,
                     y + (height - fontSize * 3 / 2d) / 2d, fontSize, true, Color.WHITE, 0,
                     "droidsansmono.ttf");
+        }
+    }
+
+    private static class NameInputScreen extends Screen {
+        private final String message;
+        private StringBuilder playerName;
+        private final int maxNameLength = 15;
+
+        private NameInputScreen(GameView gameView, String message) {
+            super(gameView, 20, 28);
+            this.message = message;
+            this.playerName = new StringBuilder();
+
+            // Create OK/Cancel buttons
+            int boxHeight = 40;
+            int boxWidth = 150;
+            int x = (GameView.WIDTH - 2 * boxWidth - gap) / 2;
+            int y = GameView.HEIGHT - boxHeight - gap;
+            ArrayList<SimpleBox> simpleBoxes = new ArrayList<>();
+            simpleBoxes.add(new SimpleBox("OK", x, y, boxWidth, boxHeight));
+            simpleBoxes.add(new SimpleBox("Cancel", x + boxWidth + gap, y, boxWidth, boxHeight));
+            setSimpleBoxes(simpleBoxes, 0);
+        }
+
+        private void startInputLoop() {
+            while (!screenClosed) {
+                checkUserInput();
+                addMessage();
+                addNameInput();
+                addSimpleBoxes();
+                gameView.plotCanvas();
+            }
+            gameView.useMouse(useMouseBackup);
+        }
+
+        @Override
+        protected void checkUserInput() {
+            for (KeyEvent keyEvent : gameView.typedKeys()) {
+                char c = keyEvent.getKeyChar();
+
+                // Handle character input (uppercase only)
+                if (Character.isLetter(c) && playerName.length() < maxNameLength) {
+                    playerName.append(Character.toUpperCase(c));
+                }
+                // Handle backspace
+                else if (keyEvent.getKeyCode() == KeyEvent.VK_BACK_SPACE && playerName.length() > 0) {
+                    playerName.deleteCharAt(playerName.length() - 1);
+                }
+                // Handle enter (confirm)
+                else if (keyEvent.getKeyCode() == KeyEvent.VK_ENTER && playerName.length() > 0) {
+                    screenClosed = true;
+                }
+                // Handle escape (cancel)
+                else if (keyEvent.getKeyCode() == KeyEvent.VK_ESCAPE) {
+                    playerName.setLength(0);
+                    screenClosed = true;
+                }
+            }
+
+            // Handle mouse clicks on buttons
+            for (MouseEvent mouseEvent : gameView.mouseEvents()) {
+                if (mouseEvent.getID() == MouseEvent.MOUSE_PRESSED) {
+                    if (selectionManager.processMouseEvent(mouseEvent.getX(), mouseEvent.getY())) {
+                        if (getSelection().equals("Cancel")) {
+                            playerName.setLength(0);
+                        }
+                        screenClosed = true;
+                    }
+                }
+            }
+        }
+
+        private void addMessage() {
+            Dimension textBounds = calculateTextBounds(message);
+            double x = gap + (GameView.WIDTH - (textBounds.width * fontSize * 0.65)) / 2d;
+            double y = gap + 50;
+            gameView.addTextToCanvas(message, x, y, fontSize, false, Color.WHITE, 0, "droidsansmono.ttf");
+        }
+
+        private void addNameInput() {
+            String displayName = playerName.toString() + "_"; // Show cursor
+            gameView.addTextToCanvas("Name: " + displayName,
+                    GameView.WIDTH / 2d - 100,
+                    GameView.HEIGHT / 2d - 50,
+                    32, true, Color.YELLOW, 0, "droidsansmono.ttf");
+        }
+
+        private void addSimpleBoxes() {
+            // Only show OK button if name is entered
+            if (playerName.length() > 0) {
+                simpleBoxes.get(0).addToCanvas(gameView);
+            }
+            simpleBoxes.get(1).addToCanvas(gameView);
+        }
+
+        public String getPlayerName() {
+            return playerName.toString().trim();
+        }
+    }
+
+    private static class BestListScreen extends Screen {
+        private final java.util.List<thd.game.utilities.PlayerScore> scores;
+        private int currentPage;
+        private final int scoresPerPage = 10;
+
+        private BestListScreen(GameView gameView) {
+            super(gameView, 20, 20);
+            this.scores = thd.game.utilities.FileAccess.readPlayerScores();
+            this.currentPage = 0;
+
+            // Sort by best time (ascending)
+            scores.sort((a, b) -> Long.compare(a.bestRoundTimeMillis, b.bestRoundTimeMillis));
+
+            // Create Back button
+            int boxHeight = 40;
+            int boxWidth = 150;
+            int x = (GameView.WIDTH - boxWidth) / 2;
+            int y = GameView.HEIGHT - boxHeight - gap;
+            ArrayList<SimpleBox> simpleBoxes = new ArrayList<>();
+            simpleBoxes.add(new SimpleBox("Back", x, y, boxWidth, boxHeight));
+            setSimpleBoxes(simpleBoxes, 0);
+        }
+
+        private void startViewLoop() {
+            while (!screenClosed) {
+                checkUserInput();
+                addTitle();
+                addScoresList();
+                addPageInfo();
+                addSimpleBoxes();
+                gameView.plotCanvas();
+            }
+            gameView.useMouse(useMouseBackup);
+        }
+
+        @Override
+        protected void checkUserInput() {
+            for (KeyEvent keyEvent : gameView.typedKeys()) {
+                if ((keyEvent.getKeyCode() == KeyEvent.VK_W || keyEvent.getKeyCode() == KeyEvent.VK_UP)
+                        && currentPage > 0) {
+                    currentPage--;
+                } else if ((keyEvent.getKeyCode() == KeyEvent.VK_S || keyEvent.getKeyCode() == KeyEvent.VK_DOWN)
+                        && (currentPage + 1) * scoresPerPage < scores.size()) {
+                    currentPage++;
+                } else if (keyEvent.getKeyCode() == KeyEvent.VK_ESCAPE || keyEvent.getKeyCode() == KeyEvent.VK_ENTER) {
+                    screenClosed = true;
+                }
+            }
+
+            // Handle mouse clicks
+            for (MouseEvent mouseEvent : gameView.mouseEvents()) {
+                if (mouseEvent.getID() == MouseEvent.MOUSE_PRESSED) {
+                    if (selectionManager.processMouseEvent(mouseEvent.getX(), mouseEvent.getY())) {
+                        screenClosed = true;
+                    }
+                }
+            }
+        }
+
+        private void addTitle() {
+            gameView.addTextToCanvas("BEST TIMES", GameView.WIDTH / 2d - 100, 50, 40, true, Color.YELLOW, 0,
+                    "droidsansmono.ttf");
+        }
+
+        private void addScoresList() {
+            int startIndex = currentPage * scoresPerPage;
+            int endIndex = Math.min(startIndex + scoresPerPage, scores.size());
+
+            if (scores.isEmpty()) {
+                gameView.addTextToCanvas("No scores yet!", GameView.WIDTH / 2d - 80, 200, 24, false, Color.WHITE, 0,
+                        "droidsansmono.ttf");
+                return;
+            }
+
+            for (int i = startIndex; i < endIndex; i++) {
+                thd.game.utilities.PlayerScore score = scores.get(i);
+                int rank = i + 1;
+                String line = String.format("%2d. %-15s %-11s (%-20s)    [%-8s]   %s",
+                        rank,
+                        score.playerName,
+                        score.getFormattedTime(),
+                        score.levelName,
+                        score.difficulty,
+                        score.achievedDate
+                                .format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")));
+
+                gameView.addTextToCanvas(line, 50, 150 + (i - startIndex) * 30, 18, false, Color.WHITE, 0,
+                        "droidsansmono.ttf");
+            }
+        }
+
+        private void addPageInfo() {
+            if (scores.size() > scoresPerPage) {
+                int totalPages = (scores.size() + scoresPerPage - 1) / scoresPerPage;
+                String pageInfo = String.format("Page %d/%d - Use W/S or Arrow Keys", currentPage + 1, totalPages);
+                gameView.addTextToCanvas(pageInfo, GameView.WIDTH / 2d - 150, GameView.HEIGHT - 100, 16, false,
+                        Color.GRAY, 0, "droidsansmono.ttf");
+            }
+        }
+
+        private void addSimpleBoxes() {
+            simpleBoxes.forEach(s -> s.addToCanvas(gameView));
         }
     }
 }

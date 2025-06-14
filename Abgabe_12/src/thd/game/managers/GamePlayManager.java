@@ -110,13 +110,16 @@ public class GamePlayManager extends WorldShiftManager {
         lastTimeDisplay.getGuiTimer().updateTimeDuration(lapTimeDisplay.getGuiTimer().timeDuration());
 
         currentLap++;
-
+        System.out.println("increased to next lap " + currentLap);
         lapJustCompleted = true;
         justCompletedLapNumber = currentLap;
 
         if (currentLap < MAX_LAPS) {
             lapTimeDisplay.getGuiTimer().reset();
             lapTimeDisplay.getGuiTimer().start();
+            sectorTracker.resetForNewLap();
+        } else {
+            lapTimeDisplay.getGuiTimer().pause();
             sectorTracker.resetForNewLap();
         }
     }
@@ -128,6 +131,17 @@ public class GamePlayManager extends WorldShiftManager {
      */
     public int getCurrentLap() {
         return currentLap;
+    }
+
+    /**
+     * Resets the current lap to 0 and restarts the lap timer.
+     */
+    public void resetCurrentLap() {
+        currentLap = 0;
+        lapJustCompleted = false;
+        justCompletedLapNumber = 0;
+        lapTimeDisplay.getGuiTimer().reset();
+        sectorTracker.resetForNewLap();
     }
 
     protected boolean isLapJustCompleted() {

@@ -13,13 +13,13 @@ import java.awt.*;
 import java.util.Objects;
 
 public class GameManager extends LevelManager {
-    private static final char[] STANDARD_CHARS = {'A', 'D', 'E', 'F', 'H', 'I'};
+    private static final char[] STANDARD_CHARS = { 'A', 'D', 'E', 'F', 'H', 'I' };
     private static final char[][] LEVEL_CHARS = {
-            {'A', 'D', 'E', 'F', 'H', 'I'}, // Level 1 (original)
-            {'J', 'K', 'l', 'M', 'N', 'O'}, // Level 2
-            {'P', 'Q', 'R', 'S', 'T', 'U'}, // Level 3
-            {'V', 'q', 'X', 'Y', 'Z', 'a'}, // Level 4
-            {'b', 'c', 'd', 'e', 'f', 'g'} // Level 5
+            { 'A', 'D', 'E', 'F', 'H', 'I' }, // Level 1 (original)
+            { 'J', 'K', 'l', 'M', 'N', 'O' }, // Level 2
+            { 'P', 'Q', 'R', 'S', 'T', 'U' }, // Level 3
+            { 'V', 'q', 'X', 'Y', 'Z', 'a' }, // Level 4
+            { 'b', 'c', 'd', 'e', 'f', 'g' } // Level 5
     };
 
     GameManager(GameView gameView) throws LineUnavailableException {
@@ -28,7 +28,8 @@ public class GameManager extends LevelManager {
     }
 
     /**
-     * Translates block image characters to level-specific characters to ensure different cache entries for different
+     * Translates block image characters to level-specific characters to ensure
+     * different cache entries for different
      * color palettes.
      *
      * @param blockImage   the original block image string
@@ -94,11 +95,27 @@ public class GameManager extends LevelManager {
             }
             if (gameView.timer(2000, 0, this)) {
                 overlay.stopShowing();
+
+                // Always offer name input for score saving
+                String playerName = Screens.showNameInputScreen(gameView,
+                        "Game Complete! Enter your name to save your time:");
+
+                if (!playerName.isEmpty()) {
+                    thd.game.utilities.PlayerScore newScore = new thd.game.utilities.PlayerScore(
+                            playerName,
+                            bestTimeDisplay.getGuiTimer().timeDuration(),
+                            level.name,
+                            level.number,
+                            java.time.LocalDateTime.now(),
+                            Level.difficulty.name);
+                    thd.game.utilities.FileAccess.writePlayerScore(newScore);
+                }
+
                 Screens.showEndScreen(
                         gameView,
-                        "Rennen auf Map " + level.name + " erfolgreich beendet!"
-                        + "\nIhre beste Zeit: " + bestTimeDisplay.getGuiTimer().timeDurationFormatted()
-                        + "\n\nWählen Sie \"Neues Spiel\", um ein weiteres Rennen zu starten!");
+                        "Rennen auf " + level.name + " erfolgreich beendet!"
+                                + "\nIhre beste Zeit: " + bestTimeDisplay.getGuiTimer().timeDurationFormatted()
+                                + "\n\nWählen Sie \"Neues Spiel\", um ein weiteres Rennen zu starten!");
                 startNewGame();
             }
         }
@@ -109,7 +126,7 @@ public class GameManager extends LevelManager {
     }
 
     private boolean endOfGame() {
-        return currentLap == MAX_LAPS;
+        return currentLap >= MAX_LAPS;
     }
 
     private String lapCompletionMessage(int lapNumber) {
@@ -122,14 +139,19 @@ public class GameManager extends LevelManager {
     }
 
     private void startNewGame() {
-        Level.difficulty = FileAccess.readDifficultyFromDisc();
+        Level.difficulty = thd.game.utilities.FileAccess.readDifficultyFromDisc();
         String selection = Screens.showStartScreen(gameView, GameInfo.TITLE, GameInfo.DESCRIPTION,
-                                                   Level.difficulty.name);
-        if (!Objects.equals(selection, "Beenden")) {
+                Level.difficulty.name);
+
+        if (Objects.equals(selection, "Best Times")) {
+            Screens.showBestListScreen(gameView);
+            startNewGame(); // Return to menu after viewing
+            return;
+        } else if (!Objects.equals(selection, "Beenden")) {
             Level.difficulty = Difficulty.fromName(selection);
         }
 
-        FileAccess.writeDifficultyToDisc(Level.difficulty);
+        thd.game.utilities.FileAccess.writeDifficultyToDisc(Level.difficulty);
         initializeGame();
     }
 
@@ -138,6 +160,8 @@ public class GameManager extends LevelManager {
         overlay.stopShowing();
         overlay.showMessage(level.name, 2);
         super.initializeLevel();
+
+        resetCurrentLap();
         updateColorPalette(level.colorPalette);
         car.updateParameters(level.roadCondition);
     }
