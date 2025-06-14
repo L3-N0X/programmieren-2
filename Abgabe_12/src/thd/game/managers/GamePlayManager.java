@@ -69,7 +69,8 @@ public class GamePlayManager extends WorldShiftManager {
     }
 
     /**
-     * This will destroy an existing gameObject in the game, but keep it in shiftable.
+     * This will destroy an existing gameObject in the game, but keep it in
+     * shiftable.
      *
      * @param gameObject The gameObject that gets destroyed.
      */
@@ -91,7 +92,8 @@ public class GamePlayManager extends WorldShiftManager {
     }
 
     /**
-     * Updates the timers after a round is completed. Only processes if all sectors have been visited.
+     * Updates the timers after a round is completed. Only processes if all sectors
+     * have been visited.
      */
     public void roundCompleted() {
         boolean allSectorsVisited = sectorTracker.allSectorsVisited();
@@ -102,7 +104,7 @@ public class GamePlayManager extends WorldShiftManager {
 
         lapTimeDisplay.getGuiTimer().pause();
         if (bestTimeDisplay.getGuiTimer().timeDuration() == 0
-            || lapTimeDisplay.getGuiTimer().timeDuration() < bestTimeDisplay.getGuiTimer().timeDuration()) {
+                || lapTimeDisplay.getGuiTimer().timeDuration() < bestTimeDisplay.getGuiTimer().timeDuration()) {
             bestTimeDisplay.getGuiTimer().updateTimeDuration(lapTimeDisplay.getGuiTimer().timeDuration());
         }
         lastTimeDisplay.getGuiTimer().updateTimeDuration(lapTimeDisplay.getGuiTimer().timeDuration());
@@ -181,5 +183,14 @@ public class GamePlayManager extends WorldShiftManager {
     public void moveWorldDown(double pixels) {
         super.moveWorldDown(pixels);
         sectorTracker.updateVirtualCarPosition(0, pixels);
+    }
+
+    /**
+     * Gets the current level.
+     *
+     * @return the current level
+     */
+    public thd.game.level.Level getCurrentLevel() {
+        return level;
     }
 }

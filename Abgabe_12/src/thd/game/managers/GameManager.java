@@ -12,10 +12,58 @@ import javax.sound.sampled.LineUnavailableException;
 import java.awt.*;
 import java.util.Objects;
 
-class GameManager extends LevelManager {
+public class GameManager extends LevelManager {
+    private static final char[] STANDARD_CHARS = {'A', 'D', 'E', 'F', 'H', 'I'};
+    private static final char[][] LEVEL_CHARS = {
+            {'A', 'D', 'E', 'F', 'H', 'I'}, // Level 1 (original)
+            {'J', 'K', 'l', 'M', 'N', 'O'}, // Level 2
+            {'P', 'Q', 'R', 'S', 'T', 'U'}, // Level 3
+            {'V', 'q', 'X', 'Y', 'Z', 'a'}, // Level 4
+            {'b', 'c', 'd', 'e', 'f', 'g'} // Level 5
+    };
+
     GameManager(GameView gameView) throws LineUnavailableException {
         super(gameView);
         startNewGame();
+    }
+
+    /**
+     * Translates block image characters to level-specific characters to ensure different cache entries for different
+     * color palettes.
+     *
+     * @param blockImage   the original block image string
+     * @param currentLevel the current level to translate for
+     * @return the translated block image string with level-specific characters
+     */
+    public static String translateBlockImageForLevel(String blockImage, thd.game.level.Level currentLevel) {
+        if (currentLevel == null || currentLevel.number == 1) {
+            return blockImage; // Level 1 uses original characters
+        }
+
+        StringBuilder translated = new StringBuilder();
+        char[] levelChars = LEVEL_CHARS[currentLevel.number - 1];
+
+        for (char c : blockImage.toCharArray()) {
+            char translatedChar = c;
+            for (int i = 0; i < STANDARD_CHARS.length; i++) {
+                if (c == STANDARD_CHARS[i]) {
+                    translatedChar = levelChars[i];
+                    break;
+                }
+            }
+            translated.append(translatedChar);
+        }
+        return translated.toString();
+    }
+
+    /**
+     * Translates block image characters for the current level.
+     *
+     * @param blockImage the original block image string
+     * @return the translated block image string with level-specific characters
+     */
+    public String translateBlockImageForCurrentLevel(String blockImage) {
+        return translateBlockImageForLevel(blockImage, level);
     }
 
     @Override
@@ -100,12 +148,24 @@ class GameManager extends LevelManager {
      * @param colorPalette the new color palette to update the game view with.
      */
     private void updateColorPalette(ColorPalette colorPalette) {
-        gameView.updateColorForBlockImage('A', colorPalette.getColor(0));
-        gameView.updateColorForBlockImage('D', colorPalette.getColor(1));
-        gameView.updateColorForBlockImage('E', colorPalette.getColor(2));
-        gameView.updateColorForBlockImage('F', colorPalette.getColor(3));
-        gameView.updateColorForBlockImage('H', colorPalette.getColor(4));
-        gameView.updateColorForBlockImage('I', colorPalette.getColor(5));
+        char[] levelChars = getLevelCharacterSet(level.number);
+
+        gameView.updateColorForBlockImage(levelChars[0], colorPalette.getColor(0));
+        gameView.updateColorForBlockImage(levelChars[1], colorPalette.getColor(1));
+        gameView.updateColorForBlockImage(levelChars[2], colorPalette.getColor(2));
+        gameView.updateColorForBlockImage(levelChars[3], colorPalette.getColor(3));
+        gameView.updateColorForBlockImage(levelChars[4], colorPalette.getColor(4));
+        gameView.updateColorForBlockImage(levelChars[5], colorPalette.getColor(5));
+    }
+
+    /**
+     * Gets the character set for a specific level.
+     *
+     * @param levelNumber the level number
+     * @return the character array for that level
+     */
+    private char[] getLevelCharacterSet(int levelNumber) {
+        return LEVEL_CHARS[levelNumber - 1];
     }
 
     @Override

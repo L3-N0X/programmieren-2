@@ -10,17 +10,17 @@ public enum ColorPalette {
             new Color(238, 123, 149),
             new Color(255, 255, 70)),
 
-    WET(new Color(0, 102, 204),
+    WET(new Color(44, 61, 236),
         new Color(0, 153, 51),
         new Color(175, 60, 88),
         new Color(128, 149, 154),
         new Color(238, 123, 149),
         new Color(255, 255, 70)),
 
-    ICY(new Color(0, 153, 255),
-        new Color(0, 204, 102),
-        new Color(255, 102, 102),
-        new Color(204, 204, 204),
+    ICY(new Color(142, 208, 255),
+        new Color(136, 220, 170),
+        new Color(234, 130, 148),
+        new Color(190, 224, 220),
         new Color(238, 123, 149),
         new Color(255, 255, 70)),
 
@@ -28,7 +28,7 @@ public enum ColorPalette {
             new Color(204, 153, 51),
             new Color(255, 204, 102),
             new Color(255, 90, 60),
-            new Color(204, 204, 153),
+            new Color(218, 210, 179),
             new Color(238, 123, 149),
             new Color(255, 255, 70));
 

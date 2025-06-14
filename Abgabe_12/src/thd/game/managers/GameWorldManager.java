@@ -2,7 +2,10 @@ package thd.game.managers;
 
 import java.util.LinkedList;
 import java.util.List;
+
 import javax.sound.sampled.LineUnavailableException;
+
+import thd.game.level.Level;
 import thd.game.utilities.GameView;
 import thd.gameobjects.base.GameObject;
 import thd.gameobjects.movable.Car;
@@ -140,4 +143,5 @@ class GameWorldManager extends GamePlayManager {
         // Initialize the sector tracker with proper bounds and starting position
         getSectorTracker().initializeForNewLevel(minX, maxX, minY, maxY, carStartX, carStartY);
     }
+
 }

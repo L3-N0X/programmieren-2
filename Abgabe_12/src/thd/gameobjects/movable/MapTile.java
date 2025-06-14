@@ -1,5 +1,6 @@
 package thd.gameobjects.movable;
 
+import thd.game.managers.GameManager;
 import thd.game.managers.GamePlayManager;
 import thd.game.managers.UnexpectedWorldTileException;
 import thd.game.utilities.GameView;
@@ -128,7 +129,9 @@ public class MapTile extends CollidingGameObject implements ShiftableGameObject,
 
     @Override
     public void addToCanvas() {
-        gameView.addBlockImageToCanvas(mapTileImage.blockImage(), position.getX(),
+        String translatedBlockImage = GameManager.translateBlockImageForLevel(
+                mapTileImage.blockImage(), gamePlayManager.getCurrentLevel());
+        gameView.addBlockImageToCanvas(translatedBlockImage, position.getX(),
                 position.getY(), GamePlayManager.BLOCK_SIZE, rotation);
     }
 

@@ -3,6 +3,7 @@ package thd.gameobjects.movable;
 import thd.game.level.Difficulty;
 import thd.game.level.Level;
 import thd.game.level.RoadCondition;
+import thd.game.managers.GameManager;
 import thd.game.managers.GamePlayManager;
 import thd.game.managers.GameViewManager;
 import thd.game.managers.WorldSectorTracker;
@@ -132,8 +133,6 @@ public class Car extends CollidingGameObject implements MainCharacter {
     public void updateParameters(RoadCondition roadCondition) {
         DifficultyParameters difficultyParameters = DIFFICULTY_PARAMETERS.get(Level.difficulty);
         RoadParameters roadParameters = ROAD_PARAMETERS.get(roadCondition);
-        System.out.println(Level.difficulty + " - " + roadCondition);
-        System.out.println("Car parameters updated: " + difficultyParameters + ", " + roadParameters);
 
         this.carParameters = new CarParameters(
                 roadParameters.driftInitiationSpeedThreshold(),
@@ -566,7 +565,9 @@ public class Car extends CollidingGameObject implements MainCharacter {
 
     @Override
     public void addToCanvas() {
-        gameView.addBlockImageToCanvas(blockImage, position.getX(), position.getY(), size, 0);
+        String translatedBlockImage = GameManager.translateBlockImageForLevel(
+                blockImage, gamePlayManager.getCurrentLevel());
+        gameView.addBlockImageToCanvas(translatedBlockImage, position.getX(), position.getY(), size, 0);
         if (GameViewManager.debug) {
             gameView.addTextToCanvas(
                     "Speed: " + Math.round(speedInPixel * 100) / 100.0 + " Rotation: " + Math.toDegrees(rotation), 5,
