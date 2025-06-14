@@ -3,13 +3,13 @@ package thd.game.level;
 /**
  * The first level.
  */
-public class Level1 extends Level {
+public class Level4 extends Level {
     /**
      * Creates the first level and sets all variables.
      */
-    public Level1() {
-        name = "ORIGINAL MAP";
-        number = 1;
+    public Level4() {
+        name = "ORIGINAL MAP - WET";
+        number = 4;
         world = """
                 RRRRRRRRRRRRRRRRDRUuRRPUurVvRRRR
                 RRRQRRRRRRRRRRRQ|QRUuqRrUMvrRRRR
@@ -38,7 +38,8 @@ public class Level1 extends Level {
                 RRRRRRRRRRRRRRRHVmuQRhUuhRRVvRRR
                 """;
         super.calculateOffsetsFromWorldString();
-        roadCondition = RoadCondition.DRY;
-        colorPalette = ColorPalette.DEFAULT;
+        roadCondition = RoadCondition.WET;
+
+        colorPalette = ColorPalette.WET;
     }
 }

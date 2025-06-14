@@ -4,7 +4,8 @@ import javax.sound.sampled.*;
 import java.util.Arrays;
 
 /**
- * Simple engine sound generator for the Car class. Generates basic engine sounds based on car speed. No threads - audio
+ * Simple engine sound generator for the Car class. Generates basic engine
+ * sounds based on car speed. No threads - audio
  * is generated on-demand when update() is called.
  */
 public class EngineAudioGenerator {
@@ -73,18 +74,6 @@ public class EngineAudioGenerator {
 
         engineOn = true;
         audioLine.start();
-    }
-
-    /**
-     * Stop the audio line (call this when shutting down).
-     */
-    private void stop() {
-        engineOn = false;
-
-        if (audioLine != null) {
-            audioLine.stop();
-            audioLine.close();
-        }
     }
 
     /**

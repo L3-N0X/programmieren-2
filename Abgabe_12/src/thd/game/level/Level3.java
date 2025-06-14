@@ -39,5 +39,8 @@ public class Level3 extends Level {
                 RRRRRRRRRRRRRRRHVm
                 """;
         super.calculateOffsetsFromWorldString();
+        roadCondition = RoadCondition.DRY;
+
+        colorPalette = ColorPalette.DEFAULT;
     }
 }

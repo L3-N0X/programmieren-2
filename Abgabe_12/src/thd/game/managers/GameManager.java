@@ -1,5 +1,6 @@
 package thd.game.managers;
 
+import thd.game.level.ColorPalette;
 import thd.game.level.Difficulty;
 import thd.game.level.Level;
 import thd.game.utilities.FileAccess;
@@ -12,8 +13,6 @@ import java.awt.*;
 import java.util.Objects;
 
 class GameManager extends LevelManager {
-    private int lastPoints;
-
     GameManager(GameView gameView) throws LineUnavailableException {
         super(gameView);
         startNewGame();
@@ -83,7 +82,6 @@ class GameManager extends LevelManager {
         }
 
         FileAccess.writeDifficultyToDisc(Level.difficulty);
-        car.updateParameters();
         initializeGame();
     }
 
@@ -92,6 +90,22 @@ class GameManager extends LevelManager {
         overlay.stopShowing();
         overlay.showMessage(level.name, 2);
         super.initializeLevel();
+        updateColorPalette(level.colorPalette);
+        car.updateParameters(level.roadCondition);
+    }
+
+    /**
+     * Updates the color palette of the game view.
+     *
+     * @param colorPalette the new color palette to update the game view with.
+     */
+    private void updateColorPalette(ColorPalette colorPalette) {
+        gameView.updateColorForBlockImage('A', colorPalette.getColor(0));
+        gameView.updateColorForBlockImage('D', colorPalette.getColor(1));
+        gameView.updateColorForBlockImage('E', colorPalette.getColor(2));
+        gameView.updateColorForBlockImage('F', colorPalette.getColor(3));
+        gameView.updateColorForBlockImage('H', colorPalette.getColor(4));
+        gameView.updateColorForBlockImage('I', colorPalette.getColor(5));
     }
 
     @Override

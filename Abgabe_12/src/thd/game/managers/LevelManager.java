@@ -4,6 +4,8 @@ import thd.game.level.Level;
 import thd.game.level.Level1;
 import thd.game.level.Level2;
 import thd.game.level.Level3;
+import thd.game.level.Level4;
+import thd.game.level.Level5;
 import thd.game.utilities.GameView;
 
 import javax.sound.sampled.LineUnavailableException;
@@ -11,7 +13,6 @@ import java.util.List;
 
 class LevelManager extends GameWorldManager {
     private List<Level> levels;
-    private static final int LIVES = 1;
 
     protected LevelManager(GameView gameView) throws LineUnavailableException {
         super(gameView);
@@ -55,7 +56,7 @@ class LevelManager extends GameWorldManager {
     }
 
     protected void initializeGame() {
-        levels = List.of(new Level1(), new Level2(), new Level3());
+        levels = List.of(new Level1(), new Level2(), new Level3(), new Level4(), new Level5());
         level = levels.get(0);
         lapTimeDisplay.getGuiTimer().stop();
     }

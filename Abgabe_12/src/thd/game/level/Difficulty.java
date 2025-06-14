@@ -15,7 +15,7 @@ public enum Difficulty {
     /**
      * The hard difficulty level.
      */
-    HARD("Hard");
+    HARD("Schwer");
 
     /**
      * The name of the difficulty level, used for display purposes.

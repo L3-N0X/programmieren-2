@@ -60,9 +60,9 @@ class GameWorldManager extends GamePlayManager {
 
                 mapMapTile.getPosition().updateCoordinates(x, y);
                 addActivatableGameObject(mapMapTile);
-                if (false) { // wichtel
-                    spawnGameObject(mapMapTile);
-                }
+                // if (false) { // wichtel
+                // spawnGameObject(mapMapTile);
+                // }
             }
         }
     }

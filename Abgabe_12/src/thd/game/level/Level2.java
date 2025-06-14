@@ -21,5 +21,8 @@ public class Level2 extends Level {
                 RQrRRrRqQhHrrRqQhHrHrRqQRR
                 """;
         super.calculateOffsetsFromWorldString();
+        roadCondition = RoadCondition.DRY;
+
+        colorPalette = ColorPalette.DESERT;
     }
 }

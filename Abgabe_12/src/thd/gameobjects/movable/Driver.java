@@ -146,7 +146,8 @@ class Driver extends GameObject {
     /**
      * Creates a new driver in the game at a default position.
      *
-     * @param gameView        the main {@link GameView} where the text later gets added to
+     * @param gameView        the main {@link GameView} where the text later gets
+     *                        added to
      * @param gamePlayManager Manages the game with spawning, despawning and more.
      */
     Driver(GameView gameView, GamePlayManager gamePlayManager) {
@@ -258,6 +259,9 @@ class Driver extends GameObject {
             case ROLLING_RIGHT -> switchToNextRightRollState();
             case RIGHT -> switchToNextRightState();
             case LEFT -> switchToNextLeftState();
+            default -> {
+                return;
+            }
         }
         applyAnimationOffsets();
     }

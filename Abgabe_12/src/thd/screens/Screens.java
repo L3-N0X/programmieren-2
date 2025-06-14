@@ -9,25 +9,34 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
- * Diese Klasse stellt Methoden zur Verfügung, um einfache Start- und Endbildschirme anzuzeigen. Die Benutzer können
- * zwischen verschiedenen Optionen wählen. Die Auswahl des Benutzers wird zurückgegeben.
+ * Diese Klasse stellt Methoden zur Verfügung, um einfache Start- und
+ * Endbildschirme anzuzeigen. Die Benutzer können
+ * zwischen verschiedenen Optionen wählen. Die Auswahl des Benutzers wird
+ * zurückgegeben.
  */
 public class Screens {
     /**
-     * Es wird ein Startbildschirm mit einem einfachen Auswahlmenü angezeigt: "Einfach", "Standard" und "Beenden". Die
-     * Auswahl des Benutzers wird zurückgegeben. Falls "Beenden" gewählt wird, wird das Programm sofort beendet.
+     * Es wird ein Startbildschirm mit einem einfachen Auswahlmenü angezeigt:
+     * "Einfach", "Standard" und "Beenden". Die
+     * Auswahl des Benutzers wird zurückgegeben. Falls "Beenden" gewählt wird, wird
+     * das Programm sofort beendet.
      *
      * @param gameView    Das aktuell genutzte GameView.
-     * @param title       Titel des Programms. Der Titel wird automatisch zentriert und in roter Farbe dargestellt.
+     * @param title       Titel des Programms. Der Titel wird automatisch zentriert
+     *                    und in roter Farbe dargestellt.
      *                    Bitte nur eine Zeile verwenden.
-     * @param description Beschreibung des Programms. Die Beschreibung wird automatisch zentriert dargestellt. Sie
-     *                    können bis zu 20 Zeilen mit je 60 Zeichen verwenden. Nennen Sie das Ziel des Spiels und
+     * @param description Beschreibung des Programms. Die Beschreibung wird
+     *                    automatisch zentriert dargestellt. Sie
+     *                    können bis zu 20 Zeilen mit je 60 Zeichen verwenden.
+     *                    Nennen Sie das Ziel des Spiels und
      *                    Beschreiben Sie die Steuerung.
-     *                    <li> Welche Tasten müssen gedrückt werden, um das Spiel zu
+     *                    <li>Welche Tasten müssen gedrückt werden, um das Spiel zu
      *                    steuern?
-     *                    <li> Was ist das Ziel des Spiels?
-     * @param preset      Die Vorauswahl der Schwierigkeitsstufe "Einfach" oder "Standard".
-     * @return String des Buttons, den der User gewählt hat, also "Einfach" oder "Standard".
+     *                    <li>Was ist das Ziel des Spiels?
+     * @param preset      Die Vorauswahl der Schwierigkeitsstufe "Einfach" oder
+     *                    "Standard".
+     * @return String des Buttons, den der User gewählt hat, also "Einfach" oder
+     *         "Standard".
      */
     public static String showStartScreen(GameView gameView, String title, String description, String preset) {
         StartScreen startScreen = new StartScreen(gameView, title, description, preset);
@@ -40,11 +49,14 @@ public class Screens {
     }
 
     /**
-     * Es wird ein Endbildschirm mit einem einfachen Auswahlmenü angezeigt: "Neu starten" und "Beenden". Falls "Beenden"
-     * gewählt wird, wird das Programm sofort beendet. Falls "Neu starten" gewählt wird, läuft das Programm weiter.
+     * Es wird ein Endbildschirm mit einem einfachen Auswahlmenü angezeigt: "Neu
+     * starten" und "Beenden". Falls "Beenden"
+     * gewählt wird, wird das Programm sofort beendet. Falls "Neu starten" gewählt
+     * wird, läuft das Programm weiter.
      *
      * @param gameView Das aktuell genutzte GameView.
-     * @param message  Nachricht, die der Benutzer angezeigt bekommt. Die Nachricht wird automatisch zentriert
+     * @param message  Nachricht, die der Benutzer angezeigt bekommt. Die Nachricht
+     *                 wird automatisch zentriert
      *                 dargestellt.
      */
     public static void showEndScreen(GameView gameView, String message) {
@@ -72,14 +84,19 @@ public class Screens {
             this.titleFontSize = 75;
             int boxHeight = 40;
             int boxWidth = 200;
-            int x = (GameView.WIDTH - 3 * boxWidth - 2 * gap) / 2;
+            int x = (GameView.WIDTH - 4 * boxWidth - 3 * gap) / 2;
             int y = GameView.HEIGHT - boxHeight - gap;
             ArrayList<SimpleBox> simpleBoxes = new ArrayList<>(3);
             simpleBoxes.add(new SimpleBox("Einfach", x, y, boxWidth, boxHeight));
             simpleBoxes.add(new SimpleBox("Standard", x + boxWidth + gap, y, boxWidth, boxHeight));
-            simpleBoxes.add(new SimpleBox("Beenden", x + 2 * boxWidth + 2 * gap, y, boxWidth, boxHeight));
+            simpleBoxes.add(new SimpleBox("Schwer", x + 2 * boxWidth + 2 * gap, y, boxWidth, boxHeight));
+            simpleBoxes.add(new SimpleBox("Beenden", x + 3 * boxWidth + 3 * gap, y, boxWidth, boxHeight));
             if (preset.equals("Einfach")) {
                 setSimpleBoxes(simpleBoxes, 0);
+            } else if (preset.equals("Standard")) {
+                setSimpleBoxes(simpleBoxes, 1);
+            } else if (preset.equals("Schwer")) {
+                setSimpleBoxes(simpleBoxes, 2);
             } else {
                 setSimpleBoxes(simpleBoxes, 1);
             }
@@ -258,9 +275,9 @@ public class Screens {
                 gameView.addRectangleToCanvas(x, y, width, height, 3, false, Color.WHITE);
             }
             gameView.addTextToCanvas(text,
-                                     x + (width - text.length() * fontSize * 0.65) / 2d,
-                                     y + (height - fontSize * 3 / 2d) / 2d, fontSize, true, Color.WHITE, 0,
-                                     "droidsansmono.ttf");
+                    x + (width - text.length() * fontSize * 0.65) / 2d,
+                    y + (height - fontSize * 3 / 2d) / 2d, fontSize, true, Color.WHITE, 0,
+                    "droidsansmono.ttf");
         }
     }
 }

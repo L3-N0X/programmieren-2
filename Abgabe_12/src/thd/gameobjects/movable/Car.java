@@ -2,6 +2,7 @@ package thd.gameobjects.movable;
 
 import thd.game.level.Difficulty;
 import thd.game.level.Level;
+import thd.game.level.RoadCondition;
 import thd.game.managers.GamePlayManager;
 import thd.game.managers.GameViewManager;
 import thd.game.managers.WorldSectorTracker;
@@ -31,7 +32,15 @@ public class Car extends CollidingGameObject implements MainCharacter {
     private static final int ROTATION_STEPS = 32;
     private static final int ROTATION_OFFSET = 8;
 
-    private static final Map<Difficulty, CarParameters> DIFFICULTY_PARAMETERS = new EnumMap<>(Difficulty.class);
+    private static final Map<Difficulty, DifficultyParameters> DIFFICULTY_PARAMETERS = new EnumMap<>(Difficulty.class);
+    private static final Map<RoadCondition, RoadParameters> ROAD_PARAMETERS = new EnumMap<>(RoadCondition.class);
+
+    private record DifficultyParameters(double maxSpeed, double acceleration, double breakRate) {
+    }
+
+    private record RoadParameters(double driftInitiationSpeedThreshold, double driftAngularVelocity,
+                                  double driftFriction, double driftRecoveryRate, double driftAngleRecoveryStep) {
+    }
 
     private record CarParameters(double driftInitiationSpeedThreshold,
                                  double driftAngularVelocity,
@@ -45,17 +54,23 @@ public class Car extends CollidingGameObject implements MainCharacter {
 
     static {
         DIFFICULTY_PARAMETERS.put(Difficulty.EASY,
-                                  new CarParameters(7.0, Math.toRadians(-1.5), 0.15,
-                                                    0.04, Math.toRadians(0.3), 12.0,
-                                                    0.2, 2.5));
+                                  new DifficultyParameters(12.0,
+                                                           0.2, 2.5));
         DIFFICULTY_PARAMETERS.put(Difficulty.STANDARD,
-                                  new CarParameters(8.5, Math.toRadians(-2.0), 0.2,
-                                                    0.032, Math.toRadians(0.2), 17.0,
-                                                    0.3, 2.8));
+                                  new DifficultyParameters(17.0,
+                                                           0.3, 2.8));
         DIFFICULTY_PARAMETERS.put(Difficulty.HARD,
-                                  new CarParameters(10.0, Math.toRadians(-2.5), 0.25,
-                                                    0.025, Math.toRadians(0.15), 22.0,
-                                                    0.4, 3.2));
+                                  new DifficultyParameters(22.0,
+                                                           0.4, 3.2));
+        ROAD_PARAMETERS.put(RoadCondition.DRY,
+                            new RoadParameters(7.0, Math.toRadians(-1.5), 0.15,
+                                               0.04, Math.toRadians(0.3)));
+        ROAD_PARAMETERS.put(RoadCondition.WET,
+                            new RoadParameters(6.0, Math.toRadians(-1.6), 0.12,
+                                               0.033, Math.toRadians(0.26)));
+        ROAD_PARAMETERS.put(RoadCondition.ICY,
+                            new RoadParameters(4.0, Math.toRadians(-1.7), 0.1,
+                                               0.027, Math.toRadians(0.17)));
     }
 
     private CarParameters carParameters;
@@ -106,7 +121,6 @@ public class Car extends CollidingGameObject implements MainCharacter {
         rotation = 0;
         driftAngle = 0.0;
         driftFactor = 0.0;
-        carParameters = DIFFICULTY_PARAMETERS.get(Level.difficulty);
         hitBoxOffsets(8, 8, -16, -16);
         lastAcceleratingTime = gameView.gameTimeInMilliseconds();
         engineAudio = new EngineAudioGenerator();
@@ -115,8 +129,21 @@ public class Car extends CollidingGameObject implements MainCharacter {
     /**
      * Updates the car parameters based on the current difficulty level.
      */
-    public void updateParameters() {
-        carParameters = DIFFICULTY_PARAMETERS.get(Level.difficulty);
+    public void updateParameters(RoadCondition roadCondition) {
+        DifficultyParameters difficultyParameters = DIFFICULTY_PARAMETERS.get(Level.difficulty);
+        RoadParameters roadParameters = ROAD_PARAMETERS.get(roadCondition);
+        System.out.println(Level.difficulty + " - " + roadCondition);
+        System.out.println("Car parameters updated: " + difficultyParameters + ", " + roadParameters);
+
+        this.carParameters = new CarParameters(
+                roadParameters.driftInitiationSpeedThreshold(),
+                roadParameters.driftAngularVelocity(),
+                roadParameters.driftFriction(),
+                roadParameters.driftRecoveryRate(),
+                roadParameters.driftAngleRecoveryStep(),
+                difficultyParameters.maxSpeed(),
+                difficultyParameters.acceleration(),
+                difficultyParameters.breakRate());
     }
 
     /**
