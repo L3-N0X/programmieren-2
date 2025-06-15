@@ -3,7 +3,6 @@ package thd.game.managers;
 import thd.game.level.ColorPalette;
 import thd.game.level.Difficulty;
 import thd.game.level.Level;
-import thd.game.utilities.FileAccess;
 import thd.game.utilities.GameView;
 import thd.screens.GameInfo;
 import thd.screens.Screens;
@@ -13,13 +12,13 @@ import java.awt.*;
 import java.util.Objects;
 
 public class GameManager extends LevelManager {
-    private static final char[] STANDARD_CHARS = { 'A', 'D', 'E', 'F', 'H', 'I' };
+    private static final char[] STANDARD_CHARS = {'A', 'D', 'E', 'F', 'H', 'I'};
     private static final char[][] LEVEL_CHARS = {
-            { 'A', 'D', 'E', 'F', 'H', 'I' }, // Level 1 (original)
-            { 'J', 'K', 'l', 'M', 'N', 'O' }, // Level 2
-            { 'P', 'Q', 'R', 'S', 'T', 'U' }, // Level 3
-            { 'V', 'q', 'X', 'Y', 'Z', 'a' }, // Level 4
-            { 'b', 'c', 'd', 'e', 'f', 'g' } // Level 5
+            {'A', 'D', 'E', 'F', 'H', 'I'}, // Level 1 (original)
+            {'J', 'K', 'l', 'M', 'N', 'O'}, // Level 2
+            {'P', 'Q', 'R', 'S', 'T', 'U'}, // Level 3
+            {'V', 'q', 'X', 'Y', 'Z', 'a'}, // Level 4
+            {'b', 'c', 'd', 'e', 'f', 'g'} // Level 5
     };
 
     GameManager(GameView gameView) throws LineUnavailableException {
@@ -28,8 +27,7 @@ public class GameManager extends LevelManager {
     }
 
     /**
-     * Translates block image characters to level-specific characters to ensure
-     * different cache entries for different
+     * Translates block image characters to level-specific characters to ensure different cache entries for different
      * color palettes.
      *
      * @param blockImage   the original block image string
@@ -97,8 +95,7 @@ public class GameManager extends LevelManager {
                 overlay.stopShowing();
 
                 // Always offer name input for score saving
-                String playerName = Screens.showNameInputScreen(gameView,
-                        "Game Complete! Enter your name to save your time:");
+                String playerName = Screens.showNameInputScreen(gameView, GameInfo.ENTER_NAME_MESSAGE);
 
                 if (!playerName.isEmpty()) {
                     thd.game.utilities.PlayerScore newScore = new thd.game.utilities.PlayerScore(
@@ -113,9 +110,9 @@ public class GameManager extends LevelManager {
 
                 Screens.showEndScreen(
                         gameView,
-                        "Rennen auf " + level.name + " erfolgreich beendet!"
-                                + "\nIhre beste Zeit: " + bestTimeDisplay.getGuiTimer().timeDurationFormatted()
-                                + "\n\nWählen Sie \"Neues Spiel\", um ein weiteres Rennen zu starten!");
+                        String.format(
+                                GameInfo.END_SCREEN_MESSAGE,
+                                level.name, bestTimeDisplay.getGuiTimer().timeDurationFormatted()));
                 startNewGame();
             }
         }
@@ -141,13 +138,13 @@ public class GameManager extends LevelManager {
     private void startNewGame() {
         Level.difficulty = thd.game.utilities.FileAccess.readDifficultyFromDisc();
         String selection = Screens.showStartScreen(gameView, GameInfo.TITLE, GameInfo.DESCRIPTION,
-                Level.difficulty.name);
+                                                   Level.difficulty.name);
 
-        if (Objects.equals(selection, "Best Times")) {
+        if (Objects.equals(selection, GameInfo.BEST_LIST_BUTTON)) {
             Screens.showBestListScreen(gameView);
             startNewGame(); // Return to menu after viewing
             return;
-        } else if (!Objects.equals(selection, "Beenden")) {
+        } else if (!Objects.equals(selection, GameInfo.EXIT_BUTTON)) {
             Level.difficulty = Difficulty.fromName(selection);
         }
 

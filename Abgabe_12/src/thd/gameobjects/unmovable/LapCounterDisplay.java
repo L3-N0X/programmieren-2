@@ -40,7 +40,8 @@ public class LapCounterDisplay extends GameObject {
 
     @Override
     public void addToCanvas() {
-        gameView.addTextToCanvas(gamePlayManager.getCurrentLap() + "/" + GamePlayManager.MAX_LAPS, position.getX(),
+        gameView.addTextToCanvas(gamePlayManager.getCurrentLap() + "/" + GamePlayManager.MAX_LAPS,
+                                 position.getX(),
                                  position.getY(), size,
                                  true,
                                  Color.WHITE, rotation,

@@ -1,5 +1,7 @@
 package thd.game.level;
 
+import thd.screens.GameInfo;
+
 /**
  * This enum represents the difficulty of a level in the game.
  */
@@ -7,15 +9,15 @@ public enum Difficulty {
     /**
      * The easy difficulty level.
      */
-    EASY("Einfach"),
+    EASY(GameInfo.EASY_BUTTON),
     /**
      * The medium difficulty level.
      */
-    STANDARD("Standard"),
+    STANDARD(GameInfo.STANDARD_BUTTON),
     /**
      * The hard difficulty level.
      */
-    HARD("Schwer");
+    HARD(GameInfo.HARD_BUTTON);
 
     /**
      * The name of the difficulty level, used for display purposes.
