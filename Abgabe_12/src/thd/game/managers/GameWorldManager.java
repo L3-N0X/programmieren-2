@@ -1,20 +1,14 @@
 package thd.game.managers;
 
-import java.util.LinkedList;
-import java.util.List;
-
-import javax.sound.sampled.LineUnavailableException;
-
-import thd.game.level.Level;
 import thd.game.utilities.GameView;
 import thd.gameobjects.base.GameObject;
 import thd.gameobjects.movable.Car;
 import thd.gameobjects.movable.MapTile;
-import thd.gameobjects.unmovable.BestTimeDisplay;
-import thd.gameobjects.unmovable.LapCounterDisplay;
-import thd.gameobjects.unmovable.LapTimeDisplay;
-import thd.gameobjects.unmovable.LastTimeDisplay;
-import thd.gameobjects.unmovable.Overlay;
+import thd.gameobjects.unmovable.*;
+
+import javax.sound.sampled.LineUnavailableException;
+import java.util.LinkedList;
+import java.util.List;
 
 class GameWorldManager extends GamePlayManager {
     private final List<GameObject> activatableGameObjects;
@@ -63,9 +57,9 @@ class GameWorldManager extends GamePlayManager {
 
                 mapMapTile.getPosition().updateCoordinates(x, y);
                 addActivatableGameObject(mapMapTile);
-                // if (false) { // wichtel
-                // spawnGameObject(mapMapTile);
-                // }
+                if (false) { // wichtel
+                    spawnGameObject(mapMapTile);
+                }
             }
         }
     }
@@ -143,5 +137,4 @@ class GameWorldManager extends GamePlayManager {
         // Initialize the sector tracker with proper bounds and starting position
         getSectorTracker().initializeForNewLevel(minX, maxX, minY, maxY, carStartX, carStartY);
     }
-
 }

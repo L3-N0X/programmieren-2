@@ -13,8 +13,8 @@ public class EngineAudioGenerator {
     private static final int BUFFER_SIZE = 1024;
 
     // Volume constants
-    private static final float MAX_VOLUME = 0.05f;
-    private static final float IDLE_VOLUME = 0.015f;
+    private static final float MAX_VOLUME = 0.032f;
+    private static final float IDLE_VOLUME = 0.012f;
     private static final float VOLUME_RANGE = MAX_VOLUME - IDLE_VOLUME;
 
     // Frequency constants

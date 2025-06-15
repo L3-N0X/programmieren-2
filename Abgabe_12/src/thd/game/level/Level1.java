@@ -8,7 +8,7 @@ public class Level1 extends Level {
      * Creates the first level and sets all variables.
      */
     public Level1() {
-        name = "ORIGINAL MAP";
+        name = "GRASSY ROAD";
         number = 1;
         world = """
                 RRRRRRRRRRRRRRRRDRUuRRPUurVvRRRR

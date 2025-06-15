@@ -56,7 +56,6 @@ class UserControlledGameObjectPool {
         } else if (keyCode == KeyEvent.VK_W || keyCode == KeyEvent.VK_UP) {
             if (!car.isDriving()) {
                 car.startDriving();
-                lapTimeDisplay.getGuiTimer().start();
             }
         } else if (keyCode == KeyEvent.VK_S || keyCode == KeyEvent.VK_DOWN || keyCode == KeyEvent.VK_SPACE) {
             currentlyBreaking = true;

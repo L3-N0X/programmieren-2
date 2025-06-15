@@ -60,13 +60,4 @@ class LevelManager extends GameWorldManager {
         level = levels.get(0);
         lapTimeDisplay.getGuiTimer().stop();
     }
-
-    /**
-     * Gets the current level.
-     *
-     * @return the current level
-     */
-    public Level getCurrentLevel() {
-        return level;
-    }
 }

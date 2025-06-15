@@ -101,15 +101,16 @@ public class Screens {
             this.titleFontSize = 75;
             int boxHeight = 40;
             int boxWidth = 200;
-            int x = (GameView.WIDTH - 5 * boxWidth - 8 * gap) / 2;
+            int x = (GameView.WIDTH - 5 * boxWidth - 8 * gap - 50) / 2;
             int y = GameView.HEIGHT - boxHeight - gap;
             ArrayList<SimpleBox> simpleBoxes = new ArrayList<>(5);
             simpleBoxes.add(new SimpleBox(GameInfo.EASY_BUTTON, x, y, boxWidth, boxHeight));
             simpleBoxes.add(new SimpleBox(GameInfo.STANDARD_BUTTON, x + boxWidth + gap, y, boxWidth, boxHeight));
             simpleBoxes.add(new SimpleBox(GameInfo.HARD_BUTTON, x + 2 * boxWidth + 2 * gap, y, boxWidth, boxHeight));
             simpleBoxes.add(
-                    new SimpleBox(GameInfo.BEST_LIST_BUTTON, x + 3 * boxWidth + 5 * gap, y, boxWidth, boxHeight));
-            simpleBoxes.add(new SimpleBox(GameInfo.EXIT_BUTTON, x + 4 * boxWidth + 8 * gap, y, boxWidth, boxHeight));
+                    new SimpleBox(GameInfo.BEST_LIST_BUTTON, x + 3 * boxWidth + 5 * gap, y, boxWidth + 50, boxHeight));
+            simpleBoxes
+                    .add(new SimpleBox(GameInfo.EXIT_BUTTON, x + 50 + 4 * boxWidth + 8 * gap, y, boxWidth, boxHeight));
             switch (preset) {
                 case GameInfo.EASY_BUTTON -> setSimpleBoxes(simpleBoxes, 0);
                 case GameInfo.HARD_BUTTON -> setSimpleBoxes(simpleBoxes, 2);
@@ -130,8 +131,8 @@ public class Screens {
 
         private void addTitle() {
             Dimension textBounds = calculateTextBounds(title);
-            double x = (GameView.WIDTH - (textBounds.width * titleFontSize * 0.605)) / 2d;
-            gameView.addTextToCanvas(title, x, gap, titleFontSize, true, titleColor, 0, "droidsansmono.ttf");
+            double x = (GameView.WIDTH - (textBounds.width * titleFontSize * 1.05)) / 2d;
+            gameView.addTextToCanvas(title, x, gap, titleFontSize, true, titleColor, 0, "kongtext.ttf");
         }
 
         private void addDescription() {
@@ -329,8 +330,8 @@ public class Screens {
         }
 
         private void addTitle() {
-            gameView.addTextToCanvas(GameInfo.BEST_LIST_TITLE, GameView.WIDTH / 2d - 100, 50, 40, true, Color.YELLOW, 0,
-                                     "droidsansmono.ttf");
+            gameView.addTextToCanvas(GameInfo.BEST_LIST_TITLE, GameView.WIDTH / 2d - 330, 50, 60, true, Color.YELLOW, 0,
+                                     "kongtext.ttf");
         }
 
         private void addScoresList() {
@@ -356,10 +357,10 @@ public class Screens {
             int rank = i + 1;
             return String.format("%2d. %-15s %-11s (%-20s)    [%-8s]   %s",
                                  rank,
-                                 score.playerName,
+                                 score.getPlayerName(),
                                  score.formatBestRoundTime(),
-                                 score.levelName,
-                                 score.difficulty,
+                                 score.getLevelName(),
+                                 score.getDifficulty(),
                                  score.formatAchievedDate());
         }
 
@@ -485,9 +486,11 @@ public class Screens {
                 gameView.addRectangleToCanvas(x, y, width, height, 3, false, Color.WHITE);
             }
             gameView.addTextToCanvas(text,
-                                     x + (width - text.length() * fontSize * 0.65) / 2d,
-                                     y + (height - fontSize * 3 / 2d) / 2d, fontSize, true, Color.WHITE, 0,
-                                     "droidsansmono.ttf");
+                                     x + (width - text.length() * fontSize * 0.7 * 1.05) / 2d,
+                                     y + (height - fontSize * 0.7 * 2.5 / 2d) / 2d, fontSize
+                                                                                    * 0.7,
+                                     true, Color.WHITE, 0,
+                                     "kongtext.ttf");
         }
     }
 }

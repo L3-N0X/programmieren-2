@@ -8,7 +8,7 @@ public class Level5 extends Level {
      * Creates the first level and sets all variables.
      */
     public Level5() {
-        name = "ORIGINAL MAP - ICY";
+        name = "GRASSY ROAD - ICY";
         number = 5;
         world = """
                 RRRRRRRRRRRRRRRRDRUuRRPUurVvRRRR
@@ -39,7 +39,6 @@ public class Level5 extends Level {
                 """;
         super.calculateOffsetsFromWorldString();
         roadCondition = RoadCondition.ICY;
-
         colorPalette = ColorPalette.ICY;
     }
 }

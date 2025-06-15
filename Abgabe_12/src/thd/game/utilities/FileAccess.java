@@ -1,5 +1,7 @@
 package thd.game.utilities;
 
+import thd.game.level.Difficulty;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -7,12 +9,9 @@ import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import thd.game.level.Difficulty;
 
 /**
- * This class provides methods to read and write the game difficulty and player
- * scores to a file
- * on the disc.
+ * This class provides methods to read and write the game difficulty and player scores to a file on the disc.
  */
 public class FileAccess {
     private static final Path SAVEGAME_DIRECTORY = Path.of(System.getProperty("user.home")).resolve("game");
@@ -37,8 +36,7 @@ public class FileAccess {
     /**
      * Reads the difficulty from a file on the disc.
      *
-     * @return the difficulty read from the disc, or Difficulty.STANDARD if no file
-     *         exists or the file is empty
+     * @return the difficulty read from the disc, or Difficulty.STANDARD if no file exists or the file is empty
      */
     public static Difficulty readDifficultyFromDisc() {
         if (Files.exists(SAVEGAME_FILE)) {
@@ -95,21 +93,17 @@ public class FileAccess {
             String[] scoreLines = parts[1].split("\\R");
 
             for (String line : scoreLines) {
-                if (line.trim().isEmpty())
+                if (line.trim().isEmpty()) {
                     continue;
+                }
                 String[] data = line.split("\\|");
                 if (data.length == 6) {
-                    scores.add(new PlayerScore(
-                            data[0],
-                            Long.parseLong(data[1]),
-                            data[2],
-                            Integer.parseInt(data[3]),
-                            LocalDateTime.parse(data[4]),
-                            data[5]));
+                    scores.add(new PlayerScore(data[0], Long.parseLong(data[1]), data[2], Integer.parseInt(data[3]),
+                                               LocalDateTime.parse(data[4]), data[5]));
                 }
             }
             return scores;
-        } catch (IOException | NumberFormatException e) {
+        } catch (IOException e) {
             return new ArrayList<>();
         }
     }
@@ -127,12 +121,9 @@ public class FileAccess {
             content.append(SEPARATOR).append("\n");
 
             for (PlayerScore score : scores) {
-                content.append(score.playerName).append("|")
-                        .append(score.bestRoundTimeMillis).append("|")
-                        .append(score.levelName).append("|")
-                        .append(score.levelNumber).append("|")
-                        .append(score.achievedDate).append("|")
-                        .append(score.difficulty).append("\n");
+                content.append(score.getPlayerName()).append("|").append(score.getBestRoundTimeMillis()).append(
+                        "|").append(score.getLevelName()).append("|").append(score.getLevelNumber()).append("|").append(
+                        score.getAchievedDate()).append("|").append(score.getDifficulty()).append("\n");
             }
 
             if (!Files.exists(SAVEGAME_DIRECTORY)) {

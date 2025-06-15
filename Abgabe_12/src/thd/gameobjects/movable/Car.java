@@ -129,6 +129,8 @@ public class Car extends CollidingGameObject implements MainCharacter {
 
     /**
      * Updates the car parameters based on the current difficulty level.
+     *
+     * @param roadCondition The current road condition which affects the car's drift parameters.
      */
     public void updateParameters(RoadCondition roadCondition) {
         DifficultyParameters difficultyParameters = DIFFICULTY_PARAMETERS.get(Level.difficulty);
@@ -187,7 +189,7 @@ public class Car extends CollidingGameObject implements MainCharacter {
             currentState = State.ACCELERATING;
         }
         switch (mapSurface) {
-            case BRICK, TRACK -> {
+            case BRICK -> {
                 switch (mapTileImage) {
                     case HOUSE_BIG, HOUSE_CORNER -> crash();
                     case ROCKS_FEW, ROCKS_MANY, ROCKS_NOT_SO_MANY, ROCKS_VERY_MANY -> {
@@ -199,6 +201,13 @@ public class Car extends CollidingGameObject implements MainCharacter {
                             }
                         }
                     }
+                    default -> {
+                    }
+                }
+            }
+            case TRACK -> { // is stone color for house tiles
+                switch (mapTileImage) {
+                    case HOUSE_BIG, HOUSE_CORNER -> crash();
                     default -> {
                     }
                 }
@@ -383,6 +392,11 @@ public class Car extends CollidingGameObject implements MainCharacter {
     public void updateStatus() {
         super.updateStatus();
         switch (currentState) {
+            case IDLE -> {
+                // Reset acceleration timer while idle to prevent acceleration buildup
+                lastAcceleratingTime = gameView.gameTimeInMilliseconds();
+                blockImage = carRotationTiles[carRotation].blockImage();
+            }
             case CRASHED -> {
                 if (gameView.timer(200, 0, this)) {
                     blockImage = currentCrashState.blockImage();
@@ -414,6 +428,12 @@ public class Car extends CollidingGameObject implements MainCharacter {
     @Override
     public void startDriving() {
         if (currentState != State.CRASHED) {
+            // Reset acceleration timer when starting to drive from idle state
+            gamePlayManager.startLapTimer();
+
+            if (currentState == State.IDLE) {
+                lastAcceleratingTime = gameView.gameTimeInMilliseconds();
+            }
             currentState = State.ACCELERATING;
         }
     }
@@ -428,7 +448,6 @@ public class Car extends CollidingGameObject implements MainCharacter {
             return;
         }
         currentState = State.CRASHED;
-        gamePlayManager.pauseLapTimer();
         gameView.playSound("crash.wav", false);
         engineAudio.turnEngineOn(false);
 
@@ -543,6 +562,7 @@ public class Car extends CollidingGameObject implements MainCharacter {
         lastSteeringTime = 0;
         lastAcceleratingTime = gameView.gameTimeInMilliseconds();
         lastUpdateTime = 0;
+        gamePlayManager.pauseLapTimer();
         currentState = State.IDLE;
     }
 
@@ -566,7 +586,7 @@ public class Car extends CollidingGameObject implements MainCharacter {
     @Override
     public void addToCanvas() {
         String translatedBlockImage = GameManager.translateBlockImageForLevel(
-                blockImage, gamePlayManager.getCurrentLevel());
+                blockImage, gamePlayManager.currentLevel());
         gameView.addBlockImageToCanvas(translatedBlockImage, position.getX(), position.getY(), size, 0);
         if (GameViewManager.debug) {
             gameView.addTextToCanvas(

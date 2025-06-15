@@ -8,7 +8,7 @@ public class Level2 extends Level {
      * Creates the second level and sets all variables.
      */
     public Level2() {
-        name = "RECTANGLE MAP";
+        name = "DESERT DUNES";
         number = 2;
         world = """
                 RRRQRRrRRqRHrqhHQrRRGRGRRR

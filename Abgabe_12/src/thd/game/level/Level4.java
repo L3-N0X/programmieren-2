@@ -8,7 +8,7 @@ public class Level4 extends Level {
      * Creates the first level and sets all variables.
      */
     public Level4() {
-        name = "ORIGINAL MAP - WET";
+        name = "GRASSY ROAD - WET";
         number = 4;
         world = """
                 RRRRRRRRRRRRRRRRDRUuRRPUurVvRRRR

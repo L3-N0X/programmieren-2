@@ -7,12 +7,12 @@ import java.time.format.DateTimeFormatter;
  * Represents a player's score with their name, best round time, level information, and achievement date.
  */
 public class PlayerScore implements Comparable<PlayerScore> {
-    public final String playerName;
-    public final long bestRoundTimeMillis;
-    public final String levelName;
-    public final int levelNumber;
-    public final LocalDateTime achievedDate;
-    public final String difficulty;
+    private final String playerName;
+    private final long bestRoundTimeMillis;
+    private final String levelName;
+    private final int levelNumber;
+    private final LocalDateTime achievedDate;
+    private final String difficulty;
 
     /**
      * Creates a new PlayerScore instance.
@@ -22,6 +22,7 @@ public class PlayerScore implements Comparable<PlayerScore> {
      * @param levelName           the name of the level
      * @param levelNumber         the number of the level
      * @param achievedDate        the date when this score was achieved
+     * @param difficulty          the difficulty of the level
      */
     public PlayerScore(String playerName, long bestRoundTimeMillis, String levelName, int levelNumber,
                        LocalDateTime achievedDate, String difficulty) {
@@ -34,7 +35,7 @@ public class PlayerScore implements Comparable<PlayerScore> {
     }
 
     /**
-     * Gets the formatted time as MM:SS.mmm
+     * Gets the formatted time as MM:SS.mmm.
      *
      * @return formatted time string
      */
@@ -46,7 +47,7 @@ public class PlayerScore implements Comparable<PlayerScore> {
     }
 
     /**
-     * Gets the formatted date as dd.MM.yyyy HH:mm
+     * Gets the formatted date as dd.MM.yyyy HH:mm.
      *
      * @return formatted date string
      */
@@ -54,27 +55,81 @@ public class PlayerScore implements Comparable<PlayerScore> {
         return achievedDate.format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm"));
     }
 
-    @Override
-    public String toString() {
-        return String.format("%s - %s (%s) - %s - Level %d - %s",
-                             playerName, formatBestRoundTime(), levelName, formatAchievedDate(), levelNumber,
-                             difficulty);
+    /**
+     * Gets the player's name.
+     *
+     * @return the player's name
+     */
+    public String getPlayerName() {
+        return playerName;
+    }
+
+    /**
+     * Gets the best round time in milliseconds.
+     *
+     * @return the best round time in milliseconds
+     */
+    public String getDifficulty() {
+        return difficulty;
+    }
+
+    /**
+     * Gets the best round time in milliseconds.
+     *
+     * @return the best round time in milliseconds
+     */
+    public String getLevelName() {
+        return levelName;
+    }
+
+    /**
+     * Gets the level number.
+     *
+     * @return the level number
+     */
+    public int getLevelNumber() {
+        return levelNumber;
+    }
+
+    /**
+     * Gets the date when this score was achieved.
+     *
+     * @return the date when this score was achieved
+     */
+    public LocalDateTime getAchievedDate() {
+        return achievedDate;
+    }
+
+    /**
+     * Gets the best round time in milliseconds.
+     *
+     * @return the best round time in milliseconds
+     */
+    public long getBestRoundTimeMillis() {
+        return bestRoundTimeMillis;
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
+    public boolean equals(Object o) {
+        if (o == this) {
             return true;
         }
-        if (!(obj instanceof PlayerScore other)) {
+        if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        return playerName.equals(other.playerName) &&
-               bestRoundTimeMillis == other.bestRoundTimeMillis &&
-               levelName.equals(other.levelName) &&
-               levelNumber == other.levelNumber &&
-               achievedDate.equals(other.achievedDate) &&
-               difficulty.equals(other.difficulty);
+        PlayerScore other = (PlayerScore) o;
+        return playerName.equals(other.playerName)
+               && bestRoundTimeMillis == other.bestRoundTimeMillis
+               && levelName.equals(other.levelName)
+               && levelNumber == other.levelNumber
+               && achievedDate.equals(other.achievedDate)
+               && difficulty.equals(other.difficulty);
+    }
+
+    @Override
+    public int hashCode() {
+        return java.util.Objects.hash(playerName, bestRoundTimeMillis, levelName, levelNumber, achievedDate,
+                                      difficulty);
     }
 
     @Override

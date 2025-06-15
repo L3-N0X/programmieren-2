@@ -25,12 +25,15 @@ public class Level {
      */
     public int worldOffsetLines;
 
-    public ColorPalette colorPalette = ColorPalette.DEFAULT;
+    /**
+     * The color palette used for the level.
+     */
+    public ColorPalette colorPalette;
 
     /**
      * The road condition of the level.
      */
-    public RoadCondition roadCondition = RoadCondition.DRY;
+    public RoadCondition roadCondition;
 
     /**
      * The difficulty of the level.

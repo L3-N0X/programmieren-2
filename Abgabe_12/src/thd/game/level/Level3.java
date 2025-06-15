@@ -8,7 +8,7 @@ public class Level3 extends Level {
      * Creates the third level and sets all variables.
      */
     public Level3() {
-        name = "CURVY MAP";
+        name = "CURVES AND HILLS";
         number = 3;
         world = """
                 RRRRRRRRRRRRRRRRRR

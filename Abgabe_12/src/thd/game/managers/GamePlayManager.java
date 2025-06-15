@@ -1,5 +1,6 @@
 package thd.game.managers;
 
+import thd.game.level.Level;
 import thd.game.utilities.GameView;
 import thd.gameobjects.base.CollidingGameObject;
 import thd.gameobjects.base.GameObject;
@@ -69,8 +70,7 @@ public class GamePlayManager extends WorldShiftManager {
     }
 
     /**
-     * This will destroy an existing gameObject in the game, but keep it in
-     * shiftable.
+     * This will destroy an existing gameObject in the game, but keep it in shiftable.
      *
      * @param gameObject The gameObject that gets destroyed.
      */
@@ -92,8 +92,14 @@ public class GamePlayManager extends WorldShiftManager {
     }
 
     /**
-     * Updates the timers after a round is completed. Only processes if all sectors
-     * have been visited.
+     * Starts the lap timer.
+     */
+    public void startLapTimer() {
+        lapTimeDisplay.getGuiTimer().start();
+    }
+
+    /**
+     * Updates the timers after a round is completed. Only processes if all sectors have been visited.
      */
     public void roundCompleted() {
         boolean allSectorsVisited = sectorTracker.allSectorsVisited();
@@ -104,13 +110,12 @@ public class GamePlayManager extends WorldShiftManager {
 
         lapTimeDisplay.getGuiTimer().pause();
         if (bestTimeDisplay.getGuiTimer().timeDuration() == 0
-                || lapTimeDisplay.getGuiTimer().timeDuration() < bestTimeDisplay.getGuiTimer().timeDuration()) {
+            || lapTimeDisplay.getGuiTimer().timeDuration() < bestTimeDisplay.getGuiTimer().timeDuration()) {
             bestTimeDisplay.getGuiTimer().updateTimeDuration(lapTimeDisplay.getGuiTimer().timeDuration());
         }
         lastTimeDisplay.getGuiTimer().updateTimeDuration(lapTimeDisplay.getGuiTimer().timeDuration());
 
         currentLap++;
-        System.out.println("increased to next lap " + currentLap);
         lapJustCompleted = true;
         justCompletedLapNumber = currentLap;
 
@@ -136,7 +141,7 @@ public class GamePlayManager extends WorldShiftManager {
     /**
      * Resets the current lap to 0 and restarts the lap timer.
      */
-    public void resetCurrentLap() {
+    protected void resetCurrentLap() {
         currentLap = 0;
         lapJustCompleted = false;
         justCompletedLapNumber = 0;
@@ -204,7 +209,7 @@ public class GamePlayManager extends WorldShiftManager {
      *
      * @return the current level
      */
-    public thd.game.level.Level getCurrentLevel() {
+    public Level currentLevel() {
         return level;
     }
 }

@@ -3,7 +3,9 @@ package thd.game.managers;
 import thd.game.level.ColorPalette;
 import thd.game.level.Difficulty;
 import thd.game.level.Level;
+import thd.game.utilities.FileAccess;
 import thd.game.utilities.GameView;
+import thd.game.utilities.PlayerScore;
 import thd.screens.GameInfo;
 import thd.screens.Screens;
 
@@ -11,6 +13,9 @@ import javax.sound.sampled.LineUnavailableException;
 import java.awt.*;
 import java.util.Objects;
 
+/**
+ * Manages the game logic, including level management, lap tracking, and game state.
+ */
 public class GameManager extends LevelManager {
     private static final char[] STANDARD_CHARS = {'A', 'D', 'E', 'F', 'H', 'I'};
     private static final char[][] LEVEL_CHARS = {
@@ -55,16 +60,6 @@ public class GameManager extends LevelManager {
         return translated.toString();
     }
 
-    /**
-     * Translates block image characters for the current level.
-     *
-     * @param blockImage the original block image string
-     * @return the translated block image string with level-specific characters
-     */
-    public String translateBlockImageForCurrentLevel(String blockImage) {
-        return translateBlockImageForLevel(blockImage, level);
-    }
-
     @Override
     protected void gameLoop() {
         super.gameLoop();
@@ -98,14 +93,14 @@ public class GameManager extends LevelManager {
                 String playerName = Screens.showNameInputScreen(gameView, GameInfo.ENTER_NAME_MESSAGE);
 
                 if (!playerName.isEmpty()) {
-                    thd.game.utilities.PlayerScore newScore = new thd.game.utilities.PlayerScore(
+                    PlayerScore newScore = new PlayerScore(
                             playerName,
                             bestTimeDisplay.getGuiTimer().timeDuration(),
                             level.name,
                             level.number,
                             java.time.LocalDateTime.now(),
                             Level.difficulty.name);
-                    thd.game.utilities.FileAccess.writePlayerScore(newScore);
+                    FileAccess.writePlayerScore(newScore);
                 }
 
                 Screens.showEndScreen(
@@ -136,7 +131,7 @@ public class GameManager extends LevelManager {
     }
 
     private void startNewGame() {
-        Level.difficulty = thd.game.utilities.FileAccess.readDifficultyFromDisc();
+        Level.difficulty = FileAccess.readDifficultyFromDisc();
         String selection = Screens.showStartScreen(gameView, GameInfo.TITLE, GameInfo.DESCRIPTION,
                                                    Level.difficulty.name);
 
@@ -169,14 +164,14 @@ public class GameManager extends LevelManager {
      * @param colorPalette the new color palette to update the game view with.
      */
     private void updateColorPalette(ColorPalette colorPalette) {
-        char[] levelChars = getLevelCharacterSet(level.number);
+        char[] levelChars = levelCharacterSet(level.number);
 
-        gameView.updateColorForBlockImage(levelChars[0], colorPalette.getColor(0));
-        gameView.updateColorForBlockImage(levelChars[1], colorPalette.getColor(1));
-        gameView.updateColorForBlockImage(levelChars[2], colorPalette.getColor(2));
-        gameView.updateColorForBlockImage(levelChars[3], colorPalette.getColor(3));
-        gameView.updateColorForBlockImage(levelChars[4], colorPalette.getColor(4));
-        gameView.updateColorForBlockImage(levelChars[5], colorPalette.getColor(5));
+        gameView.updateColorForBlockImage(levelChars[0], colorPalette.colorAt(0));
+        gameView.updateColorForBlockImage(levelChars[1], colorPalette.colorAt(1));
+        gameView.updateColorForBlockImage(levelChars[2], colorPalette.colorAt(2));
+        gameView.updateColorForBlockImage(levelChars[3], colorPalette.colorAt(3));
+        gameView.updateColorForBlockImage(levelChars[4], colorPalette.colorAt(4));
+        gameView.updateColorForBlockImage(levelChars[5], colorPalette.colorAt(5));
     }
 
     /**
@@ -185,7 +180,7 @@ public class GameManager extends LevelManager {
      * @param levelNumber the level number
      * @return the character array for that level
      */
-    private char[] getLevelCharacterSet(int levelNumber) {
+    private char[] levelCharacterSet(int levelNumber) {
         return LEVEL_CHARS[levelNumber - 1];
     }
 
