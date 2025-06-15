@@ -2,7 +2,7 @@ package thd.screens;
 
 import thd.game.utilities.FileAccess;
 import thd.game.utilities.GameView;
-import thd.game.utilities.PlayerScore;
+import thd.gameobjects.base.PlayerScore;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -354,14 +354,23 @@ public class Screens {
 
         private String formatLine(int i) {
             PlayerScore score = scores.get(i);
+
             int rank = i + 1;
+
+            long minutes = score.getBestRoundTimeMillis() / 60000;
+            long seconds = (score.getBestRoundTimeMillis() % 60000) / 1000;
+            long millis = score.getBestRoundTimeMillis() % 1000;
+            String bestRoundTime = String.format("%02d:%02d.%03d", minutes, seconds, millis);
+
+            String achievedDate = score.getAchievedDate().toLocalDate().toString();
+
             return String.format("%2d. %-15s %-11s (%-20s)    [%-8s]   %s",
                                  rank,
                                  score.getPlayerName(),
-                                 score.formatBestRoundTime(),
+                                 bestRoundTime,
                                  score.getLevelName(),
                                  score.getDifficulty(),
-                                 score.formatAchievedDate());
+                                 achievedDate);
         }
 
         private void addPageInfo() {

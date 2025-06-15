@@ -1,7 +1,6 @@
-package thd.game.utilities;
+package thd.gameobjects.base;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 /**
  * Represents a player's score with their name, best round time, level information, and achievement date.
@@ -32,27 +31,6 @@ public class PlayerScore implements Comparable<PlayerScore> {
         this.levelNumber = levelNumber;
         this.achievedDate = achievedDate;
         this.difficulty = difficulty;
-    }
-
-    /**
-     * Gets the formatted time as MM:SS.mmm.
-     *
-     * @return formatted time string
-     */
-    public String formatBestRoundTime() {
-        long minutes = bestRoundTimeMillis / 60000;
-        long seconds = (bestRoundTimeMillis % 60000) / 1000;
-        long millis = bestRoundTimeMillis % 1000;
-        return String.format("%02d:%02d.%03d", minutes, seconds, millis);
-    }
-
-    /**
-     * Gets the formatted date as dd.MM.yyyy HH:mm.
-     *
-     * @return formatted date string
-     */
-    public String formatAchievedDate() {
-        return achievedDate.format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm"));
     }
 
     /**

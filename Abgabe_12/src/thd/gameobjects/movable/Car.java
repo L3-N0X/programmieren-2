@@ -185,21 +185,13 @@ public class Car extends CollidingGameObject implements MainCharacter {
     }
 
     private void handleMapSurface(MapSurface mapSurface, MapBlockImages.MapTileImage mapTileImage) {
-        if (currentState == State.GRASS || currentState == State.WATER) {
-            currentState = State.ACCELERATING;
-        }
+        resetSurfaceState();
         switch (mapSurface) {
             case BRICK -> {
                 switch (mapTileImage) {
                     case HOUSE_BIG, HOUSE_CORNER -> crash();
                     case ROCKS_FEW, ROCKS_MANY, ROCKS_NOT_SO_MANY, ROCKS_VERY_MANY -> {
-                        if (speedInPixel > carParameters.maxSpeed / 4) {
-                            crash();
-                        } else if (speedInPixel > carParameters.maxSpeed / 8) {
-                            if (gameView.timer((int) (Math.random() * 300 + 200), 0, this)) {
-                                gameView.playSound("rocks.wav", false);
-                            }
-                        }
+                        crashIfTooFast();
                     }
                     default -> {
                     }
@@ -224,6 +216,22 @@ public class Car extends CollidingGameObject implements MainCharacter {
             }
             default -> {
             }
+        }
+    }
+
+    private void crashIfTooFast() {
+        if (speedInPixel > carParameters.maxSpeed / 4) {
+            crash();
+        } else if (speedInPixel > carParameters.maxSpeed / 8) {
+            if (gameView.timer((int) (Math.random() * 300 + 100), 0, this)) {
+                gameView.playSound("rocks.wav", false);
+            }
+        }
+    }
+
+    private void resetSurfaceState() {
+        if (currentState == State.GRASS || currentState == State.WATER) {
+            currentState = State.ACCELERATING;
         }
     }
 
@@ -511,54 +519,72 @@ public class Car extends CollidingGameObject implements MainCharacter {
     private void respawn() {
         speedInPixel = 0;
         if (lastTrackTile != null) {
-            ArrayList<Integer> possibleSpawnRotations = lastTrackTile.getMapTileImage().getPossibleRotations();
-            carRotation = findClosestRotation(lastCarRotationOnTrack, possibleSpawnRotations);
+            rotateCarToLastTrackTile();
+            placeCarOnLastTrackTile();
+        }
+        resetTimeAndState();
+    }
 
-            double lastTrackTileWorldX = lastTrackTile.getPosition().getX();
-            double lastTrackTileWorldY = lastTrackTile.getPosition().getY();
+    private void rotateCarToLastTrackTile() {
+        ArrayList<Integer> possibleSpawnRotations = lastTrackTile.getMapTileImage().getPossibleRotations();
+        carRotation = findClosestRotation(lastCarRotationOnTrack, possibleSpawnRotations);
+    }
 
-            double tileWidthInPixels = GamePlayManager.BLOCK_SIZE * GamePlayManager.MAP_TILE_WIDTH;
-            double tileHeightInPixels = GamePlayManager.BLOCK_SIZE * GamePlayManager.MAP_TILE_HEIGHT;
+    private void placeCarOnLastTrackTile() {
+        double lastTrackTileWorldX = lastTrackTile.getPosition().getX();
+        double lastTrackTileWorldY = lastTrackTile.getPosition().getY();
+        double tileWidthInPixels = GamePlayManager.BLOCK_SIZE * GamePlayManager.MAP_TILE_WIDTH;
+        double tileHeightInPixels = GamePlayManager.BLOCK_SIZE * GamePlayManager.MAP_TILE_HEIGHT;
+        double screenCenterX = GameView.WIDTH / 2.0;
+        double screenCenterY = GameView.HEIGHT / 2.0;
+        double initialCarOffsetX = width / 2.0;
+        double initialCarOffsetY = height / 2.0;
 
-            double screenCenterX = GameView.WIDTH / 2.0;
-            double screenCenterY = GameView.HEIGHT / 2.0;
+        gameView.stopAllSounds();
+        engineAudio.start();
+        engineAudio.turnEngineOn(true);
 
-            double carOffsetX = width / 2.0;
-            double carOffsetY = height / 2.0;
+        Position adjustedOffsets = applyDiagonalOffsets(new Position(initialCarOffsetX, initialCarOffsetY),
+                                                        tileWidthInPixels,
+                                                        tileHeightInPixels);
 
-            gameView.stopAllSounds();
-            engineAudio.start();
-            engineAudio.turnEngineOn(true);
+        double tileOffsetX = screenCenterX - (lastTrackTileWorldX + tileWidthInPixels / 2.0) + adjustedOffsets.getX();
+        double tileOffsetY = screenCenterY - (lastTrackTileWorldY + tileHeightInPixels / 2.0) + adjustedOffsets.getY();
 
-            if (null != lastTrackTile.getMapTileImage()) {
-                switch (lastTrackTile.getMapTileImage()) {
-                    case TRACK_DIAGONAL_SW -> {
-                        carOffsetX += tileWidthInPixels / 4;
-                        carOffsetY -= tileHeightInPixels / 4;
-                    }
-                    case TRACK_DIAGONAL_NE -> {
-                        carOffsetX -= tileWidthInPixels / 4;
-                        carOffsetY += tileHeightInPixels / 4;
-                    }
-                    case TRACK_DIAGONAL_NW -> {
-                        carOffsetX += tileWidthInPixels / 4;
-                        carOffsetY += tileHeightInPixels / 4;
-                    }
-                    case TRACK_DIAGONAL_SE -> {
-                        carOffsetX -= tileWidthInPixels / 4;
-                        carOffsetY -= tileHeightInPixels / 4;
-                    }
-                    default -> {
-                    }
+        gamePlayManager.moveWorldToRight(tileOffsetX);
+        gamePlayManager.moveWorldDown(tileOffsetY);
+    }
+
+    private Position applyDiagonalOffsets(Position carOffsets, double tileWidthInPixels,
+                                          double tileHeightInPixels) {
+        double newCarOffsetX = carOffsets.getX();
+        double newCarOffsetY = carOffsets.getY();
+        if (lastTrackTile.getMapTileImage() != null) {
+            switch (lastTrackTile.getMapTileImage()) {
+                case TRACK_DIAGONAL_SW -> {
+                    newCarOffsetX += tileWidthInPixels / 4;
+                    newCarOffsetY -= tileHeightInPixels / 4;
+                }
+                case TRACK_DIAGONAL_NE -> {
+                    newCarOffsetX -= tileWidthInPixels / 4;
+                    newCarOffsetY += tileHeightInPixels / 4;
+                }
+                case TRACK_DIAGONAL_NW -> {
+                    newCarOffsetX += tileWidthInPixels / 4;
+                    newCarOffsetY += tileHeightInPixels / 4;
+                }
+                case TRACK_DIAGONAL_SE -> {
+                    newCarOffsetX -= tileWidthInPixels / 4;
+                    newCarOffsetY -= tileHeightInPixels / 4;
+                }
+                default -> {
                 }
             }
-
-            double tileOffsetX = screenCenterX - (lastTrackTileWorldX + tileWidthInPixels / 2.0) + carOffsetX;
-            double tileOffsetY = screenCenterY - (lastTrackTileWorldY + tileHeightInPixels / 2.0) + carOffsetY;
-
-            gamePlayManager.moveWorldToRight(tileOffsetX);
-            gamePlayManager.moveWorldDown(tileOffsetY);
         }
+        return new Position(newCarOffsetX, newCarOffsetY);
+    }
+
+    private void resetTimeAndState() {
         lastSteeringTime = 0;
         lastAcceleratingTime = gameView.gameTimeInMilliseconds();
         lastUpdateTime = 0;

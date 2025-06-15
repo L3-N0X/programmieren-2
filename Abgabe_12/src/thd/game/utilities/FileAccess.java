@@ -1,6 +1,7 @@
 package thd.game.utilities;
 
 import thd.game.level.Difficulty;
+import thd.gameobjects.base.PlayerScore;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;

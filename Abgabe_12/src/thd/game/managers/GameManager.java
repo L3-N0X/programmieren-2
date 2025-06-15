@@ -5,7 +5,7 @@ import thd.game.level.Difficulty;
 import thd.game.level.Level;
 import thd.game.utilities.FileAccess;
 import thd.game.utilities.GameView;
-import thd.game.utilities.PlayerScore;
+import thd.gameobjects.base.PlayerScore;
 import thd.screens.GameInfo;
 import thd.screens.Screens;
 
