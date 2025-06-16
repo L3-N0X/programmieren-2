@@ -72,20 +72,19 @@ public class GameManager extends LevelManager {
             if (!overlay.isMessageShown()) {
                 gameView.playSound("complete.wav", false);
                 overlay.showMessage(lapCompletionMessage(getJustCompletedLapNumber()));
+                if (getJustCompletedLapNumber() >= MAX_LAPS) {
+                    car.stopDriving();
+                }
             }
             if (gameView.timer(2000, 0, this)) {
                 overlay.stopShowing();
                 clearLapCompletionFlag();
-                if (endOfGame()) {
-
-                    return;
-                }
             }
         } else if (endOfGame()) {
             gameView.updateBackgroundColor(Color.BLACK);
             if (!overlay.isMessageShown()) {
                 gameView.playSound("gameover.wav", false);
-                overlay.showMessage("GAME OVER");
+                overlay.showMessage("RENNEN BEENDET!");
             }
             if (gameView.timer(2000, 0, this)) {
                 overlay.stopShowing();

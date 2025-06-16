@@ -11,7 +11,9 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URL;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.LockSupport;
 import java.util.stream.Collectors;
 
@@ -791,6 +793,20 @@ public final class GameView {
     }
 
     /**
+     * Mit dieser Methode kann ein Sound (eine .wav-Datei) vorab geladen werden, um die Ladezeit beim Abspielen zu reduzieren. Diese Methode sollte
+     * z.B. beim Wechsel des Levels aufgerufen werden, um Sounds für das nächste Level vorab zu laden.
+     * <p>
+     * Die Sound-Datei muss in einem Verzeichnis "src/resources" liegen. Bitte den Namen der Datei ohne Verzeichnisnamen angeben,
+     * z.B. <code>preloadSound("boom.wav")</code>. Der Dateiname darf nur aus Kleinbuchstaben bestehen.
+     *
+     * @param soundFile Name der Sound-Datei. Die Sound-Datei muss in einem Verzeichnis "src/resources" liegen und
+     *                  auf ".wav" enden. Die Datei wird nur einmal geladen, auch wenn diese Methode mehrfach aufgerufen wird.
+     */
+    public void preloadSound(String soundFile) {
+        sound.createClipPoolIfNeeded(soundFile);
+    }
+
+    /**
      * Spielt einen Sound ab (eine .wav-Datei). Die Sound-Datei muss in einem Verzeichnis "src/resources" liegen. Bitte
      * den Namen der Datei ohne Verzeichnisnamen angeben, z.B. <code>playSound("boom.wav", false)</code>. Der Dateiname
      * darf nur aus Kleinbuchstaben bestehen.
@@ -799,6 +815,9 @@ public final class GameView {
      * den Sound endlos zu wiederholen. Mit der Methode {@link #stopSound(int)} kann ein Sound frühzeitig beendet
      * werden. Mit der Methode {@link #stopAllSounds()} können alle laufenden Sounds beendet werden. Achten Sie auf
      * Groß- und Kleinschreibung beim Soundfile!
+     * <p>
+     *  Beim erstmaligen Aufruf dieser Methode wird der Sound in den Speicher geladen, was einige Zeit in Anspruch nehmen kann.
+     *  Die Ladezeit kann durch die Methode {@link #preloadSound(String)} reduziert werden, die den Sound vorab lädt.
      *
      * @param soundFile Name der Sound-Datei. Die Sound-Datei muss in einem Verzeichnis "src/resources" liegen und auf
      *                  ".wav" enden.
@@ -1316,85 +1335,170 @@ public final class GameView {
         }
     }
 
-    private static class Sound {
-        private final ConcurrentHashMap<Integer, Clip> clips;
-        private final ConcurrentHashMap<String, byte[]> storedSoundBytes;
-        private final ExecutorService executor;
+    private static class ClipPool {
+        private final static int MAX_CLIPS = 64;
+        private final static int MAX_CLIPS_PER_POOL = 8;
+        private final static Random random = new Random();
+        private static int globalClipCount = 0;
+        private final List<Clip> clips;
+        private final byte[] soundData;
+        private final String soundFile;
+        private int clipCount;
 
-        private Sound() {
-            clips = new ConcurrentHashMap<>();
-            storedSoundBytes = new ConcurrentHashMap<>();
-            executor = Executors.newCachedThreadPool();
+        private ClipPool(String soundFile, byte[] soundData) {
+            this.soundFile = soundFile;
+            this.soundData = soundData;
+            this.clips = new ArrayList<>();
+            this.clips.add(createClip());
         }
 
-        private void loadSoundBytes(String soundFile) {
-            storedSoundBytes.computeIfAbsent(soundFile, key -> {
-                try (InputStream stream = GameView.class.getResourceAsStream(Tools.RESOURCE_PREFIX + key)) {
-                    return Objects.requireNonNull(stream).readAllBytes();
-                } catch (IOException e) {
-                    throw new UncheckedIOException("Soundfile \"" + key + "\" konnte nicht gelesen werden!", e);
+        private synchronized Clip getClip() {
+            for (Clip clip : clips) {
+                if (!clip.isRunning()) {
+                    clip.setFramePosition(0);
+                    return clip;
                 }
-            });
+            }
+            if (clipCount < MAX_CLIPS_PER_POOL) {
+                Clip newClip = createClip();
+                clips.add(newClip);
+                return newClip;
+            } else {
+                Clip clip = clips.get(random.nextInt(clips.size()));
+                clip.stop();
+                clip.setFramePosition(0);
+                return clip;
+            }
         }
 
-        private Clip createClipFromBytes(byte[] soundBytes) {
-            try (AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new ByteArrayInputStream(soundBytes))) {
+        private Clip createClip() {
+            try {
                 Clip clip = AudioSystem.getClip();
-                clip.open(audioInputStream);
+                clip.open(AudioSystem.getAudioInputStream(new BufferedInputStream(new ByteArrayInputStream(soundData))));
+                clipCount++;
+                globalClipCount++;
                 return clip;
             } catch (IOException e) {
-                throw new UncheckedIOException("Fehler beim Lesen der Sounddatei", e);
-            } catch (LineUnavailableException | UnsupportedAudioFileException e) {
-                throw new IllegalStateException("Sound kann nicht geladen werden!", e);
+                throw new SoundException(
+                        "Fehler beim Laden der Sound-Datei \"" + soundFile + "\": " + e.getMessage(), e);
+            } catch (LineUnavailableException e) {
+                throw new SoundException("Zu viele offene Sound-Dateien. Bitte entfernen Sie nicht mehr benötigte Sound-Dateien mit unloadSound(String soundFile) aus dem Speicher.");
+            } catch (UnsupportedAudioFileException e) {
+                throw new SoundException(
+                        "Audio-Datei \"" + soundFile + "\" ist nicht im richtigen Format oder beschädigt: "
+                        + e.getMessage(), e);
+            }
+        }
+
+        private synchronized void closeAll() {
+            for (Clip clip : clips) {
+                clip.stop();
+                clip.close();
+            }
+            clips.clear();
+        }
+    }
+
+    private static class SoundException extends RuntimeException {
+
+        public SoundException(String message) {
+            super(message);
+        }
+
+        public SoundException(String message, Throwable cause) {
+            super(message, cause);
+        }
+    }
+
+    private static class Sound {
+        private final Map<String, ClipPool> pools = new ConcurrentHashMap<>();
+        private final Map<Integer, Clip> activeClips = new ConcurrentHashMap<>();
+        private final AtomicInteger nextId = new AtomicInteger(1); // Start bei 1
+
+        private void createClipPoolIfNeeded(String soundFile) {
+            if (!pools.containsKey(soundFile)) {
+                byte[] soundBytes = loadSoundBytes(soundFile);
+                ClipPool clipPool = new ClipPool(soundFile, soundBytes);
+                pools.put(soundFile, clipPool);
+            }
+        }
+
+        private byte[] loadSoundBytes(String soundFile) {
+            try (InputStream stream = GameView.class.getResourceAsStream(Tools.RESOURCE_PREFIX + soundFile)) {
+                return Objects.requireNonNull(stream).readAllBytes();
+            } catch (IOException e) {
+                throw new SoundException("Soundfile \"" + soundFile + "\" konnte nicht gelesen werden!", e);
             }
         }
 
         private int playSound(String soundFile, boolean loop) {
-            loadSoundBytes(soundFile);
-            int id = soundFile.hashCode();
-            executor.submit(() -> {
-                Clip clip = createClipFromBytes(storedSoundBytes.get(soundFile));
-                addLineListener(id, clip);
-                playClip(id, clip, loop);
-            });
-
-            return id;
-        }
-
-        private void addLineListener(int id, Clip clip) {
-            clip.addLineListener(event -> {
-                if (event.getType() == LineEvent.Type.STOP) {
-                    clips.remove(id);
-                    executor.submit(() -> {
-                        clip.flush();
-                        clip.close();
-                    });
+            createClipPoolIfNeeded(soundFile);
+            ClipPool pool = pools.get(soundFile);
+            Clip clip = pool.getClip();
+            checkClipCount();
+            int id = nextId.getAndIncrement();
+            clip.addLineListener(e -> {
+                if (e.getType() == LineEvent.Type.STOP) {
+                    activeClips.remove(id);
                 }
             });
-        }
-
-        private void playClip(int id, Clip clip, boolean loop) {
-            clips.put(id, clip);
+            activeClips.put(id, clip);
             if (loop) {
                 clip.loop(Clip.LOOP_CONTINUOUSLY);
             } else {
                 clip.start();
             }
+            return id;
         }
 
-        private void stopSound(int id) {
-            Clip clip = clips.remove(id);
-            if (clip != null) {
-                clip.stop();
-                executor.submit(() -> {
-                    clip.flush();
-                    clip.close();
-                });
+        private void checkClipCount() {
+            if (ClipPool.globalClipCount > ClipPool.MAX_CLIPS) {
+                for (ClipPool pool : pools.values()) {
+                    if (!hasActiveClip(pool)) {
+                        unload(pool.soundFile);
+                        pools.remove(pool.soundFile);
+                        ClipPool.globalClipCount = 0;
+                    }
+                }
             }
         }
 
-        private void stopAllSounds() {
-            clips.keySet().forEach(this::stopSound);
+        private boolean hasActiveClip(ClipPool pool) {
+            for (Clip clip : pool.clips) {
+                if (activeClips.containsValue(clip)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public void stopSound(int id) {
+            Clip clip = activeClips.remove(id);
+            if (clip != null) {
+                clip.stop();
+            }
+        }
+
+        public void stopAllSounds() {
+            for (int id : activeClips.keySet()) {
+                stopSound(id);
+            }
+        }
+
+        public void unload(String soundFile) {
+            ClipPool pool = pools.remove(soundFile);
+            if (pool == null) {
+                throw new SoundException("Soundfile \"" + soundFile
+                                         + "\" ist nicht geladen und kann deshalb nicht mit "
+                                         + "unloadSound(String soundFile) entfernt werden!");
+            }
+            pool.closeAll();
+        }
+
+        public void unloadAllSounds() {
+            activeClips.clear();
+            pools.values().forEach(ClipPool::closeAll);
+            pools.clear();
         }
     }
 
@@ -1681,7 +1785,7 @@ public final class GameView {
 
         // Beenden
         private void closeGameView() {
-            sound.stopAllSounds();
+            sound.unloadAllSounds();
             mouse.invisibleMouseTimer.stop();
             frame.dispose();
         }
@@ -1739,6 +1843,7 @@ public final class GameView {
                 } while (canvasBufferStrategy.contentsRestored());
                 statistic.paintImageTic();
                 canvasBufferStrategy.show();
+                Toolkit.getDefaultToolkit().sync();
                 statistic.paintImageToc();
             } while (canvasBufferStrategy.contentsLost());
         }
@@ -1871,7 +1976,7 @@ public final class GameView {
     private static class Version {
         private static final int MAJOR = 2;
         private static final int MINOR = 5;
-        private static final int UPDATE = 0;
+        private static final int UPDATE = 2;
 
         private static final String VERSION = MAJOR + "." + MINOR + "." + UPDATE;
 
@@ -2048,7 +2153,6 @@ public final class GameView {
         private long paintImageAverageDuration;
         private long lastStatisticsUpdateTime;
         private boolean showStatistics;
-        private int cyclesCounter;
         private int framesCounter;
         private int invisiblePrintObjects;
 
@@ -2065,9 +2169,7 @@ public final class GameView {
                     return;
                 }
                 // FPS
-                statisticBox.loopsPerSecondValue = cyclesCounter;
                 statisticBox.framesPerSecondValue = framesCounter;
-                cyclesCounter = 0;
                 framesCounter = 0;
 
                 // Average Times
@@ -2124,8 +2226,9 @@ public final class GameView {
     }
 
     private class StatisticBox {
+        private final int criticalFPS;
+        private final int dangerousFPS;
         private int boxYPosition;
-        private int loopsPerSecondValue;
         private int framesPerSecondValue;
         private int gameViewValue;
         private int graphicValue;
@@ -2136,8 +2239,9 @@ public final class GameView {
         private int bufferOverflowValue;
 
         private StatisticBox() {
-            loopsPerSecondValue = GameLoop.FRAMES_PER_SECOND;
             framesPerSecondValue = GameLoop.FRAMES_PER_SECOND;
+            dangerousFPS = (int) (GameLoop.FRAMES_PER_SECOND * 0.9);
+            criticalFPS = (int) (GameLoop.FRAMES_PER_SECOND * 0.8);
             gameViewValue = 1;
             graphicValue = 1;
             gameValue = 1;
@@ -2145,18 +2249,16 @@ public final class GameView {
 
         private void paintStatisticBox() {
             boxYPosition = 5;
-            addBox(new Title("Bildraten"),
-                    new Line("Loops/Sekunde:", loopsPerSecondValue, null, false, 54, 50),
-                    new Line("Bilder/Sekunde:", framesPerSecondValue, null, false, 50, 28));
+            addBox(new Title("Bildrate"), new Line("Bilder/Sekunde:", framesPerSecondValue, null, false, dangerousFPS, criticalFPS));
             addBox(new Title("16 ms pro Bild"),
-                    new Line("GameView:", gameViewValue, "ms", true, 10, 20),
-                    new Line("Fenster:", graphicValue, "ms", true, 15, 20),
+                    new Line("GameView:", gameViewValue, "ms", true, 3, 4),
+                    new Line("Fenster:", graphicValue, "ms", true, 3, 4),
                     new Line("Spiel-Logik:", gameValue, "ms", true, 2, 3));
             addBox(new Title("Spiel-Objekte"),
                     new Line("Sichtbar:", visibleValue, null, true, 200, 300),
                     new Line("Unsichtbar:", invisibleValue, null, true, 100, 200));
             addBox(new Title("Bildpuffer"),
-                    new Line("Größe:", bufferSizeValue, "MB", true, 500, 700),
+                    new Line("Größe:", bufferSizeValue, "MB", true, 750, 900),
                     new Line("Überläufe:", bufferOverflowValue, null, true, 1, 2));
         }
 
@@ -2261,7 +2363,6 @@ public final class GameView {
 
         private void plotCanvas() {
             statistic.gameLogicToc();
-            statistic.cyclesCounter++;
             statistic.updateStatistic();
             swingAdapter.paintImage(canvas.printObjects, canvas.backgroundColor);
             statistic.framesCounter++;

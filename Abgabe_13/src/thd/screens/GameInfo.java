@@ -81,6 +81,10 @@ public class GameInfo {
      * The scroll hint displayed on the best list screen.
      */
     public static final String PAGE_INFO = "<- Seite %d/%d ->";
+
+    /**
+     * The scroll hint displayed on the best list screen, in German.
+     */
     public static final String CHANGE_PAGE_INFO = "Blättern: WASD oder Pfeiltasten";
 
     /**
@@ -92,5 +96,9 @@ public class GameInfo {
             Ihre beste Zeit war:  %s\s
             \s
             Wählen Sie "Neues Spiel", um ein weiteres Rennen zu starten!""";
+
+    /**
+     * The title displayed when the race is finished.
+     */
     public static final String FINISHED_TITLE = "Rennen Beendet!";
 }

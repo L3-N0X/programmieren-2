@@ -166,9 +166,7 @@ public class MapTile extends CollidingGameObject implements ShiftableGameObject,
         if (other instanceof Car) {
             if (mapTileImage == MapBlockImages.MapTileImage.TRACK_START_FINISH) {
                 boolean atFinishLine = gamePlayManager.getSectorTracker().isCarAtFinishLine(this);
-                boolean allSectorsVisited = gamePlayManager.getSectorTracker().allSectorsVisited();
-
-                if (atFinishLine && allSectorsVisited) {
+                if (atFinishLine) {
                     gamePlayManager.roundCompleted();
                 }
             }

@@ -102,13 +102,18 @@ public class GamePlayManager extends WorldShiftManager {
      * Updates the timers after a round is completed. Only processes if all sectors have been visited.
      */
     public void roundCompleted() {
-        boolean allSectorsVisited = sectorTracker.allSectorsVisited();
+        if (!sectorTracker.allSectorsVisited()) {
+            if (sectorTracker.visitedSectorCount() > 2) {
+                overlay.showMessage("You missed some Checkpoints!", 2);
 
-        if (!allSectorsVisited) {
+                lapTimeDisplay.getGuiTimer().reset();
+                lapTimeDisplay.getGuiTimer().start();
+                sectorTracker.resetForNewLap();
+            }
             return;
         }
 
-        lapTimeDisplay.getGuiTimer().pause();
+        pauseLapTimer();
         if (bestTimeDisplay.getGuiTimer().timeDuration() == 0
             || lapTimeDisplay.getGuiTimer().timeDuration() < bestTimeDisplay.getGuiTimer().timeDuration()) {
             bestTimeDisplay.getGuiTimer().updateTimeDuration(lapTimeDisplay.getGuiTimer().timeDuration());
@@ -124,7 +129,7 @@ public class GamePlayManager extends WorldShiftManager {
             lapTimeDisplay.getGuiTimer().start();
             sectorTracker.resetForNewLap();
         } else {
-            lapTimeDisplay.getGuiTimer().pause();
+            pauseLapTimer();
             sectorTracker.resetForNewLap();
         }
     }

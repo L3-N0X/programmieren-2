@@ -1,15 +1,11 @@
 package thd.game.managers;
 
-import java.awt.*;
-import java.awt.event.KeyEvent;
 import thd.game.level.Level;
 import thd.game.utilities.GameView;
 import thd.gameobjects.movable.Car;
-import thd.gameobjects.unmovable.BestTimeDisplay;
-import thd.gameobjects.unmovable.LapCounterDisplay;
-import thd.gameobjects.unmovable.LapTimeDisplay;
-import thd.gameobjects.unmovable.LastTimeDisplay;
-import thd.gameobjects.unmovable.Overlay;
+import thd.gameobjects.unmovable.*;
+
+import java.awt.event.KeyEvent;
 
 class UserControlledGameObjectPool {
     protected final GameView gameView;
@@ -32,10 +28,6 @@ class UserControlledGameObjectPool {
         Integer[] pressedKeys = gameView.keyCodesOfCurrentlyPressedKeys();
         currentlyBreaking = false;
         for (int keyCode : pressedKeys) {
-            if (GameViewManager.debug) {
-                gameView.addTextToCanvas("Taste " + ((char) keyCode) + " gedrückt", 0, 0, 18,
-                        true, Color.WHITE, 0);
-            }
             processKeyCode(keyCode);
         }
 
@@ -67,9 +59,8 @@ class UserControlledGameObjectPool {
     }
 
     /**
-     * Handles key press/release events for single-press actions like level changes.
-     * Uses GameView's typedKeys() method to get proper key press/release events
-     * instead of continuous key polling, ensuring single-press behavior.
+     * Handles key press/release events for single-press actions like level changes. Uses GameView's typedKeys() method
+     * to get proper key press/release events instead of continuous key polling, ensuring single-press behavior.
      */
     private void handleKeyEvents() {
         KeyEvent[] keyEvents = gameView.typedKeys();
@@ -81,8 +72,6 @@ class UserControlledGameObjectPool {
                     cycleToPreviousLevel();
                 } else if (keyEvent.getKeyCode() == KeyEvent.VK_R) {
                     resetCurrentLevel();
-                } else if (keyEvent.getKeyCode() == KeyEvent.VK_F3) {
-                    GameViewManager.debug = !GameViewManager.debug;
                 }
             }
         }

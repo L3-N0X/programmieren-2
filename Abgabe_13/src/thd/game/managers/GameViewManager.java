@@ -11,10 +11,6 @@ import java.awt.*;
 public class GameViewManager {
     private final GameView gameView;
     private final GameManager gameManager;
-    /**
-     * When enabled adds some additional values in the ui & console for debugging.
-     */
-    public static boolean debug = false;
 
     /**
      * Creates a new GameView, does its setup and starts the main game loop.
@@ -33,7 +29,6 @@ public class GameViewManager {
         gameView.updateColorForBlockImage('I', new Color(255, 255, 70));
 
         gameManager = new GameManager(gameView);
-        //gameView.showStatistic(true);
         startGameLoop();
     }
 

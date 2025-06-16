@@ -124,8 +124,17 @@ public class WorldSectorTracker {
      *
      * @return true if all sectors have been visited, false otherwise
      */
-    public boolean allSectorsVisited() {
+    boolean allSectorsVisited() {
         return visitedSectors.size() >= 4;
+    }
+
+    /**
+     * Checks if at least some of the sectors have been visited.
+     *
+     * @return Number of visited sectors
+     */
+    int visitedSectorCount() {
+        return visitedSectors.size();
     }
 
     /**
@@ -157,43 +166,5 @@ public class WorldSectorTracker {
 
         // Use a smaller threshold and check both axes
         return distanceX < FINISH_LINE_THRESHOLD && distanceY < FINISH_LINE_THRESHOLD;
-    }
-
-    /**
-     * Gets the visited sectors for debugging purposes.
-     *
-     * @return A defensive copy of the visited sectors set
-     */
-    public Set<Integer> getVisitedSectors() {
-        return new HashSet<>(visitedSectors);
-    }
-
-    /**
-     * Gets the current sector the car is in for debugging purposes.
-     *
-     * @return The current sector number (1-4), or 0 if not calculated yet
-     */
-    public int currentSector() {
-        if (!worldBoundsCalculated) {
-            return 0;
-        }
-
-        double worldWidth = worldMaxX - worldMinX;
-        double worldHeight = worldMaxY - worldMinY;
-        double sectorWidth = worldWidth / 2.0;
-        double sectorHeight = worldHeight / 2.0;
-
-        boolean inRightHalf = (virtualCarX - worldMinX) > sectorWidth;
-        boolean inBottomHalf = (virtualCarY - worldMinY) > sectorHeight;
-
-        if (!inRightHalf && !inBottomHalf) {
-            return 1; // Top-Left
-        } else if (inRightHalf && !inBottomHalf) {
-            return 2; // Top-Right
-        } else if (!inRightHalf && inBottomHalf) {
-            return 4; // Bottom-Left
-        } else {
-            return 3; // Bottom-Right
-        }
     }
 }

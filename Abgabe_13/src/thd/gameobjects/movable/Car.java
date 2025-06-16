@@ -5,8 +5,6 @@ import thd.game.level.Level;
 import thd.game.level.RoadCondition;
 import thd.game.managers.GameManager;
 import thd.game.managers.GamePlayManager;
-import thd.game.managers.GameViewManager;
-import thd.game.managers.WorldSectorTracker;
 import thd.game.utilities.GameView;
 import thd.gameobjects.base.CollidingGameObject;
 import thd.gameobjects.base.EngineAudioGenerator;
@@ -14,8 +12,10 @@ import thd.gameobjects.base.MainCharacter;
 import thd.gameobjects.base.Position;
 
 import javax.sound.sampled.LineUnavailableException;
-import java.awt.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.LinkedList;
+import java.util.Map;
 
 /**
  * A car that can be controlled by the player. It can drive, steer, accelerate, and crash. It reacts to collisions with
@@ -97,6 +97,10 @@ public class Car extends CollidingGameObject implements MainCharacter {
     private int lastSteeringTime;
     private int lastAcceleratingTime;
     private int lastUpdateTime;
+
+    // Manual crash timing variables to fix timer bug
+    private int crashStartTime;
+    private int lastAnimationUpdateTime;
 
     private final EngineAudioGenerator engineAudio;
 
@@ -236,16 +240,16 @@ public class Car extends CollidingGameObject implements MainCharacter {
     }
 
     /**
-     * Calculates the distance the car shakes from its current state.
+     * Calculates the distance the hud shakes from its current state.
      *
-     * @return the distance the car shakes from its current state in pixels.
+     * @return the distance the hud shakes from its current state in pixels.
      */
     public double shakeDistanceFromState() {
         return switch (currentState) {
-            case IDLE, ACCELERATING, BREAKING -> 0.0;
             case GRASS -> 0.6 * speedInPixel;
             case WATER -> 0.8 * speedInPixel;
             case CRASHED -> 1 * speedInPixel;
+            default -> 0.0;
         };
     }
 
@@ -405,12 +409,30 @@ public class Car extends CollidingGameObject implements MainCharacter {
                 lastAcceleratingTime = gameView.gameTimeInMilliseconds();
                 blockImage = carRotationTiles[carRotation].blockImage();
             }
+            case STOPPING -> {
+                if (speedInPixel > 0) {
+                    speedInPixel -= carParameters.breakRate * 4 * timeDeltaInSeconds(lastUpdateTime);
+                    if (speedInPixel <= 0.1) {
+                        speedInPixel = 0;
+                        currentState = State.IDLE;
+                    }
+                } else {
+                    currentState = State.IDLE;
+                }
+                blockImage = carRotationTiles[carRotation].blockImage();
+            }
             case CRASHED -> {
-                if (gameView.timer(200, 0, this)) {
+                int currentTime = gameView.gameTimeInMilliseconds();
+
+                // Animation timer - update every 200ms
+                if (currentTime >= lastAnimationUpdateTime + 200) {
                     blockImage = currentCrashState.blockImage();
                     switchToNextCrashState();
+                    lastAnimationUpdateTime = currentTime;
                 }
-                if (gameView.timer(5000, 0, this)) {
+
+                // Respawn timer - wait 5000ms total
+                if (currentTime >= crashStartTime + 5000) {
                     gamePlayManager.destroyGameObject(driver);
                     respawn();
                 }
@@ -446,6 +468,18 @@ public class Car extends CollidingGameObject implements MainCharacter {
         }
     }
 
+    @Override
+    public void stopDriving() {
+        if (currentState == State.CRASHED || currentState == State.IDLE) {
+            return;
+        }
+        if (speedInPixel > 0) {
+            currentState = State.STOPPING;
+        } else {
+            currentState = State.IDLE;
+        }
+    }
+
     /**
      * Sets the current state to crashed and stops the car.
      */
@@ -454,6 +488,11 @@ public class Car extends CollidingGameObject implements MainCharacter {
             return;
         }
         currentState = State.CRASHED;
+
+        // Initialize manual timers
+        crashStartTime = gameView.gameTimeInMilliseconds();
+        lastAnimationUpdateTime = crashStartTime;
+
         gameView.playSound("crash.wav", false);
         engineAudio.turnEngineOn(false);
 
@@ -501,6 +540,10 @@ public class Car extends CollidingGameObject implements MainCharacter {
         lastSteeringTime = 0;
         lastAcceleratingTime = gameView.gameTimeInMilliseconds();
         currentState = State.IDLE;
+
+        // Reset crash timers
+        crashStartTime = 0;
+        lastAnimationUpdateTime = 0;
 
         lastUpdateTime = 0;
         engineAudio.start();
@@ -612,34 +655,6 @@ public class Car extends CollidingGameObject implements MainCharacter {
         String translatedBlockImage = GameManager.translateBlockImageForLevel(
                 blockImage, gamePlayManager.currentLevel());
         gameView.addBlockImageToCanvas(translatedBlockImage, position.getX(), position.getY(), size, 0);
-        if (GameViewManager.debug) {
-            gameView.addTextToCanvas(
-                    "Speed: " + Math.round(speedInPixel * 100) / 100.0 + " Rotation: " + Math.toDegrees(rotation), 5,
-                    30, 14,
-                    true, Color.BLACK,
-                    0);
-            gameView.addTextToCanvas(
-                    "DriftAngle: " + Math.round(Math.toDegrees(driftAngle) * 100) / 100.0, 5,
-                    45, 14, true, Color.BLACK, 0);
-            gameView.addTextToCanvas(
-                    "DriftFactor: " + Math.round(driftFactor * 100) / 100.0, 5,
-                    80, 14, true, Color.BLACK, 0);
-            double currentEffectiveAngleRad = normalizeAngle(rotation + (driftAngle * driftFactor));
-            gameView.addTextToCanvas(
-                    "EffectiveAngle: " + Math.round(Math.toDegrees(currentEffectiveAngleRad) * 100) / 100.0,
-                    5, 95, 14, true, Color.BLACK, 0);
-            if (lastTrackTile != null) {
-                gameView.addTextToCanvas(lastTrackTile.getPosition().toString(), 5, 60, 14, true, Color.BLACK, 0);
-            }
-
-            WorldSectorTracker sectorTracker = gamePlayManager.getSectorTracker();
-            Set<Integer> visitedSectors = sectorTracker.getVisitedSectors();
-            int currentSector = sectorTracker.currentSector();
-
-            gameView.addTextToCanvas(
-                    "Sectors - Visited: " + visitedSectors + " Current: " + currentSector, 5,
-                    110, 14, true, Color.BLACK, 0);
-        }
     }
 
     @Override
@@ -648,6 +663,6 @@ public class Car extends CollidingGameObject implements MainCharacter {
     }
 
     private enum State {
-        IDLE, ACCELERATING, BREAKING, CRASHED, GRASS, WATER
+        IDLE, ACCELERATING, BREAKING, CRASHED, GRASS, WATER, STOPPING
     }
 }

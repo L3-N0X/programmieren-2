@@ -18,6 +18,8 @@ class LevelManager extends GameWorldManager {
         super.initializeLevel();
         initializeGameObjects();
         lapTimeDisplay.getGuiTimer().reset();
+        lastTimeDisplay.getGuiTimer().reset();
+        bestTimeDisplay.getGuiTimer().reset();
     }
 
     /**

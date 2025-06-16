@@ -47,6 +47,9 @@ public enum ColorPalette {
             new Color(238, 123, 149),
             new Color(255, 255, 70)),
 
+    /**
+     * Color palette for autumn-themed levels.
+     */
     AUTUMN(
             new Color(44, 61, 236),
             new Color(129, 157, 72),
