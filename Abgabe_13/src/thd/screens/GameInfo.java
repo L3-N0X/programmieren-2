@@ -30,7 +30,7 @@ public class GameInfo {
     /**
      * The message displayed when the player.
      */
-    public static final String ENTER_NAME_MESSAGE = "Rennen erfolgreich beendet!\n" + "Bitte geben Sie Ihren Namen ein, um Ihre Zeit zu speichern:";
+    public static final String ENTER_NAME_MESSAGE = "Bitte geben Sie Ihren Namen ein, um Ihre Zeit zu speichern:";
 
     /**
      * The Easy button text.
@@ -80,14 +80,17 @@ public class GameInfo {
     /**
      * The scroll hint displayed on the best list screen.
      */
-    public static final String CHANGE_PAGE_INFO = "Seite %d/%d - Nutze W/S oder Pfeiltasten um zu blättern";
+    public static final String PAGE_INFO = "<- Seite %d/%d ->";
+    public static final String CHANGE_PAGE_INFO = "Blättern: WASD oder Pfeiltasten";
 
     /**
      * The message displayed on the end screen.
      */
     public static final String END_SCREEN_MESSAGE = """
-            Rennen auf %s erfolgreich beendet!\s
-            Ihre beste Zeit: %s\s
+            Sie haben das Rennen auf %s erfolgreich abgeschlossen!\s
+            \s
+            Ihre beste Zeit war:  %s\s
             \s
             Wählen Sie "Neues Spiel", um ein weiteres Rennen zu starten!""";
+    public static final String FINISHED_TITLE = "Rennen Beendet!";
 }

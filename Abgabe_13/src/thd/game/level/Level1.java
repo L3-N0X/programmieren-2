@@ -1,41 +1,26 @@
 package thd.game.level;
 
 /**
- * The first level.
+ * The training level.
  */
 public class Level1 extends Level {
     /**
-     * Creates the first level and sets all variables.
+     * Creates the level and sets all variables.
      */
     public Level1() {
-        name = "GRASSY ROAD";
+        name = "TRAINING MAP";
         number = 1;
         world = """
-                RRRRRRRRRRRRRRRRDRUuRRPUurVvRRRR
-                RRRQRRRRRRRRRRRQ|QRUuqRrUMvrRRRR
-                RqVmuHRQPHRRRRRR|RRRUuRRRRPRRRRR
-                PVvhUA-S-buPRRRr|RRhrUurRRRRRRRR
-                QDRRRRHRRQUuQRRR|RVmuRUuhRRRRRRR
-                R|qRRRPVmuhUuhRq|QDRdRRUurPRQrPR
-                R|RRRhVvRUuRWrRR|R|R|rRQUA-N-buR
-                q|HRqVvPRqUMvHRR|H|h|RRRRrRqRRWr
-                QCPRHwqRRHHPrRRq|R|R|HRRRRRRRVvR
-                RUuRRUuhVmuPRRRr|h|h|RRRRRRrVvQR
-                RHWQRRUMvPdRRRRR|R|H|QRRRRRRwPRR
-                RVvRRqhHRh|rRRRQ|Q|R|RRRRRRPUurR
-                PwRRQVmurR|qRRRR|R|H|HRRRRRRqUuR
-                RUuRVvRWRq|HRRRrCHch|RRRRRRRRRdR
-                RqUMvRVvQR|rRRRHUMvRcrRRRqRRRQ|r
-                RRHrRVvrRR|qRRRRqQRVvRRhVmuHRR|R
-                RRRRVvRRRH|PRRRRRhVvHRqVvRUuRP|R
-                RRPVvqRRRr|qRRRRPVvrRrVvrRHWRQ|r
-                RRrwRRRRRRCqRqRrVvPRHVvhRqVvHq|R
-                RRqUuqRRRRUA--NavRRrVvRRRVvRRR|P
-                RRRQUuHRRRrhRRrRRRqVvRRrVvHRRr|Q
-                RRRRPUuPrRPqRQRRRrVvHRRVvhRRRRcR
-                RRRRRrUA-N---N---avRRPVvRRRRRVvR
-                RRRRRRHQRRrRPqRrRHPRRRwrRRRrVvQR
-                RRRRRRRRRRRRRRRHVmuQRhUuhRRVvRRR
+                rRPRrHqrrPrRRPUuhcRr
+                rRrRrrRRRrrVmurUMvRR
+                VB-S--burRrDqdHRRhqR
+                DrqRrRRUuRP|r|RRrrrR
+                |RqRrRrRUuRcR|qRhPrq
+                |rrRRVmuRUMvQ|PrQrHQ
+                CRhRVvHWRRrrQCRrRqPR
+                UA-avrVvRrQqRUA-buqR
+                rrRrRRwPhrRrQHRqRdRr
+                qrqRHrUA---N-burR|hR
                 """;
         super.calculateOffsetsFromWorldString();
         roadCondition = RoadCondition.DRY;

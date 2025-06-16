@@ -23,7 +23,8 @@ public class GameManager extends LevelManager {
             {'J', 'K', 'l', 'M', 'N', 'O'}, // Level 2
             {'P', 'Q', 'R', 'S', 'T', 'U'}, // Level 3
             {'V', 'q', 'X', 'Y', 'Z', 'a'}, // Level 4
-            {'b', 'c', 'd', 'e', 'f', 'g'} // Level 5
+            {'b', 'c', 'd', 'e', 'f', 'g'}, // Level 5
+            {'h', 'i', 'j', 'k', 'l', 'm'}  // Level 6
     };
 
     GameManager(GameView gameView) throws LineUnavailableException {

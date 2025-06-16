@@ -12,13 +12,13 @@ public class Level2 extends Level {
         number = 2;
         world = """
                 RRRQRRrRRqRHrqhHQrRRGRGRRR
-                RhVBS---------N-------buRR
-                RqDPRhHrRRPRqQrRrRhqhRRdRR
-                RQ|qQRRRRRRRRRRRRRqrRRh|RR
+                RhVBS----buRhRVB---N--buRR
+                RqDPRhHrRRUuRVvQrRhqhRRdRR
+                RQ|qQRRRRRRUMvRRRRqrRRh|RR
                 Rh|rRQRRRRQRRRRRRRRRRRR|HR
-                RHCRrPrRGGRPQRRqRrRrQRrcrR
-                RrUA------N------N----avrR
-                RQrRRrRqQhHrrRqQhHrHrRqQRR
+                RHCRrPrVB-N-buGGRrRrQRrcrR
+                RrUA--avhrRqQUuHrPVB--avrR
+                RQrRRrRqQhHrrRUANavrHrRqRR
                 """;
         super.calculateOffsetsFromWorldString();
         roadCondition = RoadCondition.DRY;

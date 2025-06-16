@@ -45,7 +45,16 @@ public enum ColorPalette {
             new Color(255, 90, 60),
             new Color(218, 210, 179),
             new Color(238, 123, 149),
-            new Color(255, 255, 70));
+            new Color(255, 255, 70)),
+
+    AUTUMN(
+            new Color(44, 61, 236),
+            new Color(129, 157, 72),
+            new Color(220, 76, 24),
+            new Color(215, 187, 151),
+            new Color(238, 123, 149),
+            new Color(255, 255, 70)
+    );
 
     private final Color[] colors;
 

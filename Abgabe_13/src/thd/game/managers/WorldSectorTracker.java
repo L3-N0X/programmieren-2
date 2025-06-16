@@ -11,7 +11,7 @@ import java.util.Set;
  * sectors and requires the car to visit all sectors before allowing lap completion.
  */
 public class WorldSectorTracker {
-    private static final double FINISH_LINE_THRESHOLD = 100.0; // Distance threshold for finish line detection
+    private static final double FINISH_LINE_THRESHOLD = 150.0; // Distance threshold for finish line detection
 
     private final Set<Integer> visitedSectors;
     private double worldMinX;

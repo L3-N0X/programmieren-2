@@ -1,7 +1,7 @@
 package thd.game.level;
 
 /**
- * The third level.
+ * The third level. Has many curves.
  */
 public class Level3 extends Level {
     /**
@@ -41,6 +41,6 @@ public class Level3 extends Level {
         super.calculateOffsetsFromWorldString();
         roadCondition = RoadCondition.DRY;
 
-        colorPalette = ColorPalette.DEFAULT;
+        colorPalette = ColorPalette.AUTUMN;
     }
 }

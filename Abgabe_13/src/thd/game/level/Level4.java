@@ -1,14 +1,14 @@
 package thd.game.level;
 
 /**
- * The first level.
+ * The first real level.
  */
 public class Level4 extends Level {
     /**
      * Creates the first level and sets all variables.
      */
     public Level4() {
-        name = "GRASSY ROAD - WET";
+        name = "GRASSY ROAD";
         number = 4;
         world = """
                 RRRRRRRRRRRRRRRRDRUuRRPUurVvRRRR
@@ -38,8 +38,7 @@ public class Level4 extends Level {
                 RRRRRRRRRRRRRRRHVmuQRhUuhRRVvRRR
                 """;
         super.calculateOffsetsFromWorldString();
-        roadCondition = RoadCondition.WET;
-
-        colorPalette = ColorPalette.WET;
+        roadCondition = RoadCondition.DRY;
+        colorPalette = ColorPalette.DEFAULT;
     }
 }

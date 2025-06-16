@@ -1,15 +1,15 @@
 package thd.game.level;
 
 /**
- * The fourth level. Has wet roads.
+ * The fifth level. Has icy roads.
  */
-public class Level5 extends Level {
+public class Level6 extends Level {
     /**
      * Creates the level and sets all variables.
      */
-    public Level5() {
-        name = "GRASSY ROAD - WET";
-        number = 5;
+    public Level6() {
+        name = "GRASSY ROAD - ICY";
+        number = 6;
         world = """
                 RRRRRRRRRRRRRRRRDRUuRRPUurVvRRRR
                 RRRQRRRRRRRRRRRQ|QRUuqRrUMvrRRRR
@@ -38,8 +38,7 @@ public class Level5 extends Level {
                 RRRRRRRRRRRRRRRHVmuQRhUuhRRVvRRR
                 """;
         super.calculateOffsetsFromWorldString();
-        roadCondition = RoadCondition.WET;
-
-        colorPalette = ColorPalette.WET;
+        roadCondition = RoadCondition.ICY;
+        colorPalette = ColorPalette.ICY;
     }
 }

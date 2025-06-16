@@ -166,11 +166,17 @@ public class Screens {
         private void printEndScreen() {
             while (!screenClosed) {
                 checkUserInput();
+                addTitle();
                 addMessage();
                 addSimpleBoxes();
                 gameView.plotCanvas();
             }
             gameView.useMouse(useMouseBackup);
+        }
+
+        private void addTitle() {
+            gameView.addTextToCanvas(GameInfo.FINISHED_TITLE, GameView.WIDTH / 2d - 480, 50, 60, true, Color.GREEN, 0,
+                                     "kongtext.ttf");
         }
 
         private void addMessage() {
@@ -196,7 +202,7 @@ public class Screens {
             this.playerName = new StringBuilder();
 
             int boxHeight = 40;
-            int boxWidth = 150;
+            int boxWidth = 200;
             int x = (GameView.WIDTH - 2 * boxWidth - gap) / 2;
             int y = GameView.HEIGHT - boxHeight - gap;
             ArrayList<SimpleBox> simpleBoxes = new ArrayList<>();
@@ -208,6 +214,7 @@ public class Screens {
         private void startInputLoop() {
             while (!screenClosed) {
                 checkUserInput();
+                addTitle();
                 addMessage();
                 addNameInput();
                 addSimpleBoxes();
@@ -245,18 +252,23 @@ public class Screens {
             }
         }
 
+        private void addTitle() {
+            gameView.addTextToCanvas(GameInfo.FINISHED_TITLE, GameView.WIDTH / 2d - 480, 50, 60, true, Color.GREEN, 0,
+                                     "kongtext.ttf");
+        }
+
         private void addMessage() {
             Dimension textBounds = calculateTextBounds(message);
             double x = gap + (GameView.WIDTH - (textBounds.width * fontSize * 0.65)) / 2d;
-            double y = gap + 50;
+            double y = gap + 250;
             gameView.addTextToCanvas(message, x, y, fontSize, false, Color.WHITE, 0, "droidsansmono.ttf");
         }
 
         private void addNameInput() {
             String displayName = playerName.toString() + "_";
             gameView.addTextToCanvas("Name: " + displayName,
-                                     GameView.WIDTH / 2d - 100,
-                                     GameView.HEIGHT / 2d - 50,
+                                     GameView.WIDTH / 2d - 180,
+                                     GameView.HEIGHT / 2d + 50,
                                      32, true, Color.YELLOW, 0, "droidsansmono.ttf");
         }
 
@@ -285,7 +297,7 @@ public class Screens {
             Collections.sort(scores);
 
             int boxHeight = 40;
-            int boxWidth = 150;
+            int boxWidth = 200;
             int x = (GameView.WIDTH - boxWidth) / 2;
             int y = GameView.HEIGHT - boxHeight - gap;
             ArrayList<SimpleBox> simpleBoxes = new ArrayList<>();
@@ -308,10 +320,12 @@ public class Screens {
         @Override
         protected void checkUserInput() {
             for (KeyEvent keyEvent : gameView.typedKeys()) {
-                if ((keyEvent.getKeyCode() == KeyEvent.VK_W || keyEvent.getKeyCode() == KeyEvent.VK_UP)
+                if ((keyEvent.getKeyCode() == KeyEvent.VK_W || keyEvent.getKeyCode() == KeyEvent.VK_A || keyEvent.getKeyCode() == KeyEvent.VK_UP ||
+                     keyEvent.getKeyCode() == KeyEvent.VK_PAGE_UP || keyEvent.getKeyCode() == KeyEvent.VK_LEFT)
                     && currentPage > 0) {
                     currentPage--;
-                } else if ((keyEvent.getKeyCode() == KeyEvent.VK_S || keyEvent.getKeyCode() == KeyEvent.VK_DOWN)
+                } else if ((keyEvent.getKeyCode() == KeyEvent.VK_S || keyEvent.getKeyCode() == KeyEvent.VK_D || keyEvent.getKeyCode() == KeyEvent.VK_DOWN ||
+                            keyEvent.getKeyCode() == KeyEvent.VK_RIGHT || keyEvent.getKeyCode() == KeyEvent.VK_PAGE_DOWN)
                            && (currentPage + 1) * SCORES_PER_PAGE < scores.size()) {
                     currentPage++;
                 } else if (keyEvent.getKeyCode() == KeyEvent.VK_ESCAPE || keyEvent.getKeyCode() == KeyEvent.VK_ENTER) {
@@ -347,7 +361,7 @@ public class Screens {
 
             for (int i = startIndex; i < endIndex; i++) {
                 String line = formatLine(i);
-                gameView.addTextToCanvas(line, 50, 150 + (i - startIndex) * 30, 18, false, Color.WHITE, 0,
+                gameView.addTextToCanvas(line, 175, 200 + (i - startIndex) * 30, 18, false, Color.WHITE, 0,
                                          "droidsansmono.ttf");
             }
         }
@@ -376,10 +390,13 @@ public class Screens {
         private void addPageInfo() {
             if (scores.size() > SCORES_PER_PAGE) {
                 int totalPages = (scores.size() + SCORES_PER_PAGE - 1) / SCORES_PER_PAGE;
-                String pageInfo = String.format(GameInfo.CHANGE_PAGE_INFO,
+                String pageInfo = String.format(GameInfo.PAGE_INFO,
                                                 currentPage + 1,
                                                 totalPages);
-                gameView.addTextToCanvas(pageInfo, GameView.WIDTH / 2d - 150, GameView.HEIGHT - 100, 16, false,
+                gameView.addTextToCanvas(pageInfo, GameView.WIDTH / 2d - 100, GameView.HEIGHT - 180, 20, false,
+                                         Color.GRAY, 0, "droidsansmono.ttf");
+                gameView.addTextToCanvas(GameInfo.CHANGE_PAGE_INFO, GameView.WIDTH / 2d - 150, GameView.HEIGHT - 120,
+                                         15, false,
                                          Color.GRAY, 0, "droidsansmono.ttf");
             }
         }
